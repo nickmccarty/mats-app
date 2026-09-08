@@ -1,0 +1,99 @@
+<meta charset="utf-8">
+<title>Chain-of-Thought Faithfulness With Ground Truth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- GitHub Pages serves this repository's root. The site itself lives in site/, because this
+     repo is a handover bundle first and a website second -- the report, the data and the
+     verification notebook are the point, and the pages are one way of reading them.
+
+     So the root is a landing card rather than a redirect. A bare redirect would drop a reader
+     straight into the site with no idea that the raw readout, the trajectories and a notebook
+     that re-derives every number are sitting one directory over. -->
+<style>
+  :root {
+    --bg:#F7F7F5; --surface:#FFFFFF; --ink:#1C1F24; --muted:#5E6672; --faint:#8A9099;
+    --rule:#E2E2DD; --accent:#9A5B1E;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#16181C; --surface:#1D2025; --ink:#E6E6E3; --muted:#A2A8B2; --faint:#7B818B;
+    --rule:#2E3238; --accent:#D89A5B;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+         line-height:1.62; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:52rem; margin:0 auto; padding:clamp(2rem,6vw,4.5rem) clamp(1rem,4vw,2rem) 4rem; }
+  .eyebrow { font-family:var(--mono); font-size:.7rem; letter-spacing:.16em;
+             text-transform:uppercase; color:var(--accent); margin-bottom:1rem; }
+  h1 { font-family:var(--serif); font-size:clamp(1.8rem,5.5vw,2.9rem); line-height:1.1;
+       margin:0 0 .8rem; font-weight:600; text-wrap:balance; }
+  .lede { font-size:clamp(1rem,2.4vw,1.15rem); color:var(--muted); max-width:44ch; }
+  .result { border:1px solid var(--rule); border-radius:10px; background:var(--surface);
+            padding:1.1rem 1.3rem; margin:2rem 0; }
+  table { border-collapse:collapse; width:100%; font-size:.88rem; }
+  th,td { text-align:left; padding:.45rem .6rem; border-bottom:1px solid var(--rule); }
+  th { font-size:.68rem; text-transform:uppercase; letter-spacing:.07em; color:var(--faint); }
+  td.n { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  tr:last-child td { border-bottom:0; }
+  .cards { display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule);
+           border-radius:10px; overflow:hidden; margin:2rem 0;
+           grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr)); }
+  .card { background:var(--surface); padding:1rem 1.1rem; text-decoration:none; color:inherit;
+          display:block; }
+  .card:hover { background:var(--bg); }
+  .card b { display:block; font-size:.95rem; margin-bottom:.25rem; }
+  .card span { display:block; font-size:.8rem; color:var(--muted); line-height:1.45; }
+  .note { font-size:.85rem; color:var(--muted); border-left:3px solid var(--rule);
+          padding:.2rem 0 .2rem 1rem; margin:2rem 0; }
+  code { font-family:var(--mono); font-size:.85em; }
+  footer { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--rule);
+           font-family:var(--mono); font-size:.72rem; color:var(--faint); }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Working draft &middot; not for redistribution</div>
+  <h1>Chain-of-thought faithfulness,<br>with an answer key</h1>
+  <p class="lede">504 agent trajectories localising real vulnerabilities at the commit before the
+  fix — so every claim a model makes can be checked against the commit that fixed it.</p>
+
+  <div class="result">
+    <table>
+      <thead><tr><th>at the token before the file is named</th><th>claims</th><th>found it</th>
+        <th>decoy</th><th>p</th></tr></thead>
+      <tbody>
+        <tr><td><b>ask the model outright</b></td><td class="n">30</td><td class="n"><b>18</b></td>
+          <td class="n">3</td><td class="n"><b>0.0003</b></td></tr>
+        <tr><td>Jacobian lens, same claims</td><td class="n">31</td><td class="n">11</td>
+          <td class="n">5</td><td class="n">0.146</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The information is there and the lens does not read it — a statement about the instrument
+  rather than the model. The comparison is deliberately unfair to the lens: it reads one
+  activation, while the baseline lets the model generate first.</p>
+
+  <div class="cards">
+    <a class="card" href="site/index.html"><b>The write-up &rarr;</b>
+      <span>The harness, the retraction, and the pilot. Includes a ten-slide deck and a 49-second
+      clip of one case end to end.</span></a>
+    <a class="card" href="report/ctarp-faithfulness.pdf"><b>The report, PDF &rarr;</b>
+      <span>10pp, typeset, with all five figures.</span></a>
+    <a class="card" href="verify/verify_findings.ipynb"><b>Check the numbers &rarr;</b>
+      <span>A notebook that re-derives every figure from the raw files. No GPU, no model, about
+      two seconds. Currently 35 of 35.</span></a>
+    <a class="card" href="site/traces/trajectory.html"><b>Read the trajectories &rarr;</b>
+      <span>All 32 runs behind the claims, searchable, with their tool calls and reasoning.</span></a>
+  </div>
+
+  <p class="note">Three corrections made during this work are reported with <em>both</em> the
+  original and the corrected value, because each one changed a conclusion: mention versus claim,
+  any-token versus distinctive-token scoring, and a &ldquo;before the sentence&rdquo; cut that was
+  byte-identical to the mid-sentence cut for a minority of claims.</p>
+
+  <footer>
+    Nicholas McCarty &middot; Upskilled Consulting &middot;
+    <a href="https://github.com/nickmccarty/mats-app">source and data on GitHub</a>
+  </footer>
+</div>

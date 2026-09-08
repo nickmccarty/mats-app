@@ -125,12 +125,84 @@ repositories do not include it.
 
 ## Reproducing
 
+Three things can be reproduced, in increasing order of cost. Only the second needs a GPU.
+
+### 1. Check every number — no GPU, no model, ~2 seconds
+
+```
+# upload to Colab (or run locally with python >= 3.10):
+#   verify/verify_findings.ipynb
+#   verify/reloc_cases.json          verify/reloc_results.json
+#   verify/reloc_cases_75.json       verify/reloc_rows_75.jsonl
+#   verify/ask_baseline_75.json      verify/gold_pilot.json
+# then: Run all
+```
+
+Each cell recomputes a figure from the raw files and prints it beside the claimed value with
+PASS/FAIL. It currently reports **35 of 35**. Where a number was corrected during the work, both
+the original and the corrected value are computed, so a correction is visible as arithmetic rather
+than asserted in prose.
+
+This is the honest entry point: it checks the arithmetic without trusting the pipeline that
+produced it.
+
+### 2. Re-run the lens — Colab A100, ~15 min weights + ~90 min probe
+
 ```
 colab new -s reloc --gpu A100
 colab install -s reloc "git+https://github.com/anthropics/jacobian-lens.git" accelerate
-colab upload -s reloc data/reloc_cases.json /content/reloc_cases.json
-# then run notebooks/jlens_reloc_replication.ipynb, or the detached CLI path in code/colab/
+colab upload -s reloc data/reloc_cases.json      /content/reloc_cases.json
+colab upload -s reloc code/jlens_reloc_probe.py  /content/jlens_reloc_probe.py
+
+# weights first, DETACHED -- 135 GB, and a foreground exec outruns the CLI's read timeout
+colab exec -s reloc -f code/colab/colab_prefetch.py
+colab exec -s reloc -f code/colab/colab_prefetch_status.py     # until PREFETCH DONE
+
+# then the probe, also detached
+colab exec -s reloc -f code/colab/colab_run_probe.py
+colab exec -s reloc -f code/colab/colab_probe_status.py        # poll
+
+# PULL ROWS AS THEY LAND -- do not wait for the end
+MSYS_NO_PATHCONV=1 colab download -s reloc /content/reloc_rows.jsonl reloc_rows.jsonl
+
+colab stop -s reloc
+python code/score_reloc8.py
 ```
 
-The model is `Qwen/Qwen3.6-35B-A3B` (~67 GB bf16, offloads to system RAM on a 40 GB A100); the lens
-is `camilablank/workspace-lenses`. Two independent runs produced identical per-case counts.
+Model `Qwen/Qwen3.6-35B-A3B` (~67 GB bf16; offloads to system RAM on a 40 GB A100), lens
+`camilablank/workspace-lenses`. 75 cases × 2 cut points × 2 lenses = 150 readouts.
+
+**Five things that cost runs here. Each one failed silently.**
+
+| trap | what it looks like | what to do |
+|---|---|---|
+| Colab prunes long sessions | run vanishes mid-probe; `colab stop` says "not found" | the probe appends each readout to `/content/reloc_rows.jsonl` and fsyncs, so pull that file every few minutes — a prune then costs only the tail |
+| `colab exec` is a blocking HTTP call on one shared kernel | `ConnectionError` from the CLI's own transport, which reads like a network fault | detach anything slow (`colab_prefetch.py`, `colab_run_probe.py`) and poll with a tiny status script |
+| Git Bash rewrites POSIX paths | `Download failed: C:/Program Files/Git/content/...` | `MSYS_NO_PATHCONV=1` on every `colab download`, and never redirect its stderr to `/dev/null` |
+| a crashed run leaves the model on the GPU | next load OOMs asking for ~96% of `max_memory` | `free_gpu()` in the probe prints free VRAM and refuses below 34 GiB. Do **not** run `code/colab/colab_restart_kernel.py` — it is disarmed because `os._exit` wedges the CLI session |
+| `jlens.apply` defaults to `max_seq_len=512`, right-truncating | 0 hits for target *and* decoy — reads like a clean null | the probe sets 4096 and `tok.truncation_side = "left"`, and prints the decoded prompt tail for the first cases |
+
+To resume a partial run, set `ONLY = "73,74"` in `code/colab/colab_run_probe.py`. The probe still
+iterates the whole case list and skips, rather than slicing it — slicing would reseed the decoy
+shuffle and re-pair every target, so the new rows would not merge with the old.
+
+### 3. Re-run the prompt baseline — local, no Colab
+
+Needs the 35B served on `:8083` (any OpenAI-compatible endpoint).
+
+```
+python code/ask_baseline.py --n 75 --out ask_baseline_75.json
+```
+
+It replays each case to the same cut, appends *"which file are you about to name? Reply with
+exactly one repository-relative path"*, and scores the reply against the target and the same
+decoy the lens was scored against. `max_tokens` is 2400 because this model reasons before
+answering and a smaller budget returns an empty string — which scores as a miss and would
+manufacture a negative. Empty replies are excluded and counted, not scored as misses.
+
+### What "reproduce" means here
+
+Two independent lens runs over the same cases produced identical per-case counts, so the readout
+is deterministic. The prompt baseline is `temperature=0` but is a generation, so exact
+reproduction is not guaranteed; the claim rests on 30 claims at p = 0.0003, not on any single
+answer.
