@@ -1,0 +1,319 @@
+{
+ "RageAgainstThePixel/setup-steamcmd@ec536b530bd3bd059377d0d0c376c52c6b870de1": {
+  "fix_sha": "3e4e408e73bdd46822f1147b45eeeab050fd1ead",
+  "ghsa": "GHSA-c5qx-p38x-qf5w",
+  "cwe": "CWE-532",
+  "gold_files": [
+   "dist/index.js",
+   "src/logging.ts"
+  ],
+  "gold_ranges": {
+   "dist/index.js": [
+    [
+     36094,
+     36099
+    ],
+    [
+     36104,
+     36110
+    ],
+    [
+     38633,
+     38641
+    ],
+    [
+     38887,
+     38893
+    ],
+    [
+     66014,
+     66020
+    ],
+    [
+     71233,
+     71239
+    ],
+    [
+     71564,
+     71570
+    ],
+    [
+     72241,
+     72249
+    ],
+    [
+     72514,
+     72542
+    ],
+    [
+     76356,
+     76362
+    ],
+    [
+     76776,
+     76785
+    ],
+    [
+     76800,
+     76832
+    ],
+    [
+     77526,
+     77531
+    ],
+    [
+     78677,
+     78685
+    ],
+    [
+     79752,
+     79758
+    ]
+   ],
+   "src/logging.ts": [
+    [
+     11,
+     17
+    ]
+   ]
+  }
+ },
+ "apache/airflow@848e432865da82c86918bac8b466d17dc12cd84c": {
+  "fix_sha": "28abf87bd173cc4cedc57f553118470e5745a968",
+  "ghsa": "GHSA-77rc-x84q-pv4f",
+  "cwe": "CWE-295",
+  "gold_files": [
+   "airflow/contrib/auth/backends/ldap_auth.py",
+   "setup.py"
+  ],
+  "gold_ranges": {
+   "airflow/contrib/auth/backends/ldap_auth.py": [
+    [
+     55,
+     70
+    ]
+   ],
+   "setup.py": [
+    [
+     206,
+     212
+    ]
+   ]
+  }
+ },
+ "buildalon/setup-steamcmd@b1c79e8a57b29f06ed1c736431370e01cf92d50a": {
+  "fix_sha": "c3301963a182b14fd7a5b4991e6ae91ed39e4a5c",
+  "ghsa": "GHSA-mj96-mh85-r574",
+  "cwe": "CWE-532",
+  "gold_files": [
+   "dist/index.js",
+   "src/logging.ts"
+  ],
+  "gold_ranges": {
+   "dist/index.js": [
+    [
+     36094,
+     36099
+    ],
+    [
+     36104,
+     36110
+    ],
+    [
+     38633,
+     38641
+    ],
+    [
+     38887,
+     38893
+    ],
+    [
+     66014,
+     66020
+    ],
+    [
+     71233,
+     71239
+    ],
+    [
+     71564,
+     71570
+    ],
+    [
+     72241,
+     72249
+    ],
+    [
+     72514,
+     72542
+    ],
+    [
+     76356,
+     76362
+    ],
+    [
+     76776,
+     76785
+    ],
+    [
+     76800,
+     76832
+    ],
+    [
+     77526,
+     77531
+    ],
+    [
+     78677,
+     78685
+    ],
+    [
+     79752,
+     79758
+    ]
+   ],
+   "src/logging.ts": [
+    [
+     11,
+     17
+    ]
+   ]
+  }
+ },
+ "dollarshaveclub/shave@1876911e423c00fdda643ef724d956b3d324d5c2": {
+  "fix_sha": "da7371b0531ba14eae48ef1bb1456a3de4cfa954",
+  "ghsa": "GHSA-gh4g-3gm9-5wrq",
+  "cwe": "CWE-79",
+  "gold_files": [
+   "dist/jquery.shave.min.js",
+   "dist/shave.es.js",
+   "dist/shave.js",
+   "dist/shave.min.js",
+   "src/shave.js"
+  ],
+  "gold_ranges": {
+   "dist/jquery.shave.min.js": [
+    [
+     1,
+     1
+    ]
+   ],
+   "dist/shave.es.js": [
+    [
+     1,
+     6
+    ],
+    [
+     61,
+     67
+    ]
+   ],
+   "dist/shave.js": [
+    [
+     1,
+     6
+    ],
+    [
+     67,
+     73
+    ]
+   ],
+   "dist/shave.min.js": [
+    [
+     1,
+     1
+    ]
+   ],
+   "src/shave.js": [
+    [
+     57,
+     63
+    ]
+   ]
+  }
+ },
+ "haxtheweb/haxcms-nodejs@7b0ad1af1b7d44e6c278f71ec01eddc736d041f7": {
+  "fix_sha": "777f9a7ff9675a160496f350d766df1f1f9b9b99",
+  "ghsa": "GHSA-54vw-f4xf-f92j",
+  "cwe": "CWE-1021",
+  "gold_files": [
+   "src/app.js"
+  ],
+  "gold_ranges": {
+   "src/app.js": [
+    [
+     27,
+     32
+    ]
+   ]
+  }
+ },
+ "hiyouga/LLaMA-Factory@1344416378ba3bbc19006bd849bcfdbb508e86fd": {
+  "fix_sha": "2989d39239d2f46e584c1e1180ba46b9768afb2a",
+  "ghsa": "GHSA-f2f7-gj54-6vpv",
+  "cwe": "CWE-502",
+  "gold_files": [
+   "scripts/convert_ckpt/llamafy_baichuan2.py"
+  ],
+  "gold_ranges": {
+   "scripts/convert_ckpt/llamafy_baichuan2.py": [
+    [
+     32,
+     38
+    ]
+   ]
+  }
+ },
+ "npm/fstream@1e4527ffe8688d4f5325283d7cf2cf2d61f14c6b": {
+  "fix_sha": "6a77d2fa6e1462693cf8e46f930da96ec1b0bb22",
+  "ghsa": "GHSA-xf7w-r453-m56c",
+  "cwe": "CWE-59",
+  "gold_files": [
+   "lib/writer.js"
+  ],
+  "gold_ranges": {
+   "lib/writer.js": [
+    [
+     147,
+     153
+    ]
+   ]
+  }
+ },
+ "pyload/pyload@9e3410ffb01e0fd8920d118d30b629661f31bbdf": {
+  "fix_sha": "f4e2d12416ba2dfac7b036d5c8d6dab5461b9840",
+  "ghsa": "GHSA-x698-5hjm-w2m5",
+  "cwe": "CWE-284",
+  "gold_files": [
+   "src/pyload/webui/app/blueprints/cnl_blueprint.py"
+  ],
+  "gold_ranges": {
+   "src/pyload/webui/app/blueprints/cnl_blueprint.py": [
+    [
+     23,
+     34
+    ]
+   ]
+  }
+ },
+ "run-llama/llama_index@fa1c1325382244a415a57de4de08d0ace25b2a99": {
+  "fix_sha": "702e4340623092fac4cf2fe95eb9465034856da3",
+  "ghsa": "GHSA-m84c-4c34-28gf",
+  "cwe": "CWE-1112",
+  "gold_files": [
+   "llama-index-core/llama_index/core/workflow/context_serializers.py"
+  ],
+  "gold_ranges": {
+   "llama-index-core/llama_index/core/workflow/context_serializers.py": [
+    [
+     64,
+     70
+    ],
+    [
+     73,
+     80
+    ]
+   ]
+  }
+ }
+}

@@ -1,0 +1,395 @@
+# Chain-of-Thought Faithfulness With Ground Truth
+
+**Nicholas McCarty** · Upskilled Consulting
+Working draft — please do not redistribute, post, or cite.
+
+---
+
+
+
+> **Confidential working draft**
+>
+> Circulated for individual review only. **Please do not redistribute, post, or cite.** Findings
+> here are provisional: the pilot rests on ~30 distinct claims and its lens arm is not
+> statistically significant. Two scoring rules were corrected during the work, and both the
+> original and corrected values are reported rather than only the survivor. Numbers may change.
+
+
+## Abstract
+
+Agentic harnesses for vulnerability localisation emit long reasoning traces and then reduce them
+to a ranked list of files, discarding the reasoning. Whether that discarded text contains
+information the structured output does not is a chain-of-thought faithfulness question, and
+unusually it is one with ground truth: each task is a real CVE at the commit before its fix, and
+the fix commit names the true files and lines.
+
+We mine 504 trajectories for *relocations* — statements where a run contradicts the question it
+was given and names a different file — and report that our own headline result does not survive
+de-duplication. Counted per mention, relocations name a true gold file 81.4% of the time,
+apparently beating the 49.8% calibration of three-of-three pass agreement. Counted per distinct
+(task, file) claim, which is the unit the baseline is measured on, precision is 40.5% on 37
+claims, below the baseline. Three tasks contribute over half the population; one is a single
+correct claim restated 55 times.
+
+A separate result is unaffected: 5 of 192 relocations fail to reach the structured output, so the
+information is not lost in the reduction, only weighted.
+
+We then ask whether the relocated file is recoverable *before* the model writes it, at the token
+where nothing on the page points at it yet. Asking the model outright recovers it in 18 of 30
+distinct claims against a decoy floor of 3 (p = 0.0003); a Jacobian lens on the same claims
+recovers 11 of 29 against a floor of 5 (p = 0.15). The information is present and the lens does
+not read it. For trace mining, the unit of analysis determines the headline, and repetition
+within a trace is not independent evidence.
+
+## Why this setting has ground truth
+
+Faithfulness experiments usually cannot check a model's stated target against an objective answer.
+The stated reasoning and the final output are both model artefacts; a third, independent
+statement of what the answer *is* rarely exists.
+
+Vulnerability localisation supplies one. A task is a repository checked out at the parent of a
+known fix commit. The weakness is present at that commit and absent at its child. The fix commit
+is a diff, so it names the files and line ranges that were actually wrong, and it was written by
+the project's own maintainers rather than by an annotator reading model output.
+
+The model is given a symptom, the repository, and nothing else — no path, no CWE identifier, no
+advisory text. It explores with `glob`, `grep` and `read`, then submits files and cites lines. Its
+transcript, its structured output, and the true answer are three independent objects.
+
+This yields a triple per trace: what the model **said**, what it **submitted**, and what was
+**true**. Faithfulness questions that are normally circular become measurable.
+
+The corpus is 594 tasks drawn from real advisories, which produced 1,288 casefiles and 504
+recorded reasoning trajectories.
+
+## Apparatus
+
+Three models with different jobs, on one workstation, with two model-free retrieval stages and a
+mechanical evidence stage that uses no model at all.
+
+| stage | model | job |
+|---|---|---|
+| locate | Antares-1B | ranks candidate files; run k times per task for agreement |
+| plan / judge | Qwen3.6-35B-A3B | selects files to examine, scores |
+| enrich | FastContext-4B | explores inside a chosen file and cites lines |
+| evidence | — | resolves every claim against the real checkout |
+
+Everything is local, so full activations are reachable for the follow-up proposed in §7. Every run
+writes an ATIF trajectory (per-node step records, tool calls, reasoning text) and a casefile (the
+structured output, ranked candidates, cited line ranges).
+
+Locate is run three times per task. The number of passes that name a file calibrates how likely
+it is to be gold: 1 of 3 → 8.0%, 2 of 3 → 22.6%, 3 of 3 → 49.8%, measured on this corpus. That
+calibration is the baseline any mined signal has to beat, and §4 turns on the fact that it is
+measured per distinct file, not per mention.
+
+## Relocations
+
+A **relocation** is a statement in the reasoning where a run contradicts the question it was given
+and names a different file than the one it was sent to examine. It is the simplest case where the
+transcript and the structured output can disagree about a checkable fact.
+
+Most apparent contradictions are not contradictions. Four filters, validated on a held-out sample
+where they removed 33 of 133 raw candidates:
+
+1. **Position within the step.** A claim made mid-reasoning and abandoned before the step ends is
+   not the run's position.
+2. **Supersession.** A claim contradicted by a later claim in the same trace is superseded, not
+   held.
+3. **Real-extension test.** Naming an additional file is an extension, not a contradiction, unless
+   it displaces the original.
+4. **Hedge detection.** "This may live in X instead" is not an assertion that it does.
+
+192 relocations survive across the corpus, covering 37 distinct (task, file) claims.
+
+Those two numbers are the same evidence counted two ways.
+
+## The result, and its retraction
+
+We measured whether a relocation names a true gold file, and compared it against the three-pass
+agreement calibration.
+
+| unit | n | precision | vs. 49.8% baseline |
+|---|---|---|---|
+| per mention | 192 | **81.4%** | above |
+| per distinct (task, file) claim | 37 | **40.5%** | below |
+
+Same data, same filters, opposite conclusions. The per-mention figure was our headline. It is
+wrong, for a reason that is visible once the population is decomposed:
+
+- Three tasks contribute more than half of all mentions.
+- One of them is a single correct claim restated 55 times within one trace.
+
+A model that returns to the same conclusion as it works produces many mentions of one claim. Per
+mention, that reads as fifty-five successes. The baseline it was being compared against is
+measured per distinct file, so the comparison was never like-for-like.
+
+The correct unit is the claim, because the claim is what a downstream consumer would act on: a
+file is either submitted or not, however many times the reasoning mentioned it. On that unit the
+mined signal is **below** the agreement baseline, and does not justify being used as a filter.
+
+This generalises past this harness. Any pipeline that mines assertions from long transcripts can
+count mentions, and mentions are the default unit because they are what a regex returns. The
+inflated number is the one that looks publishable.
+
+## What survived
+
+The extraction is sound, and one finding is unaffected by the counting error because it is a
+question about presence rather than precision:
+
+> Of 192 relocations mined from reasoning, **5** fail to appear in the structured output.
+
+97.4% of what the model states in its reasoning does reach the ranked list. The reduction from
+transcript to structured output is therefore not discarding the model's stated conclusions. This
+is a negative result for the "reasoning is thrown away" hypothesis in this setting.
+
+Whether those conclusions are *weighted* correctly is a separate question. On current evidence we
+do not know, and §4 is the reason we decline to claim otherwise.
+
+## Instrument validation
+
+Claims about a model are only worth their instrument. Two mechanisms carry that weight here.
+
+**Every claim is resolved against the real checkout** on the way into a casefile. A path that does
+not exist at that commit is struck through, scored `p_gold 0.0`, and labelled `fabricated` rather
+than dropped, so the failure stays visible. This fires on 3 of 20 tasks in the current bank —
+fabricated paths are built out of the question's own vocabulary, which makes them the most
+plausible-looking rows in the table.
+
+**Measurements were audited against their own inputs.** Eight were wrong before they were checked.
+Each was found by asking a number what it was made of:
+
+| reported | actual |
+|---|---|
+| Parser read 1,288 / 1,288 casefiles | Candidates found in 437; 831 used a five-column table the positional regex did not match |
+| Enrichment is a no-op across four interventions | A dropped range in aggregation; the intervention was never measured |
+| Model served with reasoning disabled | Three flags asserted it; 107 of 107 streamed tokens were reasoning |
+| Arms differ by enricher | Locate was not replayed, so the arms received different file lists |
+
+The last two are recent. The third is instructive: a server flag named for the desired behaviour,
+accepted without error, that did not produce it — the request-level parameter overrode it. A flag
+named for the thing you want is not evidence the thing happened.
+
+Arms are now run against a replayed locate stage, so the file list is identical across arms and
+the enricher is the only variable.
+
+## Pilot: is the relocated file decodable before it is stated?
+
+The follow-up below is no longer hypothetical. Two methods were put to the same question on
+`qwen3.6-35b`, the model in this corpus that both relocates often (1.10 per trace, four times any
+other) and has a published Jacobian lens.
+
+Each case replays a real trajectory to the moment **before** the model names the relocated file.
+Two cut points test different strengths of claim: `at_path` stops mid-sentence, after ``the
+vulnerability is present in ` ``; `at_sentence` stops before the clause exists at all. Every
+readout is scored a second time against a **decoy** — another case's target, so the filename
+distribution matches and the answer is wrong.
+
+**Only the cut that is genuinely earlier counts.** `prefix_at_sentence` falls back to the whole
+step when a claim has no earlier sentence boundary, and for a minority of claims it is
+byte-identical to `prefix_at_path` — where the model has already written ``present in ` ``.
+Measuring "before the sentence" on those is measuring after it. Every figure below is reported on
+the genuinely-earlier subset, and the difference this makes is large: on the first 30-case export
+it moved the lens from 9/17 (p = 0.109) to 4/12 (p = 0.6875).
+
+### The cheap baseline beats the lens
+
+| genuinely earlier cut | claims | target | decoy | p (McNemar exact) |
+|---|---|---|---|---|
+| **ask the model outright** | 30 | **18** | 3 | **0.0003** |
+| Jacobian lens, any-token scoring | 31 | 11 | 5 | 0.146 |
+| Jacobian lens, distinctive tokens | 31 | 11 | 5 | 0.146 |
+
+The lens row is given under both scoring rules because the obvious objection is that it loses only
+because the permissive rule inflates its decoy. It does not: at this cut the two rules give the
+same 11 of 31 against the same floor of 5. The shared-token contamination is real but lives
+entirely at the later cut, where correcting it drops the decoy from 21 of 31 to 4.
+
+
+> **[ INSERT FIGURE 1 — `report/figures/baseline.png` ]**
+
+*Figure 1. The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unreadable without the floor it has to clear. Scored only on claims whose cut is genuinely earlier than the naming sentence.*
+
+
+Asking is simply appending *"which file are you about to name? Reply with one path"* to the same
+prefix and reading the reply. It recovers the file in 18 of 30 claims against a decoy floor of 3.
+The lens, on the same question and the same corpus, does not separate from its decoy.
+
+**The information is there. The lens does not read it.** That is the pilot's result, and it is a
+statement about the instrument rather than about the model. It also makes the faithfulness
+question well-posed: something at that point in the trajectory determines the file the model is
+about to name, and it is recoverable — so "can a lens recover it?" has a real answer, and for this
+lens the answer is no.
+
+The comparison is deliberately unfair to the lens, in the direction that makes the negative
+safe: the lens reads a single activation, while the baseline lets the model generate — up to
+2,400 tokens, and on these cases it uses them. So the baseline shows the answer is reachable
+*with additional forward computation*, not that it sits in the residual stream. A baseline that
+strong losing would have been decisive for the lens; a baseline that strong winning only bounds
+what the lens failed to find.
+
+
+> **[ INSERT FIGURE 2 — `report/figures/emergence.png` ]**
+
+*Figure 2. Where the relocated file becomes decodable, by layer, on the first 30-case export. At `at_path` the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer, where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This figure describes the later cut, where the model is already mid-sentence; it is not evidence about the earlier cut, where the lens does not beat its decoy.*
+
+
+### What survives about the transport
+
+Against the plain logit lens the Jacobian transport is **never worse on any of the 60 readouts**
+of the first export, carrying 4.2× the layer-hits before the naming sentence and 2.7× after. That
+is a real property of the transport and it is orthogonal to the result above: being a better
+readout than the logit lens does not make it a sufficient one.
+
+
+> **[ INSERT FIGURE 3 — `report/figures/transport.png` ]**
+
+*Figure 3. Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagonal. Per *claim* the two look close at `at_path` — 16 of 17 against 14 of 17 — which is the conservative test and stays the headline.*
+
+
+### The scoring defect the control found
+
+A hit was counted when **any** token of a filename entered the top 20. Two unrelated files sharing
+`.py` therefore scored for the target and the decoy at once.
+
+
+> **[ INSERT FIGURE 4 — `report/figures/shared.png` ]**
+
+*Figure 4. The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts at 0.11 mean layers; sharing one token — always `.py` — on 83% at 8.17. Name *length* was the first hypothesis and the data rejected it: r = 0.183 over 120 observations, and the four-token name outscores the eleven-token one.*
+
+
+Correcting it symmetrically — dropping shared tokens from target and decoy alike — tightened
+`at_path` and left `at_sentence` unchanged. We had expected it to rescue the result; a one-sided
+correction appeared to, and was not licensed.
+
+
+> **[ INSERT FIGURE 5 — `report/figures/control.png` ]**
+
+*Figure 5. Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a two-character token.*
+
+
+### Provenance of the numbers
+
+Two exports and two runs sit behind this section, and they measure different things:
+
+| | cases | claims | cut taken from | raw readout |
+|---|---|---|---|---|
+| first export | 30 | 17 | `message` | complete — top-20 ids at 39 layers |
+| second export | 75 | 34 | `reasoning_content` | complete — 149 readouts, all 75 cases |
+
+The first export only found claims whose path also appeared in the visible message, so its cut
+sat in the wrong text. Its figures are retained above only where they describe the transport or
+the scoring defect — neither of which depends on the cut being early.
+
+The second export reads the field the miner actually found the claim in and is 2.5× larger; it is
+the one the headline table is computed on. Its lens run was pruned by the compute provider at row
+145 of 150, but the probe appends each readout as it is produced rather than writing at the end,
+so the rows survived; the two remaining cases were scored by a short resume run and merged. The
+resume reproduces the seeded decoy pairing exactly, because the probe iterates the whole case list
+and skips rather than slicing it — slicing would reseed the shuffle and re-pair every target.
+
+## Proposed follow-up
+
+The divergence between stated and submitted location is visible in the transcript, after the fact.
+The question this dataset is positioned to ask is whether it is visible **in the activations, and
+before the output is produced**. The pilot above is a first pass at question 1; questions 2 and 3
+are untouched.
+
+Concretely, the corpus supplies per trace a triple — stated location, submitted location, true
+location — with 192 cases where stated and submitted diverge and 5 where a stated location never
+reaches the output at all. The models are 1B–4B and run locally, so residual streams are
+accessible without inference-provider constraints.
+
+Three questions, in increasing order of interest:
+
+1. **Is the submitted answer decodable before it is stated?** Train a linear probe on the residual
+   stream at the token where the model states location A, predicting the file it will eventually
+   submit. If the eventual answer is already linearly decodable, the stated location is not the
+   computation that produced it.
+2. **Do divergent traces look different at the point of divergence?** Compare probe confidence and
+   representational geometry between traces where stated and submitted agree and the 192 where
+   they do not, at matched positions.
+3. **Is the 5-case set — stated but never submitted — mechanistically distinct** from the cases
+   where a stated location is submitted and wrong? One is a suppression story, the other an error
+   story, and they should not look alike.
+
+The value of the setting is that (1) can be scored against an answer key that neither the
+transcript nor the output produced.
+
+## Limitations
+
+- 37 distinct claims is a small denominator. The per-claim precision of 40.5% has a wide interval,
+  and the honest reading is "below baseline, not usefully estimated".
+- Three tasks dominating the mention population means the corpus is not diverse at the trace
+  level, whatever the task count suggests.
+- Relocation is one operationalisation of stated/acted divergence and the narrowest one. It does
+  not capture a run that reasons correctly and submits correctly for a stated reason that is
+  false.
+- The agreement calibration (49.8% at 3 of 3) is measured on this corpus and this specialist. It
+  is a local baseline, not a general one.
+- Gold ranges come from fix-commit hunks with context, so line-level scoring inherits whatever the
+  maintainer included in the diff.
+- The pilot has ~30 distinct claims from 15 repositories. That is enough to establish the
+  baseline result (p = 0.0003) and not enough to distinguish a weak lens effect from none.
+- The lens arm covers all 75 cases. The main run was pruned by the provider at row 145 of 150;
+  the rows survived because the probe appends each readout as it is produced rather than writing
+  at the end, and the two remaining cases were scored by a short resume run and merged. The decoy
+  pairing is identical across both because the probe iterates the full case list and skips rather
+  than slicing it.
+- The baseline lets the model generate up to 2,400 tokens before answering, while the lens reads
+  one activation. The comparison is deliberately unfair in the direction that makes the lens
+  negative safe, and correspondingly weak as evidence that nothing is in the residual stream.
+- Lens scoring counts a hit when any token of a filename enters the top 20, which is permissive.
+  Shared tokens are now removed from target and decoy alike, which fixes the collision the control
+  exposed, but the rule is still "any token at any layer" and a hit is not a rank.
+- The emergence curve is a per-layer *hit rate over claims*, not a confidence trajectory. It says
+  where the token enters a top-20, not how strongly. Layer 38 is the model's own output
+  distribution, so the logit lens arriving there is expected and is not evidence about the
+  transport.
+
+---
+
+# Appendix A — Figures to insert
+
+All five are in `mats-app/report/figures/`. They are captured at 2x and are readable at full
+document width; none of them carry information that is also in the prose, so dropping one loses
+something.
+
+| # | file | what it shows |
+|---|---|---|
+| 1 | `baseline.png` | The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here |
+| 2 | `emergence.png` | Where the relocated file becomes decodable, by layer, on the first 30-case export |
+| 3 | `transport.png` | Jacobian transport against the plain logit lens, per readout, same forward pass |
+| 4 | `shared.png` | The decoy's noise floor, split by whether it shares a token with the target |
+| 5 | `control.png` | Why the decoy is not decoration |
+
+# Appendix B — What is in the handover folder
+
+`mats-app/` (164 files) accompanies this document.
+
+| path | what it is |
+|---|---|
+| `report/ctarp-faithfulness.pdf` | this document, typeset, 10pp |
+| `verify/verify_findings.ipynb` | **re-derives every number below from the raw files.** Colab, no GPU, no model, ~2s. Prints computed against claimed with PASS/FAIL; currently 35 of 35 |
+| `verify/*.json`, `verify/reloc_rows_75.jsonl` | the exact inputs that notebook reads |
+| `data/reloc_rows_75.jsonl` | the lens readout: top-20 token ids at all 39 layers, both lenses, 149 readouts across all 75 cases |
+| `data/ask_baseline_75.json` | the prompt baseline: what the model answered, per case |
+| `data/reloc_cases.json` | the 75 cases — conversation prefix, both cut points, target path |
+| `data/reloc_cases_v1_30.json` | the superseded 30-case export, kept so old figures can be traced |
+| `data/trajectories/` | full ATIF trace, tool trace and casefile for all 29 source runs |
+| `site/index.html`, `site/deck.html` | the web version and a ten-slide deck, both openable from `file://` |
+| `site/relocation.mp4` | 49s, silent: one case end to end, from the question to the fix commit |
+| `code/` | the probe, the analyses, and the Colab session helpers |
+
+# Appendix C — How to check the numbers
+
+```
+# no GPU, no model, about two seconds
+upload verify/verify_findings.ipynb to Colab
+upload the six files in verify/ beside it
+run all cells
+```
+
+Each cell recomputes a figure from the raw files and prints it next to the claimed value. Where a
+number was corrected during the work, both the old and the new value are computed, so the
+correction is visible as arithmetic rather than asserted in prose.

@@ -1,0 +1,5 @@
+# Nothing here is generated in place -- the folder is a snapshot produced by
+# ctarp/sync_mats_app.py -- so this only keeps OS and editor litter out.
+.DS_Store
+Thumbs.db
+desktop.ini

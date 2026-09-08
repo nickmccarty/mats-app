@@ -1,0 +1,418 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Faithfulness With Ground Truth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,300&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* Palette taken from the instrument itself rather than invented for the deck: ctarp's own dark
+   slate ground, its teal for things the model asserted, its amber for gold -- the answer key.
+   Red is reserved for exactly one job here, the retraction, and appears nowhere else. */
+:root{
+  --ground:#F7F6F3; --surface:#FFFFFF; --rule:#DCD8D0;
+  --ink:#16191C; --muted:#5C666E; --faint:#8A939B;
+  --teal:#0E8C8C; --amber:#B47A14; --red:#C43A47;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+}
+/* LIGHT BY DEFAULT. The deck is embedded in a page that now commits to light to match the
+   report figures it carries, and an iframe that flipped to dark on a dark OS made the row read
+   as two unrelated objects. Dark remains available via data-theme="dark" for a darkened room. */
+:root[data-theme="dark"]{
+  --ground:#121619; --surface:#191F24; --rule:#2A333A;
+  --ink:#E4E9EC; --muted:#93A1AB; --faint:#6D7C86;
+  --teal:#3FC5C5; --amber:#E3A93C; --red:#E8636F;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--serif); font-size:clamp(15px,1.15vw,18px);
+  scroll-snap-type:y mandatory; overflow-y:auto; height:100vh;
+}
+.slide{
+  min-height:100vh; scroll-snap-align:start; scroll-snap-stop:always;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:clamp(2rem,6vw,5rem) clamp(1.5rem,7vw,7rem) clamp(4rem,8vw,6rem);
+  position:relative; border-bottom:1px solid var(--rule);
+}
+.inner{width:100%; max-width:60rem; margin:0 auto}
+
+.eyebrow{
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--faint); margin-bottom:1.4rem;
+}
+h1{
+  font-family:var(--serif); font-weight:300; letter-spacing:-.02em;
+  font-size:clamp(2.4rem,6.5vw,4.6rem); line-height:1.04; margin:0 0 1.4rem;
+  text-wrap:balance;
+}
+h2{
+  font-family:var(--serif); font-weight:300; letter-spacing:-.015em;
+  font-size:clamp(1.7rem,4vw,3rem); line-height:1.12; margin:0 0 1.5rem;
+  text-wrap:balance;
+}
+p{font-size:clamp(1rem,1.5vw,1.2rem); line-height:1.7; color:var(--muted); max-width:44rem; margin:0 0 1rem}
+p.lead{color:var(--ink); font-size:clamp(1.05rem,1.7vw,1.35rem)}
+em{font-style:italic; color:var(--ink)}
+strong{font-weight:600; color:var(--ink)}
+.mono{font-family:var(--mono)}
+.tealt{color:var(--teal)} .ambert{color:var(--amber)} .redt{color:var(--red)}
+
+/* the counters row -- the corpus, stated once, in the subject's own units */
+.stats{display:flex; flex-wrap:wrap; gap:clamp(1.4rem,4vw,3.4rem); margin:2.2rem 0 0}
+.stat .n{font-family:var(--mono); font-size:clamp(1.6rem,3.6vw,2.6rem); font-weight:500;
+         color:var(--ink); font-variant-numeric:tabular-nums; line-height:1}
+.stat .l{font-family:var(--mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+         color:var(--faint); margin-top:.5rem}
+
+/* a source excerpt, styled as the pane styles one: gold band, cited band */
+.code{
+  font-family:var(--mono); font-size:clamp(.72rem,1.05vw,.85rem); line-height:1.85;
+  background:var(--surface); border:1px solid var(--rule); border-radius:8px;
+  padding:.9rem 0; margin:1.6rem 0; overflow-x:auto;
+}
+.code .ln{display:block; padding:0 1rem; white-space:pre; color:var(--muted)}
+.code .ln b{color:var(--faint); font-weight:400; display:inline-block; width:3.2em}
+.code .gold{background:color-mix(in srgb,var(--amber) 16%,transparent)}
+.code .cited{box-shadow:inset 3px 0 0 var(--teal)}
+
+.pull{
+  border-left:3px solid var(--rule); padding:.2rem 0 .2rem 1.3rem; margin:1.8rem 0;
+  font-size:clamp(1.05rem,1.7vw,1.3rem); line-height:1.6; color:var(--ink); font-weight:300;
+}
+.pull.red{border-left-color:var(--red)}
+
+/* the figure that carries the whole argument */
+/* PLOT AREA AND LABELS ARE SEPARATE BOXES. The fills are percentages of a true zero-to-100
+   plot, so 49.8 on the baseline and 49.8 on a bar mean the same distance up the page. Putting
+   the value and key labels inside the bar -- the obvious first cut -- makes every percentage
+   relative to a box that also holds two lines of text, so nothing lines up with the rule. */
+.plot{position:relative; height:clamp(170px,25vh,240px); display:flex; align-items:flex-end;
+      gap:clamp(2rem,7vw,5rem); margin:2.4rem 0 0}
+.bar{flex:0 0 clamp(88px,14vw,140px); position:relative; height:100%}
+.bar .fill{position:absolute; left:0; right:0; bottom:0; border-radius:5px 5px 0 0}
+.bar .v{position:absolute; left:0; right:0; font-family:var(--mono);
+        font-size:clamp(1.1rem,2.4vw,1.7rem); font-weight:600; font-variant-numeric:tabular-nums;
+        line-height:1; padding-bottom:.45rem}
+.keys{display:flex; gap:clamp(2rem,7vw,5rem); margin-top:.7rem}
+.keys div{flex:0 0 clamp(88px,14vw,140px); font-family:var(--mono); font-size:.68rem;
+          letter-spacing:.06em; text-transform:uppercase; color:var(--faint); line-height:1.5}
+.baseline{position:absolute; left:0; right:0; border-top:1px dashed var(--muted); pointer-events:none}
+.baseline span{position:absolute; right:0; top:-1.7em; font-family:var(--mono); font-size:.68rem;
+               color:var(--muted); background:var(--ground); padding:0 .4em}
+
+/* population: one bar, segmented, showing three tasks owning half of it */
+.pop{display:flex; height:2.6rem; border-radius:5px; overflow:hidden; margin:1.8rem 0 .8rem;
+     border:1px solid var(--rule)}
+.pop div{display:flex; align-items:center; justify-content:center; font-family:var(--mono);
+         font-size:.7rem; color:#0B0E10; font-weight:600; white-space:nowrap; overflow:hidden}
+.legend{display:flex; flex-wrap:wrap; gap:1.2rem; font-family:var(--mono); font-size:.72rem; color:var(--muted)}
+.legend i{display:inline-block; width:.72em; height:.72em; border-radius:2px; margin-right:.45em;
+          vertical-align:baseline; font-style:normal}
+
+table{border-collapse:collapse; width:100%; font-family:var(--mono);
+      font-size:clamp(.72rem,1.05vw,.85rem); margin:1.6rem 0}
+th,td{text-align:left; padding:.62rem .8rem; border-bottom:1px solid var(--rule); vertical-align:top}
+th{color:var(--faint); font-weight:500; letter-spacing:.06em; text-transform:uppercase; font-size:.66rem}
+td.was{color:var(--muted)} td.is{color:var(--ink)}
+.strike{text-decoration:line-through; color:var(--faint)}
+
+.pipe{display:flex; flex-wrap:wrap; align-items:center; gap:.65rem; margin:2rem 0 .5rem;
+      font-family:var(--mono); font-size:clamp(.72rem,1.1vw,.86rem)}
+.pipe .node{border:1px solid var(--rule); background:var(--surface); border-radius:6px;
+            padding:.55rem .8rem; color:var(--ink)}
+.pipe .node small{display:block; color:var(--faint); font-size:.86em; margin-top:.2rem}
+.pipe .arw{color:var(--faint)}
+
+.foot{position:absolute; left:clamp(1.5rem,7vw,7rem); right:clamp(1.5rem,7vw,7rem);
+      bottom:clamp(1.4rem,3vw,2.4rem); display:flex; justify-content:space-between;
+      align-items:baseline; font-family:var(--mono); font-size:.68rem; color:var(--faint);
+      border-top:1px solid var(--rule); padding-top:.7rem}
+
+.nav{position:fixed; right:clamp(.8rem,2vw,1.6rem); top:50%; transform:translateY(-50%);
+     display:flex; flex-direction:column; gap:.55rem; z-index:20}
+.nav a{width:7px; height:7px; border-radius:50%; background:var(--rule); display:block;
+       transition:background .2s, transform .2s}
+.nav a:hover{transform:scale(1.5)}
+.nav a.on{background:var(--teal); transform:scale(1.35)}
+a{color:inherit}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; scroll-behavior:auto!important}}
+@media (max-width:640px){ .nav{display:none} .stats{gap:1.3rem} }
+</style>
+
+<nav class="nav" id="nav" aria-label="Slides"></nav>
+
+<!-- 1 ............................................................................ -->
+<section class="slide" id="s1">
+  <div class="inner">
+    <div class="eyebrow">ctarp · chain-of-thought faithfulness</div>
+    <h1>Do models act on<br>what they say?</h1>
+    <p class="lead">An agent states one location in its reasoning and emits a different one in its
+      answer. That divergence is normally unmeasurable — there is no ground truth for what a model
+      &ldquo;really meant.&rdquo;</p>
+    <p class="lead"><em>In vulnerability localisation there is.</em> Every task is a real CVE at
+      the commit before its fix, and the fix commit names the true files.</p>
+  </div>
+  <div class="foot"><span>Nicholas McCarty</span><span>01 / 10</span></div>
+</section>
+
+<!-- 2 ............................................................................ -->
+<section class="slide" id="s2">
+  <div class="inner">
+    <div class="eyebrow">The setting</div>
+    <h2>A task with a known answer</h2>
+    <p>The model is given a symptom and a repository at its pre-fix commit. No path, no CWE, no
+      advisory. It explores, then cites lines. The fix commit — withheld — says which lines were
+      actually wrong.</p>
+    <div class="code" aria-label="Source excerpt from vllm shm_broadcast.py">
+      <span class="ln"><b>241</b>    self.remote_socket.setsockopt(IPV6, 1)</span>
+      <span class="ln gold"><b>243</b>    connect_ip = f"[{connect_ip}]"</span>
+      <span class="ln gold cited"><b>244</b>    socket_addr = f"tcp://*:{remote_subscribe_port}"</span>
+      <span class="ln gold cited"><b>245</b>    self.remote_socket.bind(socket_addr)</span>
+      <span class="ln gold cited"><b>246</b>    remote_subscribe_addr = f"tcp://{connect_ip}:{port}"</span>
+      <span class="ln gold"><b>247</b>  else:</span>
+    </div>
+    <p class="mono" style="font-size:.8rem">
+      <span class="ambert">▌</span> gold, from the fix commit &nbsp;·&nbsp;
+      <span class="tealt">▌</span> what the model cited, knowing none of it
+    </p>
+  </div>
+  <div class="foot"><span>vllm-project/vllm · GHSA-9f8f-2vmf-885j · CWE-770</span><span>02 / 10</span></div>
+</section>
+
+<!-- 3 ............................................................................ -->
+<section class="slide" id="s3">
+  <div class="inner">
+    <div class="eyebrow">The apparatus</div>
+    <h2>Three models, one box, everything recorded</h2>
+    <div class="pipe">
+      <span class="node">Antares-1B<small>localise · ranks files</small></span>
+      <span class="arw">→</span>
+      <span class="node">Qwen3.6-35B<small>judge · plan</small></span>
+      <span class="arw">→</span>
+      <span class="node">FastContext-4B<small>explore inside a file</small></span>
+      <span class="arw">→</span>
+      <span class="node">evidence<small>no model at all</small></span>
+    </div>
+    <p>Two model-free retrieval stages and a mechanical evidence stage sit between them. Every run
+      writes a full reasoning trajectory and a casefile, so the transcript and the structured
+      output are both on disk and can be compared after the fact.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">594</div><div class="l">tasks · real CVEs</div></div>
+      <div class="stat"><div class="n">1,288</div><div class="l">casefiles</div></div>
+      <div class="stat"><div class="n">504</div><div class="l">trajectories</div></div>
+    </div>
+  </div>
+  <div class="foot"><span>local · one workstation</span><span>03 / 10</span></div>
+</section>
+
+<!-- 4 ............................................................................ -->
+<section class="slide" id="s4">
+  <div class="inner">
+    <div class="eyebrow">The measurement</div>
+    <h2>Relocations</h2>
+    <p class="lead">A <strong>relocation</strong> is a statement where a run contradicts the
+      question it was given and names a different file than the one it was sent to examine.</p>
+    <p>Mining them from reasoning needs filters, because most apparent contradictions are not one:
+      a claim made mid-step and abandoned, a claim superseded later in the same trace, an extension
+      rather than a contradiction, a hedge. Four filters, validated on a held-out sample where they
+      removed <span class="mono">33 of 133</span> raw candidates.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">192</div><div class="l">relocations mined</div></div>
+      <div class="stat"><div class="n">37</div><div class="l">distinct (task, file) claims</div></div>
+    </div>
+    <p style="margin-top:1.6rem">Those two numbers are the same evidence counted two ways. That
+      turns out to be the whole story.</p>
+  </div>
+  <div class="foot"><span>four filters · held-out validation</span><span>04 / 10</span></div>
+</section>
+
+<!-- 5 ............................................................................ -->
+<section class="slide" id="s5">
+  <div class="inner">
+    <div class="eyebrow">The result</div>
+    <h2>The unit decides the headline</h2>
+    <div class="plot">
+      <div class="baseline" style="bottom:49.8%"><span>49.8% — baseline: 3-of-3 pass agreement</span></div>
+      <div class="bar">
+        <div class="v tealt" style="bottom:81.4%">81.4%</div>
+        <div class="fill" style="height:81.4%;background:color-mix(in srgb,var(--teal) 40%,transparent);border:1px solid var(--teal)"></div>
+      </div>
+      <div class="bar">
+        <div class="v redt" style="bottom:40.5%">40.5%</div>
+        <div class="fill" style="height:40.5%;background:color-mix(in srgb,var(--red) 32%,transparent);border:1px solid var(--red)"></div>
+      </div>
+    </div>
+    <div class="keys">
+      <div>per mention<br>192 relocations</div>
+      <div>per claim<br>37 distinct</div>
+    </div>
+    <p style="margin-top:1.4rem">Counted per mention, relocations name a true gold file
+      <strong>81.4%</strong> of the time — apparently beating the calibration of three independent
+      passes agreeing. Counted per distinct claim, which is <em>the unit the baseline itself is
+      measured on</em>, precision is <strong>40.5%</strong>. Below the baseline.</p>
+  </div>
+  <div class="foot"><span>same data · same filters · two units</span><span>05 / 10</span></div>
+</section>
+
+<!-- 6 ............................................................................ -->
+<section class="slide" id="s6">
+  <div class="inner">
+    <div class="eyebrow">Why</div>
+    <h2>Repetition is not independent evidence</h2>
+    <div class="pop" role="img" aria-label="Three tasks account for over half of all relocation mentions">
+      <div style="flex:0 0 28.6%;background:var(--amber)">one claim × 55</div>
+      <div style="flex:0 0 14%;background:color-mix(in srgb,var(--amber) 62%,var(--ground))">task 2</div>
+      <div style="flex:0 0 10%;background:color-mix(in srgb,var(--amber) 40%,var(--ground))">task 3</div>
+      <div style="flex:1;background:var(--surface);color:var(--muted)">the other 34 claims</div>
+    </div>
+    <div class="legend"><span><i style="background:var(--amber)"></i>3 tasks — over half the population</span>
+      <span><i style="background:var(--surface);border:1px solid var(--rule)"></i>everything else</span></div>
+    <p style="margin-top:1.8rem">Three tasks contribute more than half of all mentions. One of them
+      is a <em>single correct claim restated 55 times</em> within one trace — a model returning to
+      the same conclusion as it works, which the per-mention count reads as fifty-five successes.</p>
+    <div class="pull">A trace that repeats itself is confident, not correct. Counting mentions
+      rewards verbosity and calls it accuracy.</div>
+  </div>
+  <div class="foot"><span>de-duplication by (task, file)</span><span>06 / 10</span></div>
+</section>
+
+<!-- 7 ............................................................................ -->
+<section class="slide" id="s7">
+  <div class="inner">
+    <div class="eyebrow">The contribution</div>
+    <h2>We retract our own headline</h2>
+    <p class="lead">The 81.4% was our result. It does not survive de-duplication, and this is the
+      paper's contribution sentence.</p>
+    <div class="pull red">Agent transcripts invite precision metrics computed over mentions rather
+      than claims, which inflates in the flattering direction <em>by default</em>.</div>
+    <p>That failure mode is not specific to this harness. Any pipeline that mines assertions from
+      long transcripts inherits it, and the inflated number is the one that looks publishable.</p>
+    <p>Eight measurements in this project were wrong before they were checked — each found by
+      asking a suspicious number what it was made of:</p>
+    <table>
+      <tr><th>what it looked like</th><th>what it was</th></tr>
+      <tr><td class="was">Parser read 1,288 / 1,288 casefiles</td>
+          <td class="is">Candidates found in 437 — 831 used a different table shape</td></tr>
+      <tr><td class="was">Enrichment is a no-op</td>
+          <td class="is">A dropped range, never measured</td></tr>
+      <tr><td class="was">Flash ran with reasoning off</td>
+          <td class="is">Three flags said so; 107 of 107 tokens were reasoning</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>the contribution sentence is a retraction</span><span>07 / 10</span></div>
+</section>
+
+<!-- 8 ............................................................................ -->
+<section class="slide" id="s8">
+  <div class="inner">
+    <div class="eyebrow">What survived</div>
+    <h2>The information is not lost. It is weighted.</h2>
+    <div class="stats" style="margin-bottom:1.8rem">
+      <div class="stat"><div class="n tealt">5</div><div class="l">of 192 relocations</div></div>
+      <div class="stat"><div class="n">97.4%</div><div class="l">reach the structured output</div></div>
+    </div>
+    <p class="lead">Only 5 of 192 relocations fail to appear in the structured output. So the
+      reduction from transcript to ranked list is <em>not</em> discarding the model's stated
+      conclusions.</p>
+    <p>That is a real negative result for the &ldquo;reasoning is thrown away&rdquo; hypothesis, and
+      it is unaffected by the counting error, because it is a question about presence rather than
+      precision. Whether those conclusions are weighted <em>correctly</em> is a separate question,
+      and the honest answer on current evidence is that we do not know.</p>
+    <p>The instrument also refuses to launder its own mistakes: a file the locate stage names that
+      does not exist at that commit is struck through in the casefile, scored
+      <span class="mono">p_gold 0.0</span>, and labelled <span class="mono">fabricated</span> —
+      <span class="mono strike">agent/dns.go</span>. That happens on 3 of 20 tasks.</p>
+  </div>
+  <div class="foot"><span>presence, not precision</span><span>08 / 10</span></div>
+</section>
+
+<!-- 9 ............................................................................ -->
+<section class="slide" id="s9">
+  <div class="inner">
+    <div class="eyebrow">Asking the activations</div>
+    <h2>Is the divergence visible<br>before the output?</h2>
+    <p class="lead">Two methods, same question, same corpus: at the token <em>before</em> the model
+      names the relocated file, can the file be recovered? Measured only where that cut is
+      genuinely earlier than the sentence.</p>
+    <div class="stats" style="margin-bottom:1.6rem">
+      <div class="stat"><div class="n tealt">18/30</div><div class="l">asking the model · floor 3/30</div></div>
+      <div class="stat"><div class="n tealt">p=0.0003</div><div class="l">the baseline result</div></div>
+      <div class="stat"><div class="n redt">11/31</div><div class="l">the lens · floor 5/31 · p=0.15</div></div>
+    </div>
+    <div class="pull">The information is there. The lens does not read it. Asking the model
+      outright recovers the file in 18 of 30 claims; the lens on the same claims does not separate
+      from its decoy.</div>
+    <p>That is a statement about the instrument, not the model — and the comparison is deliberately
+      unfair to the lens: it reads one activation, while the baseline lets the model generate two
+      thousand tokens first. A baseline that strong losing would have settled it; winning only
+      bounds what the lens failed to find.</p>
+  </div>
+  <div class="foot"><span>the control is the point</span><span>09 / 10</span></div>
+</section>
+
+<!-- 10 ........................................................................... -->
+<section class="slide" id="s10">
+  <div class="inner">
+    <div class="eyebrow">What the control caught</div>
+    <h2>One shared token<br>scored for both names</h2>
+    <p class="lead">Every readout is scored a second time against another case's target — same
+      filename distribution, wrong answer. Six of sixty rows came back near-tied.</p>
+    <div class="pull red">Scoring counted a hit when <em>any</em> token of a filename entered the
+      top 20. <span class="mono">.py</span> is shared, so one generic token scored for the target
+      and the decoy at once.</div>
+    <p>Five of those six are the same two files in both directions, from unrelated repositories.
+      It is a defect in the measurement, not a property of the model — found by the control rather
+      than by inspection, which is the only reason it is on this slide instead of in the headline.</p>
+    <div class="stats" style="margin:1.4rem 0 1.6rem">
+      <div class="stat"><div class="n">9/17</div><div class="l">before the cut was checked</div></div>
+      <div class="stat"><div class="n redt">4/12</div><div class="l">after — p went 0.11 to 0.69</div></div>
+    </div>
+    <p>A second defect was larger than the shared token. The &ldquo;before the sentence&rdquo;
+      prefix falls back to the whole step when a claim has no earlier sentence boundary, so for a
+      minority of claims it is byte-identical to the mid-sentence prefix. Every earlier figure
+      included them. Excluding them is what moved the lens from apparently-suggestive to flat —
+      and it was found by scoping a baseline, not by looking for it.</p>
+    <p class="mono" style="font-size:.8rem;color:var(--faint);margin-top:2rem">
+      ctarp — local vulnerability-localisation harness · full method and data at the linked report</p>
+  </div>
+  <div class="foot"><span>end</span><span>10 / 10</span></div>
+</section>
+
+<script>
+// Dots that track position, and arrow/space keys, because a deck embedded in an iframe is read
+// with the keyboard as often as scrolled. IntersectionObserver rather than a scroll handler so a
+// snapped slide is marked when it actually settles.
+(function(){
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var nav = document.getElementById('nav');
+  slides.forEach(function(s, i){
+    var a = document.createElement('a');
+    a.href = '#' + s.id; a.setAttribute('aria-label', 'Slide ' + (i+1));
+    nav.appendChild(a);
+  });
+  var dots = [].slice.call(nav.children);
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if (!e.isIntersecting) return;
+        var i = slides.indexOf(e.target);
+        dots.forEach(function(d, j){ d.classList.toggle('on', j === i); });
+      });
+    }, {threshold: 0.55});
+    slides.forEach(function(s){ io.observe(s); });
+  }
+  function go(dir){
+    var y = window.scrollY, cur = 0;
+    slides.forEach(function(s, i){ if (s.offsetTop <= y + 10) cur = i; });
+    var next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+    slides[next].scrollIntoView({behavior: 'smooth'});
+  }
+  addEventListener('keydown', function(e){
+    if (['ArrowDown','PageDown',' '].indexOf(e.key) > -1){ e.preventDefault(); go(1); }
+    if (['ArrowUp','PageUp'].indexOf(e.key) > -1){ e.preventDefault(); go(-1); }
+  });
+})();
+</script>

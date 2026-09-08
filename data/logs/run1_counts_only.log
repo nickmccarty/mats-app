@@ -1,0 +1,811 @@
+GPU free after cleanup: 39.1 GiB
+cases: 30
+loading Qwen/Qwen3.6-35B-A3B (bf16, offloading, head pinned) ...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]Fetching 26 files: 100%|██████████| 26/26 [00:00<00:00, 2053.48it/s]
+Loading weights:   0%|          | 0/693 [00:00<?, ?it/s]Loading weights:   0%|          | 1/693 [00:03<45:56,  3.98s/it]Loading weights:   1%|▏         | 9/693 [00:04<03:53,  2.93it/s]Loading weights:   2%|▏         | 13/693 [00:06<04:35,  2.47it/s]Loading weights:   2%|▏         | 15/693 [00:10<08:27,  1.34it/s]Loading weights:   3%|▎         | 24/693 [00:10<03:33,  3.14it/s]Loading weights:   4%|▍         | 30/693 [00:12<03:34,  3.10it/s]Loading weights:   5%|▍         | 33/693 [00:15<05:33,  1.98it/s]Loading weights:   6%|▋         | 45/693 [00:16<02:36,  4.13it/s]Loading weights:   7%|▋         | 49/693 [00:17<03:01,  3.55it/s]Loading weights:   8%|▊         | 52/693 [00:21<04:42,  2.27it/s]Loading weights:   8%|▊         | 58/693 [00:26<06:14,  1.70it/s]Loading weights:  10%|▉         | 69/693 [00:26<03:19,  3.12it/s]Loading weights:  11%|█         | 75/693 [00:26<02:27,  4.18it/s]Loading weights:  12%|█▏        | 81/693 [00:28<02:35,  3.93it/s]Loading weights:  12%|█▏        | 84/693 [00:32<04:05,  2.48it/s]Loading weights:  14%|█▎        | 94/693 [00:32<02:19,  4.28it/s]Loading weights:  14%|█▍        | 100/693 [00:34<02:27,  4.01it/s]Loading weights:  15%|█▍        | 103/693 [00:37<03:55,  2.50it/s]Loading weights:  16%|█▋        | 114/693 [00:37<02:07,  4.53it/s]Loading weights:  17%|█▋        | 118/693 [00:39<02:30,  3.81it/s]Loading weights:  17%|█▋        | 121/693 [00:42<04:00,  2.38it/s]Loading weights:  18%|█▊        | 127/693 [00:44<03:36,  2.62it/s]Loading weights:  19%|█▊        | 129/693 [00:48<05:22,  1.75it/s]Loading weights:  20%|█▉        | 136/693 [00:48<03:17,  2.83it/s]Loading weights:  21%|██        | 147/693 [00:48<01:44,  5.23it/s]Loading weights:  22%|██▏       | 151/693 [00:50<02:13,  4.06it/s]Loading weights:  22%|██▏       | 154/693 [00:54<03:38,  2.47it/s]Loading weights:  23%|██▎       | 162/693 [00:54<02:12,  4.00it/s]Loading weights:  24%|██▍       | 167/693 [00:54<01:40,  5.26it/s]Loading weights:  25%|██▍       | 171/693 [00:59<03:56,  2.20it/s]Loading weights:  26%|██▌       | 180/693 [00:59<02:18,  3.71it/s]Loading weights:  27%|██▋       | 187/693 [01:01<02:13,  3.79it/s]Loading weights:  27%|██▋       | 190/693 [01:04<03:24,  2.46it/s]Loading weights:  28%|██▊       | 196/693 [01:06<03:02,  2.72it/s]Loading weights:  29%|██▊       | 198/693 [01:10<04:29,  1.84it/s]Loading weights:  30%|███       | 208/693 [01:10<02:20,  3.46it/s]Loading weights:  31%|███       | 214/693 [01:10<01:40,  4.76it/s]Loading weights:  32%|███▏      | 219/693 [01:10<01:16,  6.21it/s]Loading weights:  32%|███▏      | 223/693 [01:15<03:17,  2.38it/s]Loading weights:  34%|███▍      | 234/693 [01:15<01:43,  4.42it/s]Loading weights:  34%|███▍      | 239/693 [01:21<03:13,  2.35it/s]Loading weights:  36%|███▋      | 252/693 [01:21<01:43,  4.27it/s]Loading weights:  37%|███▋      | 257/693 [01:26<02:53,  2.51it/s]Loading weights:  38%|███▊      | 265/693 [01:28<02:25,  2.94it/s]Loading weights:  39%|███▊      | 268/693 [01:31<03:17,  2.15it/s]Loading weights:  40%|███▉      | 277/693 [01:32<02:02,  3.40it/s]Loading weights:  41%|████      | 284/693 [01:32<01:26,  4.72it/s]Loading weights:  42%|████▏     | 288/693 [01:32<01:11,  5.65it/s]Loading weights:  42%|████▏     | 292/693 [01:37<02:53,  2.31it/s]Loading weights:  43%|████▎     | 301/693 [01:37<01:43,  3.80it/s]Loading weights:  44%|████▍     | 307/693 [01:39<01:44,  3.68it/s]Loading weights:  45%|████▍     | 310/693 [01:43<02:41,  2.37it/s]Loading weights:  52%|█████▏    | 358/693 [01:43<00:29, 11.26it/s]Loading weights:  57%|█████▋    | 393/693 [01:43<00:14, 20.03it/s]Loading weights:  67%|██████▋   | 465/693 [01:43<00:05, 44.99it/s]Loading weights:  75%|███████▍  | 519/693 [01:43<00:02, 68.88it/s]Loading weights:  85%|████████▍ | 587/693 [01:43<00:00, 107.33it/s]Loading weights: 100%|██████████| 693/693 [01:43<00:00,  6.68it/s] 
+Some parameters are on the meta device because they were offloaded to the cpu.
+lm_head on: cuda:0
+Fetching 1 files:   0%|          | 0/1 [00:00<?, ?it/s]Fetching 1 files: 100%|██████████| 1/1 [00:00<00:00, 969.56it/s]
+model + lens ready
+    [window 2712 tok] ...' files from Steam directories and dumps their contents into GitHub Actions job output via `core.info()`.\n\n\n<|assistant|>\nThe vulnerability is present in `'
+  case  0 prefix_at_sentence target hits j=  1/39 l=  0  decoy j=  0 l=  0
+    [window 2712 tok] ...' files from Steam directories and dumps their contents into GitHub Actions job output via `core.info()`.\n\n\n<|assistant|>\nThe vulnerability is present in `'
+  case  0 prefix_at_path     target hits j=  1/39 l=  0  decoy j=  0 l=  0
+    [window 1202 tok] ..." `src/lib/HAXCMS.js`, but this file is a library class with no entry points — it doesn't handle HTTP requests or set any security headers."
+  case  1 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+    [window 1210 tok] ..." but this file is a library class with no entry points — it doesn't handle HTTP requests or set any security headers. The actual web server configuration lives in `"
+  case  1 prefix_at_path     target hits j=  6/39 l=  0  decoy j=  0 l=  4
+  case  2 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  2 prefix_at_path     target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  3 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  3 prefix_at_path     target hits j=  3/39 l=  0  decoy j=  0 l=  0
+  case  4 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  4 prefix_at_path     target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  5 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  5 prefix_at_path     target hits j= 16/39 l=  1  decoy j=  0 l=  0
+  case  6 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  4 l=  1
+  case  6 prefix_at_path     target hits j= 11/39 l= 10  decoy j=  8 l=  7
+  case  7 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  7 prefix_at_path     target hits j= 12/39 l=  3  decoy j=  0 l=  0
+  case  8 prefix_at_sentence target hits j=  1/39 l=  1  decoy j=  0 l=  0
+  case  8 prefix_at_path     target hits j=  8/39 l=  6  decoy j=  0 l=  0
+  case  9 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case  9 prefix_at_path     target hits j=  5/39 l=  5  decoy j=  0 l=  0
+  case 10 prefix_at_sentence target hits j=  1/39 l=  1  decoy j=  0 l=  0
+  case 10 prefix_at_path     target hits j=  6/39 l=  4  decoy j=  0 l=  0
+  case 11 prefix_at_sentence target hits j=  6/39 l=  1  decoy j=  1 l=  0
+  case 11 prefix_at_path     target hits j=  6/39 l=  1  decoy j=  1 l=  0
+  case 12 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 12 prefix_at_path     target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 13 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 13 prefix_at_path     target hits j=  4/39 l=  1  decoy j=  4 l=  0
+  case 14 prefix_at_sentence target hits j=  7/39 l=  0  decoy j=  0 l=  0
+  case 14 prefix_at_path     target hits j=  7/39 l=  0  decoy j=  0 l=  0
+  case 15 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 15 prefix_at_path     target hits j=  5/39 l=  0  decoy j=  0 l=  0
+  case 16 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 16 prefix_at_path     target hits j=  5/39 l=  1  decoy j=  0 l=  3
+  case 17 prefix_at_sentence target hits j=  2/39 l=  1  decoy j=  0 l=  4
+  case 17 prefix_at_path     target hits j=  4/39 l=  2  decoy j=  0 l=  4
+  case 18 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 18 prefix_at_path     target hits j= 19/39 l= 12  decoy j=  0 l=  0
+  case 19 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  4 l=  1
+  case 19 prefix_at_path     target hits j= 20/39 l=  3  decoy j= 17 l=  5
+  case 20 prefix_at_sentence target hits j=  2/39 l=  1  decoy j=  0 l=  0
+  case 20 prefix_at_path     target hits j= 17/39 l=  4  decoy j= 16 l=  0
+  case 21 prefix_at_sentence target hits j=  2/39 l=  1  decoy j=  0 l=  0
+  case 21 prefix_at_path     target hits j=  7/39 l=  4  decoy j=  0 l=  0
+  case 22 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 22 prefix_at_path     target hits j=  6/39 l=  4  decoy j=  0 l=  0
+  case 23 prefix_at_sentence target hits j=  2/39 l=  1  decoy j=  0 l=  0
+  case 23 prefix_at_path     target hits j=  5/39 l=  4  decoy j=  0 l=  0
+  case 24 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 24 prefix_at_path     target hits j=  7/39 l=  4  decoy j=  0 l=  0
+  case 25 prefix_at_sentence target hits j= 11/39 l=  1  decoy j=  0 l=  0
+  case 25 prefix_at_path     target hits j= 11/39 l=  1  decoy j=  0 l=  0
+  case 26 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 26 prefix_at_path     target hits j=  0/39 l=  0  decoy j=  0 l=  0
+  case 27 prefix_at_sentence target hits j=  0/39 l=  0  decoy j=  0 l=  2
+  case 27 prefix_at_path     target hits j=  0/39 l=  0  decoy j=  0 l=  2
+  case 28 prefix_at_sentence target hits j=  2/39 l=  1  decoy j=  0 l=  0
+  case 28 prefix_at_path     target hits j=  2/39 l=  1  decoy j=  0 l=  0
+  case 29 prefix_at_sentence target hits j=  1/39 l=  0  decoy j=  0 l=  0
+  case 29 prefix_at_path     target hits j=  2/39 l=  1  decoy j=  0 l=  0
+
+=== SUMMARY ===
+prefix_at_sentence  (n=30)
+  j-lens     target 0.032 of layers   decoy 0.008
+  logit-lens target 0.008 of layers   decoy 0.007
+  mentions with ANY j-lens target hit: 12/30   decoy: 3/30
+  CLAIMS (the unit that counts): j-lens target 9/17  decoy 3/17  logit-lens target 6/17
+prefix_at_path  (n=30)
+  j-lens     target 0.167 of layers   decoy 0.039
+  logit-lens target 0.062 of layers   decoy 0.021
+  mentions with ANY j-lens target hit: 25/30   decoy: 5/30
+  CLAIMS (the unit that counts): j-lens target 16/17  decoy 5/17  logit-lens target 14/17
+[
+ {
+  "case": 0,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260901-231236-eval001",
+  "target": "logging.ts",
+  "decoy": "cnl_blueprint.py",
+  "j_target": 1,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 0,
+  "cut": "prefix_at_path",
+  "run_id": "20260901-231236-eval001",
+  "target": "logging.ts",
+  "decoy": "cnl_blueprint.py",
+  "j_target": 1,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 1,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 1,
+  "cut": "prefix_at_path",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 6,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 4,
+  "layers": 39
+ },
+ {
+  "case": 2,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "json_blueprint.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 2,
+  "cut": "prefix_at_path",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "json_blueprint.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 3,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "logging.ts",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 3,
+  "cut": "prefix_at_path",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "logging.ts",
+  "j_target": 3,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 4,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "context_serializers.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 4,
+  "cut": "prefix_at_path",
+  "run_id": "20260901-232831-eval002",
+  "target": "app.js",
+  "decoy": "context_serializers.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 5,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-013153-eval007",
+  "target": "cnl_blueprint.py",
+  "decoy": "app.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 5,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-013153-eval007",
+  "target": "cnl_blueprint.py",
+  "decoy": "app.js",
+  "j_target": 16,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 6,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-013153-eval007",
+  "target": "cnl_blueprint.py",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 0,
+  "j_decoy": 4,
+  "l_target": 0,
+  "l_decoy": 1,
+  "layers": 39
+ },
+ {
+  "case": 6,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-013153-eval007",
+  "target": "cnl_blueprint.py",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 11,
+  "j_decoy": 8,
+  "l_target": 10,
+  "l_decoy": 7,
+  "layers": 39
+ },
+ {
+  "case": 7,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-013153-eval007",
+  "target": "json_blueprint.py",
+  "decoy": "logging.ts",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 7,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-013153-eval007",
+  "target": "json_blueprint.py",
+  "decoy": "logging.ts",
+  "j_target": 12,
+  "j_decoy": 0,
+  "l_target": 3,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 8,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-030052-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "logging.ts",
+  "j_target": 1,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 8,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-030052-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "logging.ts",
+  "j_target": 8,
+  "j_decoy": 0,
+  "l_target": 6,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 9,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-030052-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "app.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 9,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-030052-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "app.js",
+  "j_target": 5,
+  "j_decoy": 0,
+  "l_target": 5,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 10,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-030052-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "logging.ts",
+  "j_target": 1,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 10,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-030052-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "logging.ts",
+  "j_target": 6,
+  "j_decoy": 0,
+  "l_target": 4,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 11,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-062512-eval020",
+  "target": "shave.js",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 6,
+  "j_decoy": 1,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 11,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-062512-eval020",
+  "target": "shave.js",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 6,
+  "j_decoy": 1,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 12,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-094757-eval001",
+  "target": "logging.ts",
+  "decoy": "link-writer.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 12,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-094757-eval001",
+  "target": "logging.ts",
+  "decoy": "link-writer.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 13,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-094757-eval001",
+  "target": "logging.ts",
+  "decoy": "app.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 13,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-094757-eval001",
+  "target": "logging.ts",
+  "decoy": "app.js",
+  "j_target": 4,
+  "j_decoy": 4,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 14,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-100450-eval002",
+  "target": "app.js",
+  "decoy": "logging.ts",
+  "j_target": 7,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 14,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-100450-eval002",
+  "target": "app.js",
+  "decoy": "logging.ts",
+  "j_target": 7,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 15,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-100450-eval002",
+  "target": "app.js",
+  "decoy": "cnl_blueprint.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 15,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-100450-eval002",
+  "target": "app.js",
+  "decoy": "cnl_blueprint.py",
+  "j_target": 5,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 16,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-100450-eval002",
+  "target": "app.js",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 16,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-100450-eval002",
+  "target": "app.js",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 5,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 3,
+  "layers": 39
+ },
+ {
+  "case": 17,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-112100-eval001",
+  "target": "logging.ts",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 2,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 4,
+  "layers": 39
+ },
+ {
+  "case": 17,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-112100-eval001",
+  "target": "logging.ts",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 4,
+  "j_decoy": 0,
+  "l_target": 2,
+  "l_decoy": 4,
+  "layers": 39
+ },
+ {
+  "case": 18,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-131832-eval006",
+  "target": "aws_hook.py",
+  "decoy": "logging.ts",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 18,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-131832-eval006",
+  "target": "aws_hook.py",
+  "decoy": "logging.ts",
+  "j_target": 19,
+  "j_decoy": 0,
+  "l_target": 12,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 19,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-134455-eval007",
+  "target": "cnl_blueprint.py",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 0,
+  "j_decoy": 4,
+  "l_target": 0,
+  "l_decoy": 1,
+  "layers": 39
+ },
+ {
+  "case": 19,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-134455-eval007",
+  "target": "cnl_blueprint.py",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 20,
+  "j_decoy": 17,
+  "l_target": 3,
+  "l_decoy": 5,
+  "layers": 39
+ },
+ {
+  "case": 20,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "cnl_blueprint.py",
+  "j_target": 2,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 20,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "cnl_blueprint.py",
+  "j_target": 17,
+  "j_decoy": 16,
+  "l_target": 4,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 21,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "app.js",
+  "j_target": 2,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 21,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "app.js",
+  "j_target": 7,
+  "j_decoy": 0,
+  "l_target": 4,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 22,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "shave.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 22,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "shave.js",
+  "j_target": 6,
+  "j_decoy": 0,
+  "l_target": 4,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 23,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "app.js",
+  "j_target": 2,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 23,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-151227-eval010",
+  "target": "llamafy_baichuan2.py",
+  "decoy": "app.js",
+  "j_target": 5,
+  "j_decoy": 0,
+  "l_target": 4,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 24,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-182137-eval018",
+  "target": "context_serializers.py",
+  "decoy": "app.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 24,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-182137-eval018",
+  "target": "context_serializers.py",
+  "decoy": "app.js",
+  "j_target": 7,
+  "j_decoy": 0,
+  "l_target": 4,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 25,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260902-185108-eval020",
+  "target": "shave.js",
+  "decoy": "aws_hook.py",
+  "j_target": 11,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 25,
+  "cut": "prefix_at_path",
+  "run_id": "20260902-185108-eval020",
+  "target": "shave.js",
+  "decoy": "aws_hook.py",
+  "j_target": 11,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 26,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260904-100337-eval001",
+  "target": "logging.ts",
+  "decoy": "app.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 26,
+  "cut": "prefix_at_path",
+  "run_id": "20260904-100337-eval001",
+  "target": "logging.ts",
+  "decoy": "app.js",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 27,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260904-153454-eval012",
+  "target": "logging.ts",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 2,
+  "layers": 39
+ },
+ {
+  "case": 27,
+  "cut": "prefix_at_path",
+  "run_id": "20260904-153454-eval012",
+  "target": "logging.ts",
+  "decoy": "llamafy_baichuan2.py",
+  "j_target": 0,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 2,
+  "layers": 39
+ },
+ {
+  "case": 28,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260904-153454-eval012",
+  "target": "logging.ts",
+  "decoy": "shave.js",
+  "j_target": 2,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 28,
+  "cut": "prefix_at_path",
+  "run_id": "20260904-153454-eval012",
+  "target": "logging.ts",
+  "decoy": "shave.js",
+  "j_target": 2,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 29,
+  "cut": "prefix_at_sentence",
+  "run_id": "20260904-191425-eval019",
+  "target": "link-writer.js",
+  "decoy": "logging.ts",
+  "j_target": 1,
+  "j_decoy": 0,
+  "l_target": 0,
+  "l_decoy": 0,
+  "layers": 39
+ },
+ {
+  "case": 29,
+  "cut": "prefix_at_path",
+  "run_id": "20260904-191425-eval019",
+  "target": "link-writer.js",
+  "decoy": "logging.ts",
+  "j_target": 2,
+  "j_decoy": 0,
+  "l_target": 1,
+  "l_decoy": 0,
+  "layers": 39
+ }
+]
+
+READ THE CONTROL FIRST. If decoy tracks target, the lens is reading 'a filename is coming', not which one, and nothing here is about relocation.
+PROBE WRAPPER FINISHED
