@@ -19,47 +19,33 @@ date: 2026-09-07
 # The abstract is a PART, not a `## Abstract` heading. The lapreprint template has a slot for it and
 # errors when the slot is empty ("'parts' missing required key: abstract"); a heading leaves the
 # slot empty and renders the abstract as an ordinary first section instead.
-# Written to the annotated-abstract structure: topic, motivation, contribution, detail, evidence,
-# weaker result, narrow impact, broad impact — one move per sentence, in that order. The site
-# renders the same text colour-coded by role (§"Annotated abstract"); here it reads as prose,
-# because the annotation is a claim about the argument rather than part of it.
+# One sentence per role, in the order the annotated-abstract format sets: topic, motivation,
+# contribution, detail/nuance, evidence, weaker result, narrow impact, broad impact. The site
+# renders this same text color-coded by role.
 parts:
   abstract: |
-    Agentic harnesses for vulnerability localisation emit long reasoning traces and then reduce
+    Agentic harnesses for vulnerability localization emit long reasoning traces and then reduce
     them to a ranked list of files, discarding the reasoning. Whether that discarded text carries
-    information the structured output does not is a chain-of-thought faithfulness question, and
-    unusually it is one with an answer key: each task is a real CVE at the commit before its fix,
-    so the fix commit names the true files independently of anything the model said. We mine 504
-    trajectories for *relocations* — statements where a run contradicts the question it was given
-    and names a different file — report that our own headline result does not survive
-    de-duplication, and then ask at the activation level whether the relocated file, or the
-    decision to relocate at all, is recoverable before the model writes it. Relocations are
-    extracted with four filters (position within the step, supersession, a real-extension test,
-    and hedge detection), which remove 33 of 133 raw candidates on a held-out sample; every
-    readout is scored a second time against a seeded decoy, every probe is cross-validated
-    leave-one-claim-out with dimensionality reduction fitted inside each fold, and every AUC is
-    reported against a permutation null for the identical procedure rather than against 0.5.
-    Denominators differ between results because the admission rules do — a genuinely earlier cut, a
-    gold label, an available cross-run centroid, a balanced control — and each is stated where it
-    applies rather than chosen after the fact.
-    Counted per mention, relocations name a true gold file 81.4% of the time, apparently beating
-    the 49.8% calibration of three-of-three pass agreement; counted per distinct (task, file)
-    claim — the unit the baseline is measured on — precision is 40.5% on 37 claims, below the
-    baseline, with one claim restated 55 times; and at the token before the file is named, asking
-    the model outright
-    recovers it in 18 of 30 claims against a decoy floor of 3 (p = 0.0003) while a Jacobian lens
-    recovers 11 of 31 against a floor of 5 (p = 0.15). The activation-level follow-ups are weaker
-    still and are reported as such: a trained readout appears to recover the file at 20 of 24
-    claims at its best layer, but relocated filenames are nested inside repositories and the
-    deconfounded version scores two; right-versus-wrong relocation is null with a detection
-    threshold of AUC 0.676 at 35 claims; and whether a relocation is coming is suggestive at late
-    layers while surviving no correction for multiple comparisons. For trace mining specifically, the unit of analysis
-    determines the headline, and repetition within a trace is not independent evidence. More
-    broadly, five artifacts here each produced a publishable-looking number and every one pointed
-    the way the hypothesis wanted — a repository detector, a delimiter detector separating classes
-    at the embedding layer, a prompt-length shortcut, a per-mention count, and a permutation null
-    built at the wrong unit — none caught by finding the result implausible, each caught by a
-    control built in advance.
+    information the ranked list does not is a chain-of-thought faithfulness question, and it is
+    normally unanswerable, because the reasoning and the output are both model artifacts with
+    nothing independent to check them against. In this work we show that vulnerability
+    localization supplies that missing third object (every task sits at the commit before a real
+    fix, so the fix commit names the true files whatever the model said), and we use it to audit
+    504 agent trajectories. Specifically, we mine *relocations*, statements where a run abandons
+    the file it was asked about and names another, and find their precision is 81.4% counted per
+    mention but 40.5% counted per distinct claim, below the baseline they had been reported as
+    beating, because three tasks are half the population and one claim is restated 55 times. Using
+    the same corpus we then ask whether the relocated file can be read out before the model writes
+    it: asking the model outright recovers it in 18 of 30 claims against a decoy floor of 3, while
+    a Jacobian lens reaches 11 of 31 against a floor of 5, so the information is present and this
+    readout does not find it. Finally, we extract the residual stream and run four activation-level
+    probes, each of which returns a null or an artifact, including one that recovers the file in 20
+    of 24 claims by identifying the repository rather than the file. Our findings show that when
+    mining assertions from transcripts the unit of analysis decides the headline, and that
+    repetition inside a trace is not independent evidence. More broadly, five measurements here
+    looked publishable and were not, every one of them flattering the hypothesis, and each was
+    caught by a control fixed before the number was seen rather than by doubting the number
+    afterward.
 ---
 
 :::{warning} Confidential working draft
@@ -73,10 +59,10 @@ corrected value rather than only the survivor. Numbers may change.
 ## Why this setting has ground truth
 
 Faithfulness experiments usually cannot check a model's stated target against an objective answer.
-The stated reasoning and the final output are both model artefacts; a third, independent
+The stated reasoning and the final output are both model artifacts; a third, independent
 statement of what the answer *is* rarely exists.
 
-Vulnerability localisation supplies one. A task is a repository checked out at the parent of a
+Vulnerability localization supplies one. A task is a repository checked out at the parent of a
 known fix commit. The weakness is present at that commit and absent at its child. The fix commit
 is a diff, so it names the files and line ranges that were actually wrong, and it was written by
 the project's own maintainers rather than by an annotator reading model output.
@@ -157,7 +143,7 @@ The correct unit is the claim, because the claim is what a downstream consumer w
 file is either submitted or not, however many times the reasoning mentioned it. On that unit the
 mined signal is **below** the agreement baseline, and does not justify being used as a filter.
 
-This generalises past this harness. Any pipeline that mines assertions from long transcripts can
+This generalizes past this harness. Any pipeline that mines assertions from long transcripts can
 count mentions, and mentions are the default unit because they are what a regex returns. The
 inflated number is the one that looks publishable.
 
@@ -206,7 +192,7 @@ do not know, and §4 is the reason we decline to claim otherwise.
 Claims about a model are only worth their instrument. Two mechanisms carry that weight here.
 
 **Every claim is resolved against the real checkout** on the way into a casefile. A path that does
-not exist at that commit is struck through, scored `p_gold 0.0`, and labelled `fabricated` rather
+not exist at that commit is struck through, scored `p_gold 0.0`, and labeled `fabricated` rather
 than dropped, so the failure stays visible. This fires on 3 of 20 tasks in the current bank —
 fabricated paths are built out of the question's own vocabulary, which makes them the most
 plausible-looking rows in the table.
@@ -221,7 +207,7 @@ Each was found by asking a number what it was made of:
 | Model served with reasoning disabled | Three flags asserted it; 107 of 107 streamed tokens were reasoning |
 | Arms differ by enricher | Locate was not replayed, so the arms received different file lists |
 
-The last two are recent. The third is instructive: a server flag named for the desired behaviour,
+The last two are recent. The third is instructive: a server flag named for the desired behavior,
 accepted without error, that did not produce it — the request-level parameter overrode it. A flag
 named for the thing you want is not evidence the thing happened.
 
@@ -285,7 +271,7 @@ survives is the target column: 18 of 30 claims naming the exact repository-relat
 the many files in that repository the model could have named instead. The lens is unaffected in
 direction — a floor that is too low could only have flattered it, and it was null regardless. The
 repair for a successor corpus is specific: draw relocation pairs from **within** a repository, so
-that project identity favours both candidates equally.
+that project identity favors both candidates equally.
 
 **The information is there. The lens does not read it.** That is the pilot's result, and it is a
 statement about the instrument rather than about the model. It also makes the faithfulness
@@ -390,17 +376,17 @@ answer moved, not whether the reasoning went somewhere true.
 
 **Two specific disagreements with how this is usually done.**
 
-*Accuracy conditioned on a behaviour is a selection artifact waiting to happen.* A natural analysis
-is to split traces by whether the behaviour occurred and compare accuracy. The trap is that the
-behaviour and the truncation budget are correlated: long traces are both likelier to contain a given
+*Accuracy conditioned on a behavior is a selection artifact waiting to happen.* A natural analysis
+is to split traces by whether the behavior occurred and compare accuracy. The trap is that the
+behavior and the truncation budget are correlated: long traces are both likelier to contain a given
 phrase and likelier to be cut off. A study reporting that a self-correction marker predicts 100%
 accuracy, against a corpus whose overall accuracy is far lower, has almost certainly conditioned on
 completion. We report the analogous split (21 correct against 14 wrong, §*The follow-up*) with the
-labelling rule stated and both rules' outcomes given, because the rule moved the balance from 21/14
+labeling rule stated and both rules' outcomes given, because the rule moved the balance from 21/14
 to 27/11 on its own.
 
 *A resampling test without a matched base rate is not a test.* Regenerating from a context that
-historically preceded a behaviour, and finding the behaviour recurs, establishes very little unless
+historically preceded a behavior, and finding the behavior recurs, establishes very little unless
 the same procedure is run from matched contexts that did not. That is the entire content of our
 control export — same run, no relocation in the step, matched on prefix length and final character —
 and getting it right took three attempts, each of which produced a confident number first (§*The
@@ -429,7 +415,7 @@ and with a causal trace: a consolation clause in the prompt drives stated reloca
 submitted output at 17.2% against 0.5% (odds ratio 39), and one transcript records the model
 resolving to cite the right file and then being redirected mid-sentence. Prompt-level instructions
 are not a nuisance parameter in agentic localization; they are a load-bearing part of the measured
-behaviour.
+behavior.
 
 @fastcontext2026 separate exploration from solving into a dedicated subagent rewarded on
 patch-derived file and line F1, and two of their methodological choices are ones we arrived at
@@ -450,7 +436,7 @@ The question this dataset is positioned to ask is whether it is visible **in the
 before the output is produced**.
 
 All of the questions below have now been attempted, and none came back the way it was proposed.
-Question 1 turned out to be unanswerable on this corpus, for a reason worth stating precisely.
+Question 1 turned out to be unanswerable on this corpus, for a specific reason.
 Question 2 is null, against a null distribution that had to be measured rather than assumed.
 Question 3 was added during the follow-up. Question 4's premise did not survive reading the traces.
 
@@ -460,7 +446,7 @@ pointed in the direction the hypothesis wanted**: a repository detector reading 
 a delimiter detector reading as an event probe, a prompt-length shortcut, a per-mention count
 inflating a per-claim p-value, and a permutation null built at the wrong unit. None was caught by
 finding the result implausible. Each was caught by a control built in advance to catch that class of
-error, which is the only method that works when the artifact and the hypothesis agree.
+error.
 
 Concretely, the corpus supplies per trace a triple — stated location, submitted location, true
 location — with 218 relocations mined and 6 where a stated location never reaches the output.
@@ -474,8 +460,8 @@ rather than a run.
 
 ### Why the denominators differ
 
-Five populations appear below and they are not the same set. That is worth stating plainly, because
-a shifting denominator is exactly what selective reporting looks like from the outside.
+Five populations appear below and they are not the same set. A shifting denominator is what
+selective reporting looks like from the outside, so here is each one and what admits a claim to it.
 
 | n | population | admission rule |
 |---|---|---|
@@ -517,7 +503,7 @@ built with within-repository relocation pairs rather than filtered into having t
 *Each bar is a repository; its height is the number of distinct files the model ever relocated to
 inside it. Only the four above the dashed line can supply a same-repository decoy at all. With
 filenames nested inside projects this way, "prefers the target over the decoy" is satisfiable by
-recognising the repository — which every method under test can do, because the context is that
+recognizing the repository — which every method under test can do, because the context is that
 repository's source.*
 
 ### Q2. Do divergent traces look different at the point of divergence?
@@ -539,11 +525,11 @@ claims in the hundreds, and the constraint is not compute but corpus: 218 reloca
 75 used here were what one A100 session could extract.
 
 A separate sweep asked what a single dimension is worth here, running the familiar recipe — rank
-every unit by ROC-AUC, take the best, check Cohen's *d*, observe it fails to generalise — and adding
+every unit by ROC-AUC, take the best, check Cohen's *d*, observe it fails to generalize — and adding
 the step usually skipped: the same procedure on shuffled labels. Mean in-sample AUC was **0.847**
 with real labels and **0.852** with random ones, held-out **0.349**, with Cohen's *d* reaching 0.65
 on provable noise. At 2,048 dimensions and 35 claims the best-looking unit is the best of 2,048
-draws, and "high AUC, large effect, fails to generalise, therefore polysemanticity" is a conclusion
+draws, and "high AUC, large effect, fails to generalize, therefore polysemanticity" is a conclusion
 this data reaches with no signal present at all.
 
 ![What the best single dimension is worth](images/diagrams/noise.svg)
@@ -628,7 +614,7 @@ nor the output produced.
 ## Limitations
 
 - 37 distinct claims is a small denominator. The per-claim precision of 40.5% has a wide interval,
-  and the honest reading is "below baseline, not usefully estimated".
+  and the reading is "below baseline, not usefully estimated".
 - Three tasks dominating the mention population means the corpus is not diverse at the trace
   level, whatever the task count suggests.
 - Relocation is one operationalisation of stated/acted divergence and the narrowest one. It does

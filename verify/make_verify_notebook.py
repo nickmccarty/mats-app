@@ -11,7 +11,7 @@ every layer for both lenses, plus the token sets for each target and decoy. Ever
 the report is a re-score of that file, which is exactly why it was recorded that way.
 
 Run: python verify/make_verify_notebook.py
-Then upload verify/verify_findings.ipynb with the three JSON files beside it.
+Then open verify/verify_findings.ipynb in Colab and Run all: it fetches its own inputs.
 """
 from __future__ import annotations
 
@@ -38,7 +38,8 @@ CELLS = [
 Every number in the report and on the site, recomputed here from raw files. Nothing is asserted;
 each cell prints what it computed next to what was claimed and marks it PASS or FAIL.
 
-**Upload these files next to the notebook** (all are in `verify/` in the repo):
+**Nothing to upload.** The cell below fetches these from `verify/` in the repository;
+drop your own copies beside the notebook to override them.
 
 | file | what it is |
 |---|---|
@@ -66,13 +67,23 @@ The third is the one that changes the conclusion.
 """),
 
     code(r"""
-import json, math, collections, pathlib
+import json, math, collections, pathlib, urllib.request
 
-def load(name):
+# Inputs come from the repository unless they are already sitting next to the notebook. A cold
+# Colab runtime starts empty, and "upload these seven files first" is the step that gets skipped —
+# so Run-all works from a fresh runtime with no setup. Drop the files in beside the notebook and
+# they win, which keeps this usable offline and against modified inputs.
+RAW = "https://raw.githubusercontent.com/nickmccarty/mats-app/main/verify/"
+
+def fetch(name):
     p = pathlib.Path(name)
     if not p.exists():
-        raise SystemExit(f"missing {name} — upload it next to this notebook")
-    return json.loads(p.read_text(encoding="utf-8"))
+        print(f"  fetching {name}")
+        urllib.request.urlretrieve(RAW + name, p)
+    return p
+
+def load(name):
+    return json.loads(fetch(name).read_text(encoding="utf-8"))
 
 cases = load("reloc_cases.json")
 rows  = load("reloc_results.json")
@@ -409,7 +420,7 @@ try:
     cases75 = load("reloc_cases_75.json")
     ask     = load("ask_baseline_75.json")
     lens_rows = [json.loads(l) for l
-                 in pathlib.Path("reloc_rows_75.jsonl").read_text(encoding="utf-8").splitlines()
+                 in fetch("reloc_rows_75.jsonl").read_text(encoding="utf-8").splitlines()
                  if l.strip()]
 except (SystemExit, FileNotFoundError) as e:
     print(e); cases75 = ask = lens_rows = None

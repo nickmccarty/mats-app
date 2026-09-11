@@ -2,7 +2,7 @@
 
 **Working draft — not for redistribution.**
 
-Agentic harnesses for vulnerability localisation emit long reasoning traces and then reduce them to
+Agentic harnesses for vulnerability localization emit long reasoning traces and then reduce them to
 a ranked list of files, discarding the reasoning. Whether that discarded text carries information
 the output does not is a chain-of-thought faithfulness question — and unusually, one with an answer
 key: each task is a real CVE at the commit before its fix, so the fix commit names the true files
@@ -25,33 +25,29 @@ independently of anything the model said.
 ## The short version
 
 **We retract our own headline.** Counted per mention, mined relocations name a true gold file 81.4%
-of the time — apparently beating the 49.8% calibration they are measured against. Counted per
-distinct claim, which is the unit that baseline uses, precision is **40.5% on 37 claims**, below it.
-One claim is restated 55 times. Three tasks are half the population.
+of the time, which looks like it beats the 49.8% calibration they are measured against. Counted per
+distinct claim, the unit that calibration uses, precision is **40.5% on 37 claims**, below it. Three
+tasks are half the population and one claim is restated 55 times.
 
 **The cheap baseline beats the instrument.** At the token before the model writes the relocated
 file, asking it outright recovers the file in **18 of 30 claims**; a Jacobian lens on the same
 claims gets 11 of 31. Something at that point determines the answer and this readout does not reach
-it — a statement about the instrument, not the model.
+it. That is a result about the instrument.
 
-**Every activation-level follow-up came back null, or came back an artifact.** A trained readout
-appears to recover the file at 20 of 24 claims at its best layer; it is detecting the *repository*,
-and deconfounded
-it scores two. Right-versus-wrong relocation is null at a detection threshold of AUC 0.676. Whether
-a relocation is *coming* is suggestive at late layers and survives no correction for multiple
+**Every activation-level follow-up returned a null or an artifact.** A trained readout recovers the
+file in 20 of 24 claims at its best layer, but it is identifying the *repository*; deconfounded it
+scores two. Right-versus-wrong relocation is null at a detection threshold of AUC 0.676. Whether a
+relocation is *coming* is suggestive at late layers and survives no correction for multiple
 comparisons.
 
-**Five numbers in this work looked publishable and were not — and every one of them pointed the way
-the hypothesis wanted.** A repository detector reading as a filename probe; a delimiter detector
-separating classes *at the embedding layer*, before any transformer block had run; a prompt-length
-shortcut; a per-mention count inflating a per-claim p-value; and a permutation null built at the
-wrong unit. None was caught by finding the result implausible. Each was caught by a control built in
-advance to catch that class of error, which is the only method that works when the artifact and the
-hypothesis agree.
+**Five measurements here looked publishable and were not, and every one flattered the hypothesis.**
+A repository detector reading as a filename probe. A delimiter detector separating classes at the
+embedding layer, before any transformer block had run. A prompt-length shortcut. A per-mention count
+inflating a per-claim p-value. A permutation null built at the wrong unit. None was caught by
+doubting the result; each was caught by a control fixed before the number was seen.
 
-That last paragraph is what this repository is for. The corrections are reported with **both**
-values, and `verify/verify_findings.ipynb` recomputes both so a correction is arithmetic a reader
-can run rather than a claim they have to take.
+Corrections are reported with **both** values, and `verify/verify_findings.ipynb` recomputes both,
+so a correction is arithmetic you can run instead of a claim you have to accept.
 
 ## What the pilot found
 
@@ -77,7 +73,7 @@ not the model — and it makes the faithfulness question well-posed rather than 
 decoy in every row is another case's real target, drawn from the whole corpus. But relocated
 filenames are almost perfectly nested inside repositories: **20 of 21 distinct basenames occur in
 exactly one repo, and 71 of 75 decoys name a file from a different project than the one being
-read.** A method can prefer the target over that decoy by recognising the repository — which every
+read.** A method can prefer the target over that decoy by recognizing the repository — which every
 method here has free access to, because the entire context is that project's source.
 
 So the *decoy* column is a floor that is too low, not a noise estimate. What survives is the
@@ -90,12 +86,12 @@ is too low could only have flattered it, and it was null regardless.
 *Each bar is a repository; its height is the number of distinct files the model ever relocated to
 inside it. Only the four above the dashed line can supply a same-repository decoy at all. With
 filenames nested inside projects this way, "prefers the target over the decoy" is satisfiable by
-recognising the repository — which every method under test can do, because the context is that
+recognizing the repository — which every method under test can do, because the context is that
 repository's source.*
 
 `code/decoy_scope_audit.py` reproduces the published 30/18/3 from the stored replies and then
 re-states it. The repair for a future corpus is concrete: relocation pairs must be drawn from
-**within** a repository, so that repo identity favours both candidates equally.
+**within** a repository, so that repo identity favors both candidates equally.
 
 The comparison is deliberately unfair to the lens: it reads one activation, while the baseline
 lets the model generate up to 2,400 tokens first. A baseline that strong losing would have settled
@@ -141,7 +137,7 @@ been invisible.
 ![The best single dimension: real labels, shuffled labels, and held-out claims](report/figures/noise.png)
 
 *The familiar recipe — rank every unit by ROC-AUC, take the best, note its Cohen's d, observe it
-fails to generalise, conclude polysemanticity — run here with the step that is usually skipped: the
+fails to generalize, conclude polysemanticity — run here with the step that is usually skipped: the
 same procedure on **shuffled** labels. Mean in-sample AUC is 0.847 with real labels and 0.852 with
 random ones. The two curves are the same curve. Held-out drops to 0.349, and Cohen's d reaches 0.65
 on labels carrying no information at all.*
@@ -217,7 +213,7 @@ Google Docs accepts PNG/JPEG/GIF but cannot insert an SVG at all.
 - `trajectories/` — the full ATIF trace, tool trace and casefile for all 29 runs behind the cases
 - `logs/` — the per-run probe logs and the baseline log
 
-## Method notes worth knowing before reading the numbers
+## Method notes, before the numbers
 
 **Read target against decoy, never against zero.** Every readout is scored a second time against
 another case's target — same filename distribution, wrong answer. The criterion ("any token in a
@@ -225,7 +221,7 @@ top-20, at any layer") is permissive by design and the decoy measures exactly ho
 
 **Per claim, not per mention.** The 30 mentions are 17 distinct (repo, target) claims; one is
 restated 7 times. Counting mentions inflates in the flattering direction, which is the error the
-main report exists to retract.
+main report retracts.
 
 **Distinctive tokens, symmetrically.** Two unrelated filenames sharing `.py` scored a hit for the
 target and the decoy at once. Shared tokens are now dropped from both sides. Dropping them from
@@ -261,7 +257,7 @@ PASS/FAIL. It currently reports **40 of 40**. Where a number was corrected durin
 the original and the corrected value are computed, so a correction is visible as arithmetic rather
 than asserted in prose.
 
-This is the honest entry point: it checks the arithmetic without trusting the pipeline that
+It checks the arithmetic without trusting the pipeline that
 produced it.
 
 ### 2. Re-run the lens — Colab A100, ~15 min weights + ~90 min probe
@@ -368,11 +364,11 @@ rather than promised:
 
 | precaution | what it prevents |
 |---|---|
-| folds are **leave-one-claim-out**, never leave-one-row-out | one claim appears as several mentions and at two cut points; a random split puts near-duplicates of the test row in training. The notebook prints the naive number beside the honest one — the gap *is* the artefact |
+| folds are **leave-one-claim-out**, never leave-one-row-out | one claim appears as several mentions and at two cut points; a random split puts near-duplicates of the test row in training. The notebook prints the naive number beside the honest one — the gap *is* the artifact |
 | a **permutation null**, 500 shuffles per layer | the reported p is the fraction of label shuffles that beat the real labels, so the null is measured on this data rather than assumed to be 0.5 |
 | PCA fitted **inside** each fold | fitting once on everything leaks the test fold into the projection |
 
-One more choice worth knowing about: Q2's labels come from matching the relocated file against gold.
+One more choice: Q2's labels come from matching the relocated file against gold.
 Matching on the exact repo-relative path gives **21 correct / 17 wrong** across 38 claims; also
 accepting a bare-filename match gives **27 / 11**. The looser rule hands the classifier a class
 balance manufactured by the scoring rule, so the strict labels are the ones used.
@@ -404,7 +400,7 @@ anything about activations. That is the floor the real probe has to clear, and f
 leave-one-**run**-out because a positive and its matched negative share a run.
 
 **What is the best single dimension worth?** `dim_auc_sweep.py` runs the standard recipe — score
-every unit by ROC-AUC, take the best, note its Cohen's *d*, check whether it generalises — and adds
+every unit by ROC-AUC, take the best, note its Cohen's *d*, check whether it generalizes — and adds
 the step that is usually skipped: the same procedure on **shuffled labels**.
 
 ```
@@ -435,7 +431,7 @@ Stated plainly, because a reader should not have to find these in the prose.
   the event probe. Every null here is weak: the Q2 probe could not have detected anything below
   AUC 0.676, and 0.676 is a large effect. The nulls bound the effects; they do not exclude them.
 - **One model, one corpus, one cut point.** Qwen3.6-35B-A3B on 15 repositories. Nothing here
-  establishes that any of it generalises.
+  establishes that any of it generalizes.
 - **The decoy controls for filename plausibility, not repository identity.** 71 of 75 decoys name a
   file from a different project. Every target-vs-decoy figure therefore reports a floor that is too
   low. It does not change the lens result, which was null against an over-generous floor.

@@ -50,7 +50,8 @@ state at that moment does not know it is about to be wrong.
 Both need the residual vectors themselves, so they were re-extracted with `output_hidden_states=True`
 — no lens involved.
 
-**Upload these next to the notebook:**
+**Nothing to upload.** The cell below fetches these from the repository; drop your own
+copies beside the notebook to override them.
 
 | file | what it is |
 |---|---|
@@ -83,12 +84,19 @@ Three specific precautions, each demonstrated below rather than promised:
 """),
 
     code(r"""
-import json, pathlib, numpy as np
+import json, pathlib, urllib.request, numpy as np
+
+# Inputs come from the repository unless they are already sitting next to the notebook. A cold
+# Colab runtime starts empty, and "upload these six files first" is the step that gets skipped —
+# so Run-all works from a fresh runtime with no setup. Files placed beside the notebook win, which
+# keeps this usable offline and against modified inputs. resid.npz is ~20 MB, the rest are small.
+RAW = "https://raw.githubusercontent.com/nickmccarty/mats-app/main/verify/"
 
 def need(name):
     p = pathlib.Path(name)
     if not p.exists():
-        raise SystemExit(f"missing {name} — upload it next to this notebook")
+        print(f"  fetching {name}")
+        urllib.request.urlretrieve(RAW + name, p)
     return p
 
 Z      = np.load(need("resid.npz"))
@@ -382,8 +390,7 @@ favours both candidates equally, and anything above chance has to come from tell
     code(r"""
 import collections, random
 
-cases = json.loads(_p.Path("reloc_cases_75.json").read_text(encoding="utf-8"))[:75] \
-        if _p.Path("reloc_cases_75.json").exists() else None
+cases = json.loads(need("reloc_cases_75.json").read_text(encoding="utf-8"))[:75]
 
 # Derive the decoy pairing from the seed rather than trusting the uploaded artifact, so this cell
 # runs whether or not tok_emb_names.json is present -- and so a drift between the two is visible.
@@ -539,11 +546,14 @@ matched negative share a run and would otherwise sit on opposite sides of a spli
 
     code(r"""
 import pathlib as _p
-if not _p.Path("resid_ctrl.npz").exists():
+try:
+    ZC = np.load(need("resid_ctrl.npz"))
+except Exception as _e:
+    ZC = None
+if ZC is None:
     print("resid_ctrl.npz not uploaded — skipping the event probe.")
 else:
-    ZC = np.load("resid_ctrl.npz")
-    MC = json.loads(_p.Path("resid_ctrl_meta.json").read_text(encoding="utf-8"))
+    MC = json.loads(need("resid_ctrl_meta.json").read_text(encoding="utf-8"))
 
     ctl_by_case = {m["matched_case"]: m for m in MC}
 
