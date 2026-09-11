@@ -1,0 +1,194 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>CTARP probe figures</title>
+<script src="d3.min.js"></script>
+<style>
+  :root{
+    --ink:#14171a; --mid:#5b6570; --faint:#c8cdd3; --rule:#e3e7ea; --bg:#ffffff;
+    --real:#b5462f;     /* the measurement */
+    --null:#9aa5b1;     /* the null band */
+    --alt:#2f6f8f;      /* the second series */
+    --warn:#8a6d1f;
+  }
+  html,body{background:var(--bg);color:var(--ink);margin:0;
+    font:14px/1.5 "Source Sans 3","Segoe UI",system-ui,sans-serif}
+  .fig{width:940px;margin:28px auto;padding:22px 26px 26px;background:var(--bg)}
+  h2{font:600 17px/1.3 "Source Serif 4",Georgia,serif;margin:0 0 2px}
+  .sub{color:var(--mid);font-size:12.5px;margin:0 0 16px;max-width:70ch}
+  .axis text{fill:var(--mid);font-size:11px}
+  .axis line,.axis path{stroke:var(--rule)}
+  .lbl{font-size:11px;fill:var(--mid)}
+  .key{font-size:11.5px;fill:var(--ink)}
+  .note{font-size:11.5px;color:var(--mid);margin-top:10px;max-width:78ch}
+  .tag{font:600 10.5px/1 ui-monospace,monospace;letter-spacing:.04em;
+    text-transform:uppercase;fill:var(--mid)}
+  b{color:var(--ink)}
+</style>
+<div class="fig" id="fig-null-band">
+  <h2>Every AUC, against the null it has to clear</h2>
+  <p class="sub">At 23&ndash;35 independent units a linear probe separates <i>shuffled</i> labels too,
+  and the null is neither 0.5 nor constant across layers. The grey band is the permutation null
+  (mean to 95th percentile) for the identical procedure; the line is the measurement. A point inside
+  the band is not a result, however far above 0.5 it sits.</p>
+  <svg width="880" height="300"></svg>
+  <p class="note" id="nb-note"></p>
+</div>
+
+<div class="fig" id="fig-noise">
+  <h2>What the best single dimension is worth</h2>
+  <p class="sub">The familiar recipe: rank every unit by ROC-AUC, take the best, note its effect
+  size, observe that it fails to generalise, conclude polysemanticity. The step usually skipped is
+  the same procedure on <i>shuffled</i> labels &mdash; drawn here in grey. With 2,048 dimensions and
+  35 claims the best-looking unit is the best of 2,048 draws from noise.</p>
+  <svg width="880" height="300"></svg>
+  <p class="note" id="ns-note"></p>
+</div>
+
+<div class="fig" id="fig-confound">
+  <h2>Why the decoy controlled for less than it looked</h2>
+  <p class="sub">Each bar is one repository, its height the number of distinct files the model ever
+  relocated to inside it. A decoy drawn from the whole corpus almost always names a file from a
+  <i>different</i> project &mdash; and the residual encodes which project it is reading, because the
+  context is that project's source.</p>
+  <svg width="880" height="260"></svg>
+  <p class="note" id="cf-note"></p>
+</div>
+
+<script>
+const D = {"q2": [{"layer": 0, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.06296296296296296, "null_mean": 0.23790346954390731, "null_p95": 0.4161868686868687, "detectable_gap": 0.1782833991429614, "p": 0.8970099667774086}, {"layer": 6, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.28641975308641976, "null_mean": 0.38930923224446107, "null_p95": 0.6062654320987655, "detectable_gap": 0.21695619985430442, "p": 0.7740863787375415}, {"layer": 11, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.2740740740740741, "null_mean": 0.4130377614981115, "null_p95": 0.6188043478260871, "detectable_gap": 0.20576658632797556, "p": 0.840531561461794}, {"layer": 17, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.3172839506172839, "null_mean": 0.4160594066862125, "null_p95": 0.6503585167292898, "detectable_gap": 0.2342991100430773, "p": 0.7541528239202658}, {"layer": 23, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.4876543209876543, "null_mean": 0.42014067133847227, "null_p95": 0.6555434782608697, "detectable_gap": 0.2354028069223974, "p": 0.32558139534883723}, {"layer": 29, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.4160493827160494, "null_mean": 0.40458043039551667, "null_p95": 0.6326722928639306, "detectable_gap": 0.2280918624684139, "p": 0.4883720930232558}, {"layer": 34, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.2876543209876543, "null_mean": 0.42345700417925114, "null_p95": 0.6286444661035305, "detectable_gap": 0.2051874619242794, "p": 0.8305647840531561}, {"layer": 40, "n_readouts": 63, "n_claims": 35, "pos": 45, "auc": 0.5172839506172839, "null_mean": 0.43534845417820794, "null_p95": 0.6758742393509127, "detectable_gap": 0.2405257851727048, "p": 0.3023255813953488}], "event": [{"layer": 0, "auc": 0.55765595463138, "null_mean": 0.4492627599243857, "null_p95": 0.5935727788279773, "p": 0.10631229235880399}, {"layer": 6, "auc": 0.6275992438563327, "null_mean": 0.48954631379962193, "null_p95": 0.6483931947069943, "p": 0.08637873754152824}, {"layer": 11, "auc": 0.5954631379962193, "null_mean": 0.49172652804032757, "null_p95": 0.6485822306238186, "p": 0.15282392026578073}, {"layer": 17, "auc": 0.5935727788279773, "null_mean": 0.4960113421550094, "null_p95": 0.6526465028355388, "p": 0.14950166112956811}, {"layer": 23, "auc": 0.5349716446124764, "null_mean": 0.4836672967863894, "null_p95": 0.6313799621928167, "p": 0.31893687707641194}, {"layer": 29, "auc": 0.6275992438563327, "null_mean": 0.48001890359168253, "null_p95": 0.6258034026465028, "p": 0.053156146179401995}, {"layer": 34, "auc": 0.665406427221172, "null_mean": 0.481518588531821, "null_p95": 0.6352551984877126, "p": 0.03322259136212625}, {"layer": 40, "auc": 0.6502835538752363, "null_mean": 0.4771203528670448, "null_p95": 0.6278827977315691, "p": 0.03986710963455149}], "event_meta": {"length_only_auc": 0.499054820415879, "n_positives": 23, "bh_threshold_smallest": 0.00625, "bh_q05_survivors": []}, "sweep": [{"layer": 0, "dim": 12, "in_sample": 0.5972850678733032, "held_out": 0.17857142857142858, "shuffled_in_sample": 0.6036113592495176, "cohens_d": 0.08043213188648224, "n_claims": 35}, {"layer": 6, "dim": 69, "in_sample": 0.8083333333333333, "held_out": 0.24666666666666667, "shuffled_in_sample": 0.8686888936297832, "cohens_d": 0.3495766818523407, "n_claims": 35}, {"layer": 11, "dim": 1478, "in_sample": 0.8666666666666667, "held_out": 0.24404761904761904, "shuffled_in_sample": 0.8635076191243487, "cohens_d": 0.1857268065214157, "n_claims": 35}, {"layer": 17, "dim": 348, "in_sample": 0.8357487922705314, "held_out": 0.32323232323232326, "shuffled_in_sample": 0.8782429635653611, "cohens_d": 0.20526760816574097, "n_claims": 35}, {"layer": 23, "dim": 1599, "in_sample": 0.907608695652174, "held_out": 0.5545454545454546, "shuffled_in_sample": 0.8863358385124213, "cohens_d": 0.6525281667709351, "n_claims": 35}, {"layer": 29, "dim": 1749, "in_sample": 0.9714285714285714, "held_out": 0.3709090909090909, "shuffled_in_sample": 0.9099114719076935, "cohens_d": 0.3589124083518982, "n_claims": 35}, {"layer": 34, "dim": 1071, "in_sample": 0.9192546583850931, "held_out": 0.41735537190082644, "shuffled_in_sample": 0.8930726273551045, "cohens_d": 0.2977719008922577, "n_claims": 35}, {"layer": 40, "dim": 82, "in_sample": 0.8666666666666667, "held_out": 0.45714285714285713, "shuffled_in_sample": 0.9144627419189946, "cohens_d": 0.4163191318511963, "n_claims": 35}], "confound": {"repos": [{"repo": "pyload", "files": 5}, {"repo": "openpgpjs", "files": 2}, {"repo": "RageAgainstThePixel/setup-steamcmd", "files": 2}, {"repo": "fstream", "files": 2}, {"repo": "buildalon/setup-steamcmd", "files": 1}, {"repo": "haxcms-nodejs", "files": 1}, {"repo": "invenio-communities", "files": 1}, {"repo": "cadwyn", "files": 1}, {"repo": "LLaMA-Factory", "files": 1}, {"repo": "vllm", "files": 1}, {"repo": "llama_index", "files": 1}, {"repo": "shave", "files": 1}, {"repo": "airflow", "files": 1}, {"repo": "Flask-AppBuilder", "files": 1}, {"repo": "tarteaucitron.js", "files": 1}], "cross": 71, "n": 75, "single": 20, "names": 21}};
+const F = d3.format(".3f");
+
+/* ---------- small multiples: one panel per probe, each with ITS OWN null ----------
+   Overlaying two null bands on one axis made them indistinguishable, which defeats the
+   point of drawing the null at all. Each probe gets its own panel and its own band. */
+function panel(svg, s, ox, W, H){
+  const m={t:20,r:16,b:34,l:44};
+  const x=d3.scaleLinear().domain(d3.extent(s.rows,r=>r.layer)).range([ox+m.l,ox+W-m.r]);
+  const y=d3.scaleLinear().domain([0.25,0.80]).range([H-m.b,m.t]);
+
+  svg.append("text").attr("class","tag").attr("x",ox+m.l).attr("y",m.t-6)
+     .attr("fill",s.color).text(s.name);
+  svg.append("g").attr("class","axis").attr("transform",`translate(0,${H-m.b})`)
+     .call(d3.axisBottom(x).ticks(6).tickFormat(d=>d));
+  svg.append("g").attr("class","axis").attr("transform",`translate(${ox+m.l},0)`)
+     .call(d3.axisLeft(y).ticks(5));
+  svg.append("text").attr("class","lbl").attr("x",ox+W-m.r).attr("y",H-6)
+     .attr("text-anchor","end").text("layer");
+
+  const area=d3.area().x(d=>x(d.layer)).y0(d=>y(d.null_mean)).y1(d=>y(d.null_p95))
+               .curve(d3.curveMonotoneX);
+  svg.append("path").datum(s.rows).attr("d",area).attr("fill","var(--null)").attr("opacity",.38);
+
+  svg.append("line").attr("x1",ox+m.l).attr("x2",ox+W-m.r).attr("y1",y(0.5)).attr("y2",y(0.5))
+     .attr("stroke","var(--faint)").attr("stroke-dasharray","2 3");
+  svg.append("text").attr("class","lbl").attr("x",ox+m.l+3).attr("y",y(0.5)-4).text("0.5");
+
+  const line=d3.line().x(d=>x(d.layer)).y(d=>y(d.auc)).curve(d3.curveMonotoneX);
+  svg.append("path").datum(s.rows).attr("d",line).attr("fill","none")
+     .attr("stroke",s.color).attr("stroke-width",2);
+  svg.selectAll(null).data(s.rows).join("circle")
+     .attr("cx",d=>x(d.layer)).attr("cy",d=>y(d.auc))
+     .attr("r",d=>d.auc>d.null_p95?4.5:3)
+     .attr("fill",d=>d.auc>d.null_p95?s.color:"var(--bg)")
+     .attr("stroke",s.color).attr("stroke-width",1.5);
+
+  // call out layer 0 explicitly: it is the diagnostic, not a data point
+  const l0=s.rows[0];
+  svg.append("text").attr("class","lbl").attr("x",x(l0.layer)+2).attr("y",y(l0.auc)-10)
+     .attr("fill","var(--mid)").text("layer 0");
+}
+{
+  const svg=d3.select("#fig-null-band svg").attr("height",330);
+  panel(svg,{name:"event probe — is a relocation coming?",rows:D.event,color:"var(--real)"},0,440,300);
+  panel(svg,{name:"right vs wrong relocation",rows:D.q2,color:"var(--alt)"},440,440,300);
+  svg.append("text").attr("class","lbl").attr("transform","rotate(-90)")
+     .attr("x",-26).attr("y",13).attr("text-anchor","end").text("cross-validated AUC");
+  svg.append("text").attr("class","key").attr("x",440).attr("y",322)
+     .attr("text-anchor","middle").attr("fill","var(--mid)")
+     .text("shaded = permutation null (mean → 95th pct) · filled dot = above its null");
+}
+{
+  const e=D.event_meta, best=D.event.reduce((a,b)=>b.auc>a.auc?b:a);
+  d3.select("#nb-note").html(
+    `<b>Event probe</b> (${e.n_positives} matched pairs, length shortcut worth
+     ${F(e.length_only_auc)}): layer 0 &mdash; the embedding output, before any block has run &mdash;
+     sits at ${F(D.event[0].auc)} inside its null, which is the diagnostic passing. The peak is
+     ${F(best.auc)} at layer ${best.layer}. But eight layers are eight tests: Benjamini&ndash;Hochberg
+     at q=0.05 needs the smallest p below ${F(e.bh_threshold_smallest)}, and
+     <b>${(e.bh_q05_survivors&&e.bh_q05_survivors.length)?"":"nothing survives"}</b>.
+     <b>Right vs wrong</b> stays inside its null at every layer.`);
+}
+
+/* ---------- figure 2: real vs shuffled vs held-out ---------- */
+{
+  const svg=d3.select("#fig-noise svg"), W=880,H=300,m={t:18,r:150,b:34,l:46};
+  const x=d3.scaleLinear().domain(d3.extent(D.sweep,d=>d.layer)).range([m.l,W-m.r]);
+  const y=d3.scaleLinear().domain([0.1,1.0]).range([H-m.b,m.t]);
+  svg.append("g").attr("class","axis").attr("transform",`translate(0,${H-m.b})`)
+     .call(d3.axisBottom(x).ticks(8));
+  svg.append("g").attr("class","axis").attr("transform",`translate(${m.l},0)`)
+     .call(d3.axisLeft(y).ticks(5));
+  svg.append("text").attr("class","lbl").attr("x",W-m.r).attr("y",H-6)
+     .attr("text-anchor","end").text("layer");
+  svg.append("text").attr("class","lbl").attr("transform","rotate(-90)")
+     .attr("x",-m.t-6).attr("y",14).attr("text-anchor","end").text("AUC of the best dimension");
+  const series=[
+    {k:"in_sample",name:"real labels, in-sample",c:"var(--real)"},
+    {k:"shuffled_in_sample",name:"SHUFFLED labels, in-sample",c:"var(--null)"},
+    {k:"held_out",name:"real labels, held-out claims",c:"var(--alt)"}
+  ];
+  series.forEach(s=>{
+    const line=d3.line().x(d=>x(d.layer)).y(d=>y(d[s.k])).curve(d3.curveMonotoneX);
+    svg.append("path").datum(D.sweep).attr("d",line).attr("fill","none")
+       .attr("stroke",s.c).attr("stroke-width",s.k==="shuffled_in_sample"?2.5:2)
+       .attr("stroke-dasharray",s.k==="shuffled_in_sample"?"6 3":null);
+    svg.selectAll(null).data(D.sweep).join("circle")
+       .attr("cx",d=>x(d.layer)).attr("cy",d=>y(d[s.k])).attr("r",3).attr("fill",s.c);
+    const last=D.sweep[D.sweep.length-1];
+    svg.append("text").attr("class","key").attr("x",x(last.layer)+9).attr("y",y(last[s.k])+4)
+       .attr("fill",s.c).text(s.name);
+  });
+  svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(0.5)).attr("y2",y(0.5))
+     .attr("stroke","var(--faint)").attr("stroke-dasharray","2 3");
+  const mi=d3.mean(D.sweep,d=>d.in_sample), ms=d3.mean(D.sweep,d=>d.shuffled_in_sample),
+        mh=d3.mean(D.sweep,d=>d.held_out), md=d3.max(D.sweep,d=>d.cohens_d);
+  d3.select("#ns-note").html(
+    `Mean in-sample AUC is <b>${F(mi)}</b> with real labels and <b>${F(ms)}</b> with random ones &mdash;
+     the same number. Held-out drops to <b>${F(mh)}</b>, and Cohen's <i>d</i> reaches
+     <b>${md.toFixed(2)}</b> on labels that carry no information. "High AUC, large effect, fails to
+     generalise, therefore polysemanticity" is a conclusion this data reaches with nothing present.`);
+}
+
+/* ---------- figure 3: the nesting that broke the decoy ---------- */
+{
+  // generous bottom margin: two repositories need their owner prefix to disambiguate, and the
+  // rotated labels were being clipped at the old height
+  const svg=d3.select("#fig-confound svg").attr("height",310), W=880,H=310,m={t:18,r:24,b:124,l:46};
+  const r=D.confound.repos;
+  const x=d3.scaleBand().domain(r.map(d=>d.repo)).range([m.l,W-m.r]).padding(0.28);
+  const y=d3.scaleLinear().domain([0,d3.max(r,d=>d.files)]).nice().range([H-m.b,m.t]);
+  svg.append("g").attr("class","axis").attr("transform",`translate(0,${H-m.b})`)
+     .call(d3.axisBottom(x)).selectAll("text")
+     .attr("transform","rotate(-38)").attr("text-anchor","end").attr("dx","-.5em").attr("dy",".2em");
+  svg.append("g").attr("class","axis").attr("transform",`translate(${m.l},0)`)
+     .call(d3.axisLeft(y).ticks(4));
+  svg.append("text").attr("class","lbl").attr("transform","rotate(-90)")
+     .attr("x",-m.t-6).attr("y",14).attr("text-anchor","end").text("distinct files relocated to");
+  svg.selectAll(null).data(r).join("rect")
+     .attr("x",d=>x(d.repo)).attr("y",d=>y(d.files))
+     .attr("width",x.bandwidth()).attr("height",d=>y(0)-y(d.files))
+     .attr("fill",d=>d.files>=2?"var(--real)":"var(--faint)");
+  // the line a within-repo decoy needs to clear
+  svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(2)).attr("y2",y(2))
+     .attr("stroke","var(--warn)").attr("stroke-dasharray","4 3");
+  svg.append("text").attr("class","tag").attr("x",W-m.r).attr("y",y(2)-7)
+     .attr("text-anchor","end").attr("fill","var(--warn)")
+     .text("2 files — the minimum for a within-repository decoy");
+  const c=D.confound;
+  d3.select("#cf-note").html(
+    `<b>${c.single} of ${c.names}</b> distinct relocated filenames occur in exactly one repository,
+     and <b>${c.cross} of ${c.n}</b> seeded decoys name a file from a different project than the one
+     being read. Only the ${r.filter(d=>d.files>=2).length} highlighted repositories can supply a
+     same-repository decoy at all &mdash; which is why the deconfounded probe scores two claims.`);
+}
+</script>

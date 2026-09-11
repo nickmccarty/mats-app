@@ -1,4 +1,4 @@
----
+﻿---
 title: "Chain-of-Thought Faithfulness With Ground Truth"
 subtitle: "504 agent trajectories where the correct answer is known independently of the model, and a headline result that does not survive de-duplication"
 short_title: Faithfulness with Ground Truth
@@ -14,7 +14,7 @@ keywords:
 # and the body is a guarantee.
 open_access: false
 venue:
-  title: "Confidential draft — not for distribution"
+  title: "Confidential draft â€” not for distribution"
 date: 2026-09-07
 ---
 
@@ -33,8 +33,8 @@ information the structured output does not is a chain-of-thought faithfulness qu
 unusually it is one with ground truth: each task is a real CVE at the commit before its fix, and
 the fix commit names the true files and lines.
 
-We mine 504 trajectories for *relocations* — statements where a run contradicts the question it
-was given and names a different file — and report that our own headline result does not survive
+We mine 504 trajectories for *relocations* â€” statements where a run contradicts the question it
+was given and names a different file â€” and report that our own headline result does not survive
 de-duplication. Counted per mention, relocations name a true gold file 81.4% of the time,
 apparently beating the 49.8% calibration of three-of-three pass agreement. Counted per distinct
 (task, file) claim, which is the unit the baseline is measured on, precision is 40.5% on 37
@@ -62,7 +62,7 @@ known fix commit. The weakness is present at that commit and absent at its child
 is a diff, so it names the files and line ranges that were actually wrong, and it was written by
 the project's own maintainers rather than by an annotator reading model output.
 
-The model is given a symptom, the repository, and nothing else — no path, no CWE identifier, no
+The model is given a symptom, the repository, and nothing else â€” no path, no CWE identifier, no
 advisory text. It explores with `glob`, `grep` and `read`, then submits files and cites lines. Its
 transcript, its structured output, and the true answer are three independent objects.
 
@@ -82,15 +82,15 @@ mechanical evidence stage that uses no model at all.
 | locate | Antares-1B | ranks candidate files; run k times per task for agreement |
 | plan / judge | Qwen3.6-35B-A3B | selects files to examine, scores |
 | enrich | FastContext-4B | explores inside a chosen file and cites lines |
-| evidence | — | resolves every claim against the real checkout |
+| evidence | â€” | resolves every claim against the real checkout |
 
-Everything is local, so full activations are reachable for the follow-up proposed in §7. Every run
+Everything is local, so full activations are reachable for the follow-up proposed in Â§7. Every run
 writes an ATIF trajectory (per-node step records, tool calls, reasoning text) and a casefile (the
 structured output, ranked candidates, cited line ranges).
 
 Locate is run three times per task. The number of passes that name a file calibrates how likely
-it is to be gold: 1 of 3 → 8.0%, 2 of 3 → 22.6%, 3 of 3 → 49.8%, measured on this corpus. That
-calibration is the baseline any mined signal has to beat, and §4 turns on the fact that it is
+it is to be gold: 1 of 3 â†’ 8.0%, 2 of 3 â†’ 22.6%, 3 of 3 â†’ 49.8%, measured on this corpus. That
+calibration is the baseline any mined signal has to beat, and Â§4 turns on the fact that it is
 measured per distinct file, not per mention.
 
 ## Relocations
@@ -162,25 +162,25 @@ enricher prompt changed:
 | on or after | 189 | **1** | 0.5% |
 
 Fisher exact, two-sided: **p = 0.00016**, odds ratio 39. The earlier prompt carried a consolation
-clause — *"then cite the closest line in the file you were asked about"* — and one trace shows the
+clause â€” *"then cite the closest line in the file you were asked about"* â€” and one trace shows the
 model walking straight into it:
 
 > *"But the actual vulnerability (the default `verify=False`) is in `http_hook.py:163`. I should
 > cite that file and note it. Wait, the instructions say: 'If what you find says the weakness is
-> really in another file, SAY SO in your explanation and name it — that is worth recording — then
-> cite the closest…'"*
+> really in another file, SAY SO in your explanation and name it â€” that is worth recording â€” then
+> cite the closestâ€¦'"*
 
 It located the weakness, resolved to cite it, and was redirected by the instruction into filing an
 in-scope citation instead. That clause was removed on 2026-08-31, and the effect went with it.
 
 So the answer to the third follow-up question below is neither of the two it proposes. The
-never-submitted set is not a suppression story and not an error story — it is instruction
+never-submitted set is not a suppression story and not an error story â€” it is instruction
 following, and the instruction was ours. The honest reading of the 97% is therefore that it
 measures a prompt as much as a reduction: under a prompt that asked for a consolation citation,
 one relocation in six was lost.
 
 Whether those conclusions are *weighted* correctly is a separate question. On current evidence we
-do not know, and §4 is the reason we decline to claim otherwise.
+do not know, and Â§4 is the reason we decline to claim otherwise.
 
 ## Instrument validation
 
@@ -188,7 +188,7 @@ Claims about a model are only worth their instrument. Two mechanisms carry that 
 
 **Every claim is resolved against the real checkout** on the way into a casefile. A path that does
 not exist at that commit is struck through, scored `p_gold 0.0`, and labelled `fabricated` rather
-than dropped, so the failure stays visible. This fires on 3 of 20 tasks in the current bank —
+than dropped, so the failure stays visible. This fires on 3 of 20 tasks in the current bank â€”
 fabricated paths are built out of the question's own vocabulary, which makes them the most
 plausible-looking rows in the table.
 
@@ -203,7 +203,7 @@ Each was found by asking a number what it was made of:
 | Arms differ by enricher | Locate was not replayed, so the arms received different file lists |
 
 The last two are recent. The third is instructive: a server flag named for the desired behaviour,
-accepted without error, that did not produce it — the request-level parameter overrode it. A flag
+accepted without error, that did not produce it â€” the request-level parameter overrode it. A flag
 named for the thing you want is not evidence the thing happened.
 
 Arms are now run against a replayed locate stage, so the file list is identical across arms and
@@ -218,12 +218,12 @@ other) and has a published Jacobian lens.
 Each case replays a real trajectory to the moment **before** the model names the relocated file.
 Two cut points test different strengths of claim: `at_path` stops mid-sentence, after ``the
 vulnerability is present in ` ``; `at_sentence` stops before the clause exists at all. Every
-readout is scored a second time against a **decoy** — another case's target, so the filename
+readout is scored a second time against a **decoy** â€” another case's target, so the filename
 distribution matches and the answer is wrong.
 
 **Only the cut that is genuinely earlier counts.** `prefix_at_sentence` falls back to the whole
 step when a claim has no earlier sentence boundary, and for a minority of claims it is
-byte-identical to `prefix_at_path` — where the model has already written ``present in ` ``.
+byte-identical to `prefix_at_path` â€” where the model has already written ``present in ` ``.
 Measuring "before the sentence" on those is measuring after it. Every figure below is reported on
 the genuinely-earlier subset, and the difference this makes is large: on the first 30-case export
 it moved the lens from 9/17 (p = 0.109) to 4/12 (p = 0.6875).
@@ -257,25 +257,25 @@ The lens, on the same question and the same corpus, does not separate from its d
 the control itself. The decoy is drawn from the whole corpus, but relocated filenames are almost
 perfectly nested inside repositories: 20 of the 21 distinct basenames occur in exactly one repo, and
 **71 of 75 decoys name a file from a different project than the one being read**. Every method here
-knows which project it is reading — for the baseline the transcript is in the prompt, for the lens
-and the probes the residual encodes it — so preferring the target over that decoy can be satisfied
+knows which project it is reading â€” for the baseline the transcript is in the prompt, for the lens
+and the probes the residual encodes it â€” so preferring the target over that decoy can be satisfied
 without ever distinguishing files *within* a repository.
 
 The decoy column is therefore a floor that is too low rather than a noise estimate. The number that
 survives is the target column: 18 of 30 claims naming the exact repository-relative path, against
 the many files in that repository the model could have named instead. The lens is unaffected in
-direction — a floor that is too low could only have flattered it, and it was null regardless. The
+direction â€” a floor that is too low could only have flattered it, and it was null regardless. The
 repair for a successor corpus is specific: draw relocation pairs from **within** a repository, so
 that project identity favours both candidates equally.
 
 **The information is there. The lens does not read it.** That is the pilot's result, and it is a
 statement about the instrument rather than about the model. It also makes the faithfulness
 question well-posed: something at that point in the trajectory determines the file the model is
-about to name, and it is recoverable — so "can a lens recover it?" has a real answer, and for this
+about to name, and it is recoverable â€” so "can a lens recover it?" has a real answer, and for this
 lens the answer is no.
 
 The comparison is deliberately unfair to the lens, in the direction that makes the negative
-safe: the lens reads a single activation, while the baseline lets the model generate — up to
+safe: the lens reads a single activation, while the baseline lets the model generate â€” up to
 2,400 tokens, and on these cases it uses them. So the baseline shows the answer is reachable
 *with additional forward computation*, not that it sits in the residual stream. A baseline that
 strong losing would have been decisive for the lens; a baseline that strong winning only bounds
@@ -286,7 +286,7 @@ what the lens failed to find.
 :width: 100%
 Where the relocated file becomes decodable, by layer, on the first 30-case export. At `at_path`
 the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain
-logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer,
+logit lens sits at or below 6% through layer 34 and arrives only at layer 38 â€” the final layer,
 where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This
 figure describes the later cut, where the model is already mid-sentence; it is not evidence about
 the earlier cut, where the lens does not beat its decoy.
@@ -295,7 +295,7 @@ the earlier cut, where the lens does not beat its decoy.
 ### What survives about the transport
 
 Against the plain logit lens the Jacobian transport is **never worse on any of the 60 readouts**
-of the first export, carrying 4.2× the layer-hits before the naming sentence and 2.7× after. That
+of the first export, carrying 4.2Ã— the layer-hits before the naming sentence and 2.7Ã— after. That
 is a real property of the transport and it is orthogonal to the result above: being a better
 readout than the logit lens does not make it a sufficient one.
 
@@ -303,8 +303,8 @@ readout than the logit lens does not make it a sufficient one.
 :label: fig-transport
 :width: 100%
 Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits
-on or above the diagonal. Per *claim* the two look close at `at_path` — 16 of 17 against 14 of 17
-— which is the conservative test and stays the headline.
+on or above the diagonal. Per *claim* the two look close at `at_path` â€” 16 of 17 against 14 of 17
+â€” which is the conservative test and stays the headline.
 :::
 
 ### The scoring defect the control found
@@ -316,12 +316,12 @@ A hit was counted when **any** token of a filename entered the top 20. Two unrel
 :label: fig-shared
 :width: 100%
 The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it
-fires on 6% of readouts at 0.11 mean layers; sharing one token — always `.py` — on 83% at 8.17.
+fires on 6% of readouts at 0.11 mean layers; sharing one token â€” always `.py` â€” on 83% at 8.17.
 Name *length* was the first hypothesis and the data rejected it: r = 0.183 over 120 observations,
 and the four-token name outscores the eleven-token one.
 :::
 
-Correcting it symmetrically — dropping shared tokens from target and decoy alike — tightened
+Correcting it symmetrically â€” dropping shared tokens from target and decoy alike â€” tightened
 `at_path` and left `at_sentence` unchanged. We had expected it to rescue the result; a one-sided
 correction appeared to, and was not licensed.
 
@@ -338,19 +338,91 @@ Two exports and two runs sit behind this section, and they measure different thi
 
 | | cases | claims | cut taken from | raw readout |
 |---|---|---|---|---|
-| first export | 30 | 17 | `message` | complete — top-20 ids at 39 layers |
-| second export | 75 | 34 | `reasoning_content` | complete — 149 readouts, all 75 cases |
+| first export | 30 | 17 | `message` | complete â€” top-20 ids at 39 layers |
+| second export | 75 | 34 | `reasoning_content` | complete â€” 149 readouts, all 75 cases |
 
 The first export only found claims whose path also appeared in the visible message, so its cut
 sat in the wrong text. Its figures are retained above only where they describe the transport or
-the scoring defect — neither of which depends on the cut being early.
+the scoring defect â€” neither of which depends on the cut being early.
 
-The second export reads the field the miner actually found the claim in and is 2.5× larger; it is
+The second export reads the field the miner actually found the claim in and is 2.5Ã— larger; it is
 the one the headline table is computed on. Its lens run was pruned by the compute provider at row
 145 of 150, but the probe appends each readout as it is produced rather than writing at the end,
 so the rows survived; the two remaining cases were scored by a short resume run and merged. The
 resume reproduces the seeded decoy pairing exactly, because the probe iterates the whole case list
-and skips rather than slicing it — slicing would reseed the shuffle and re-pair every target.
+and skips rather than slicing it â€” slicing would reseed the shuffle and re-pair every target.
+
+## Where this sits, and what it disagrees with
+
+**Perturbation tests measure self-consistency, and the field knows it.** The dominant way to test
+chain-of-thought faithfulness is to corrupt the reasoning and see whether the answer moves
+[@lanham2023faithfulness; @turpin2023say]. @parcalabescu2024measuring argue that this measures the
+model's tendency to produce a desired output under perturbation rather than faithfulness in
+@jacovi2020faithfully's sense, and the objection is well taken: an unchanged answer is scored
+unfaithful whether the model ignored the corrupted step or noticed and silently repaired it.
+
+The setting here sidesteps that argument rather than resolving it. A **relocation** â€” the model
+abandoning the file it was asked about and naming a different one, mid-reasoning â€” is a
+mid-stream revision that the model produces *spontaneously*. Nothing is corrupted, so there is no
+perturbation whose effect has to be disentangled from the model's response to being perturbed. And
+because the corpus is built from real advisories, the fix commit says whether the revision was
+**right**. That is the property a GSM8K-style perturbation study cannot have: it can ask whether the
+answer moved, not whether the reasoning went somewhere true.
+
+**Two specific disagreements with how this is usually done.**
+
+*Accuracy conditioned on a behaviour is a selection artifact waiting to happen.* A natural analysis
+is to split traces by whether the behaviour occurred and compare accuracy. The trap is that the
+behaviour and the truncation budget are correlated: long traces are both likelier to contain a given
+phrase and likelier to be cut off. A study reporting that a self-correction marker predicts 100%
+accuracy, against a corpus whose overall accuracy is far lower, has almost certainly conditioned on
+completion. We report the analogous split (21 correct against 14 wrong, Â§*The follow-up*) with the
+labelling rule stated and both rules' outcomes given, because the rule moved the balance from 21/14
+to 27/11 on its own.
+
+*A resampling test without a matched base rate is not a test.* Regenerating from a context that
+historically preceded a behaviour, and finding the behaviour recurs, establishes very little unless
+the same procedure is run from matched contexts that did not. That is the entire content of our
+control export â€” same run, no relocation in the step, matched on prefix length and final character â€”
+and getting it right took three attempts, each of which produced a confident number first (Â§*The
+follow-up*, Q3).
+
+**Attention to a delimiter is the null hypothesis, not the finding.** Reasoning models attend
+heavily to `\n` and to structural tokens near the start of the context; this is the well-documented
+attention-sink pattern and it appears in essentially every decoder. Our own analogue of that mistake
+was cheaper to catch and more embarrassing: a probe that scored AUC 0.894 **at the embedding layer**,
+which no amount of mechanism could explain, because no block had run. It was punctuation.
+
+**On the instrument.** The Jacobian readout tested here is a transport in the family of the logit
+lens [@nostalgebraist2020logitlens] and the tuned lens [@belrose2023tunedlens]. Our negative is
+about *this* readout at *this* sample size and is not evidence that the information is absent â€” the
+ask-the-model baseline recovers the file in 18 of 30 claims, so something at that point determines
+it.
+
+**On the task.** @antares2026 establish two facts this corpus inherits. First, localization
+difficulty follows structure rather than severity, and performance *collapses* on vulnerabilities
+spanning five or more files â€” which is the backdrop for our Q1 failure: relocated filenames are
+nested inside repositories, only 4 of our 15 repositories host two distinct relocations, and a
+within-repository decoy therefore has almost nothing to score. Second, their Â§C.2 shows that adding
+a three-phase strategy to the system prompt, with no retraining, moves File F1 from 0.223 to 0.2313
+and structural exploration from 10.2% to 17.3%. Our Q4 result is the same phenomenon at finer grain
+and with a causal trace: a consolation clause in the prompt drives stated relocations out of the
+submitted output at 17.2% against 0.5% (odds ratio 39), and one transcript records the model
+resolving to cite the right file and then being redirected mid-sentence. Prompt-level instructions
+are not a nuisance parameter in agentic localization; they are a load-bearing part of the measured
+behaviour.
+
+@fastcontext2026 separate exploration from solving into a dedicated subagent rewarded on
+patch-derived file and line F1, and two of their methodological choices are ones we arrived at
+independently and for the same reasons. They report **instance-wise averages rather than
+micro-averages** "so repositories with large patches do not dominate" â€” which is precisely our
+per-claim rather than per-mention unit, and the correction that shrank our first published figure
+when one claim turned out to be restated seven times. And they note their evaluation "intentionally
+rewards recovery of edited locations; it may under-credit supporting evidence such as tests,
+callers, configuration files, or neighboring implementations that are useful to an end-to-end solver
+but not modified by the reference patch." Our gold has exactly this shape, and it is why Â§*The
+follow-up* reports the strict path-match labels and the looser basename labels side by side instead
+of choosing one silently.
 
 ## The follow-up, and what it returned
 
@@ -363,7 +435,7 @@ Question 1 turned out to be unanswerable on this corpus, for a reason worth stat
 Question 2 is null, against a null distribution that had to be measured rather than assumed.
 Question 3 was added during the follow-up. Question 4's premise did not survive reading the traces.
 
-Each is reported with the number that was wrong first. That ordering is not modesty — across the
+Each is reported with the number that was wrong first. That ordering is not modesty â€” across the
 follow-up, **five separate artifacts produced a publishable-looking result, and every one of them
 pointed in the direction the hypothesis wanted**: a repository detector reading as a filename probe,
 a delimiter detector reading as an event probe, a prompt-length shortcut, a per-mention count
@@ -371,13 +443,13 @@ inflating a per-claim p-value, and a permutation null built at the wrong unit. N
 finding the result implausible. Each was caught by a control built in advance to catch that class of
 error, which is the only method that works when the artifact and the hypothesis agree.
 
-Concretely, the corpus supplies per trace a triple — stated location, submitted location, true
-location — with 218 relocations mined and 6 where a stated location never reaches the output.
+Concretely, the corpus supplies per trace a triple â€” stated location, submitted location, true
+location â€” with 218 relocations mined and 6 where a stated location never reaches the output.
 
 The model that relocates often enough to study is the 35B, which does not fit on the local card, so
 both extractions ran on a rented A100 with the weights offloaded to system RAM. That constraint
 shapes what is affordable: a full residual extraction is ~45 minutes of GPU time per condition, and
-the provider prunes long sessions without warning — it took one run mid-flight during this work.
+the provider prunes long sessions without warning â€” it took one run mid-flight during this work.
 Every extraction therefore writes incrementally and is pulled as it grows, so a prune costs a tail
 rather than a run.
 
@@ -385,7 +457,7 @@ Four questions, in increasing order of interest:
 
 1. ~~**Is the submitted answer decodable before it is stated?**~~ **Attempted. The corpus cannot
    answer it, and finding out why is the more useful result.** A second extraction saved the
-   residual stream itself — 150 readouts, 41 layers, 2,048 dimensions — and a nearest-centroid
+   residual stream itself â€” 150 readouts, 41 layers, 2,048 dimensions â€” and a nearest-centroid
    readout scored 20 of 24 claims over its decoy at the last layer (p = 0.0015), rising monotonically
    with depth. That number is an artifact. Relocated filenames are nested inside repositories: 20 of
    21 distinct basenames occur in exactly one repo, and 71 of 75 decoys name a file from a different
@@ -395,31 +467,56 @@ Four questions, in increasing order of interest:
    host two distinct relocations. The question is well-posed and this corpus is the wrong instrument
    for it; a successor has to be built with within-repository relocation pairs rather than filtered
    into having them.
+
+   :::{figure} images/diagrams/confound.svg
+   :label: fig-confound
+   :width: 100%
+   Why the decoy controlled for less than it looked. Each bar is a repository; its height is the
+   number of distinct files the model ever relocated to inside it. Only the four above the dashed
+   line can supply a same-repository decoy at all. With filenames nested inside projects this way,
+   "prefers the target over the decoy" is satisfiable by recognising the repository â€” which every
+   method under test can do, because the context is that repository's source.
+   :::
 2. ~~**Do divergent traces look different at the point of divergence?**~~ **Attempted, and null.**
    Logistic regression on the residual at the earlier cut, predicting whether the relocated file is
    in the fix commit, leave-one-claim-out with PCA fitted inside each fold and a claim-level
    permutation null. 35 claims, 21 correct against 14 wrong. No layer clears its null; the best is
    AUC 0.517 against a null mean of 0.435 (p = 0.30). The null sits near 0.42 rather than 0.5
-   because of the class imbalance and skipped folds — which is precisely why it has to be measured
+   because of the class imbalance and skipped folds â€” which is precisely why it has to be measured
    rather than assumed, since read against 0.5 the same number would have looked like a weak
    positive.
 
    **What the null is worth, stated as power rather than as prose.** The null's 95th percentile at
    the best layer is **0.676**. That is the detection threshold this design actually had: at 35
    claims, no effect below AUC 0.676 could have been called significant however real it was. 0.676
-   is a large effect, so this is a weak null — it bounds the effect, it does not exclude one. Any
+   is a large effect, so this is a weak null â€” it bounds the effect, it does not exclude one. Any
    successor needs claims in the hundreds, and the constraint is not compute but corpus: 218
    relocations exist, and the 75 used here were what one A100 session could extract.
 
-   A separate sweep asked what a single dimension is worth here, running the familiar recipe —
-   rank every unit by ROC-AUC, take the best, check Cohen's *d*, observe it fails to generalise —
+   A separate sweep asked what a single dimension is worth here, running the familiar recipe â€”
+   rank every unit by ROC-AUC, take the best, check Cohen's *d*, observe it fails to generalise â€”
    and adding the step usually skipped: the same procedure on shuffled labels. Mean in-sample AUC
    was **0.847** with real labels and **0.852** with random ones, held-out **0.349**, with Cohen's
-   *d* up to 0.97 on provable noise. At 2,048 dimensions and 35 claims the best-looking unit is the
-   best of 2,048 draws, and "high AUC, large effect, fails to generalise, therefore polysemanticity"
-   is a conclusion this data reaches with no signal present at all.
+   *d* reaching 0.65 on provable noise. At 2,048 dimensions and 35 claims the best-looking unit is
+   the best of 2,048 draws, and "high AUC, large effect, fails to generalise, therefore
+   polysemanticity" is a conclusion this data reaches with no signal present at all.
+
+   :::{figure} images/diagrams/noise.svg
+   :label: fig-noise
+   :width: 100%
+   What the best single dimension is worth. Three curves over depth: real labels in-sample, the same
+   procedure on **shuffled** labels in-sample, and real labels scored on held-out claims. The first
+   two are the same number. The recipe that ends in "polysemanticity" reaches that conclusion here
+   with nothing present.
+   :::
+
+   One detail of that sweep is itself a lesson. The first version drew a fresh claim-split for each
+   permutation while scoring the real labels on one fixed split, which compares a single draw
+   against an average over draws. Pinning the split changed mean Cohen's *d* from 0.97 to 0.65 and
+   made the real and shuffled curves converge â€” the corrected version is the stronger result, and
+   the uncorrected one would have been the more impressive-looking figure.
 3. **Is the relocation EVENT decodable, before the sentence that carries it?** Added during the
-   follow-up, because it is the question the chain-of-thought literature asks of backtracking — and
+   follow-up, because it is the question the chain-of-thought literature asks of backtracking â€” and
    a relocation is backtracking with an answer key. It needs negatives, so a second export emits one
    matched control per relocation: a sentence boundary in the *same run*, in a step containing no
    relocation, chosen to match the positive's prefix length.
@@ -431,7 +528,7 @@ Four questions, in increasing order of interest:
      median of 14 characters was not enough, because the prompt also carries the conversation and
      controls sit at earlier steps (20.6 messages against 27.3). Token count alone separated the
      classes at **AUC 0.62**. Capping the within-pair token gap at 30% drops that to 0.498.
-   - **Punctuation.** The first probe scored **AUC 0.894 at layer 0** — the embedding output, before
+   - **Punctuation.** The first probe scored **AUC 0.894 at layer 0** â€” the embedding output, before
      a single transformer block has run, where no separation can be a fact about computation. The
      two exports cut on different conventions: relocation prefixes end on the punctuation mark and
      control prefixes kept the trailing space, so relocations ended on `.` 45 times of 75 and
@@ -445,7 +542,7 @@ Four questions, in increasing order of interest:
    probe that separates classes before any block has run is reading its input, not the model.
 
    **The corrected result: suggestive, and not a finding.** On the 23 pairs that are both
-   length-balanced and final-character matched — where the length shortcut is worth 0.499 — the
+   length-balanced and final-character matched â€” where the length shortcut is worth 0.499 â€” the
    probe behaves the way a real signal should and still fails to clear the bar:
 
    | layer | AUC | null 95th pct | p |
@@ -455,22 +552,32 @@ Four questions, in increasing order of interest:
    | 34 | 0.665 | 0.635 | 0.033 |
    | 40 | 0.650 | 0.630 | 0.040 |
 
+   :::{figure} images/diagrams/nullband.svg
+   :label: fig-nullband
+   :width: 100%
+   Both probes against the nulls they have to clear. Each panel draws its **own** permutation null
+   as a band (mean to 95th percentile) for the identical procedure; a filled dot is a layer above
+   its null. The event probe rises out of its band late and starts inside it at layer 0 â€” the right
+   shape. Right-vs-wrong never leaves its band. Reading either curve against 0.5 instead of against
+   its band would give the wrong answer in both panels.
+   :::
+
    Layer 0 is now non-significant, which is the diagnostic passing: nothing is separable before the
    model computes anything, and what separation exists appears late. That is the right shape. But
    eight layers are eight tests, and Benjamini-Hochberg at q = 0.05 requires the smallest p below
    0.00625. The smallest is 0.033. **Nothing survives correction**, and at 23 pairs the detection
-   threshold was AUC 0.635 — so a real late-layer effect of ordinary size would have been invisible
+   threshold was AUC 0.635 â€” so a real late-layer effect of ordinary size would have been invisible
    regardless.
 
    The correct reading is that the experiment is now *well-formed* and *underpowered*, which is a
    better place to be than the version that returned AUC 0.894 at layer 0. The design is reusable:
    218 relocations exist against the 75 extracted here, and the matched-control export is the part
    that took three attempts to get right.
-4. ~~**Is the 5-case set — stated but never submitted — mechanistically distinct** from the cases
+4. ~~**Is the 5-case set â€” stated but never submitted â€” mechanistically distinct** from the cases
    where a stated location is submitted and wrong?~~ **Answered, and the premise was wrong.** It is
    neither a suppression story nor an error story: the rate is 17.2% under a prompt carrying a
    consolation clause and 0.5% without it (p = 0.00016, odds ratio 39), and one trace records the
-   model deciding to cite the right file and then being redirected by the instruction. See §6. A
+   model deciding to cite the right file and then being redirected by the instruction. See Â§6. A
    mechanistic account was not needed; reading the six traces was.
 
 The value of the setting is that (1) can be scored against an answer key that neither the
@@ -511,8 +618,8 @@ transcript nor the output produced.
   in this report therefore reports a floor that is too low. This does not change the lens result,
   which was null against an over-generous floor, and it moves the baseline's load-bearing number
   from the 18-versus-3 gap to the 18-of-30 exact-path hit rate.
-- Because relocated filenames are nested inside repositories — 20 of 21 occur in exactly one repo,
-  and only 4 of 15 repos host two — a within-repository version of the decoy leaves too few
+- Because relocated filenames are nested inside repositories â€” 20 of 21 occur in exactly one repo,
+  and only 4 of 15 repos host two â€” a within-repository version of the decoy leaves too few
   scoreable claims to test. The question "does the residual identify the file rather than the
   project?" is **not answerable on this corpus**, and a successor corpus has to be built for it
   rather than filtered into it.
