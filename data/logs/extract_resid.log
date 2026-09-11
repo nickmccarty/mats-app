@@ -1,0 +1,160 @@
+GPU free: 39.1 GiB
+cases: 75
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]Fetching 26 files: 100%|██████████| 26/26 [00:00<00:00, 1888.61it/s]
+Loading weights:   0%|          | 0/693 [00:00<?, ?it/s]Loading weights:   0%|          | 1/693 [00:00<01:40,  6.85it/s]Loading weights:   0%|          | 2/693 [00:03<20:59,  1.82s/it]Loading weights:   1%|▏         | 9/693 [00:03<03:09,  3.60it/s]Loading weights:   2%|▏         | 13/693 [00:04<03:45,  3.02it/s]Loading weights:   2%|▏         | 16/693 [00:08<06:11,  1.82it/s]Loading weights:   4%|▍         | 26/693 [00:08<02:33,  4.34it/s]Loading weights:   4%|▍         | 30/693 [00:09<02:58,  3.72it/s]Loading weights:   5%|▍         | 33/693 [00:12<04:37,  2.37it/s]Loading weights:   6%|▌         | 43/693 [00:12<02:19,  4.66it/s]Loading weights:   7%|▋         | 49/693 [00:14<02:24,  4.45it/s]Loading weights:   8%|▊         | 52/693 [00:17<03:46,  2.83it/s]Loading weights:   8%|▊         | 58/693 [00:21<05:02,  2.10it/s]Loading weights:  10%|▉         | 69/693 [00:21<02:42,  3.85it/s]Loading weights:  11%|█▏        | 79/693 [00:21<01:42,  5.99it/s]Loading weights:  12%|█▏        | 84/693 [00:25<03:12,  3.17it/s]Loading weights:  14%|█▎        | 95/693 [00:26<01:55,  5.17it/s]Loading weights:  15%|█▍        | 101/693 [00:30<03:10,  3.10it/s]Loading weights:  16%|█▋        | 114/693 [00:30<01:51,  5.19it/s]Loading weights:  17%|█▋        | 119/693 [00:34<03:01,  3.16it/s]Loading weights:  18%|█▊        | 127/693 [00:39<03:36,  2.61it/s]Loading weights:  20%|██        | 139/693 [00:39<02:11,  4.20it/s]Loading weights:  21%|██        | 144/693 [00:39<01:48,  5.08it/s]Loading weights:  22%|██▏       | 150/693 [00:41<01:53,  4.77it/s]Loading weights:  22%|██▏       | 153/693 [00:43<02:52,  3.13it/s]Loading weights:  24%|██▍       | 165/693 [00:43<01:33,  5.66it/s]Loading weights:  25%|██▍       | 170/693 [00:48<02:50,  3.06it/s]Loading weights:  26%|██▌       | 181/693 [00:48<01:42,  4.99it/s]Loading weights:  27%|██▋       | 187/693 [00:49<01:46,  4.74it/s]Loading weights:  28%|██▊       | 191/693 [00:52<02:32,  3.29it/s]Loading weights:  28%|██▊       | 196/693 [00:54<02:28,  3.35it/s]Loading weights:  29%|██▊       | 198/693 [00:57<03:36,  2.29it/s]Loading weights:  30%|███       | 208/693 [00:57<01:55,  4.20it/s]Loading weights:  31%|███       | 216/693 [00:57<01:17,  6.19it/s]Loading weights:  32%|███▏      | 220/693 [00:58<01:37,  4.84it/s]Loading weights:  32%|███▏      | 223/693 [01:01<02:42,  2.88it/s]Loading weights:  34%|███▍      | 234/693 [01:02<01:24,  5.40it/s]Loading weights:  34%|███▍      | 239/693 [01:06<02:41,  2.81it/s]Loading weights:  36%|███▋      | 252/693 [01:06<01:25,  5.13it/s]Loading weights:  37%|███▋      | 257/693 [01:10<02:23,  3.04it/s]Loading weights:  38%|███▊      | 265/693 [01:12<02:00,  3.55it/s]Loading weights:  39%|███▊      | 268/693 [01:15<02:42,  2.62it/s]Loading weights:  40%|███▉      | 277/693 [01:15<01:40,  4.14it/s]Loading weights:  41%|████      | 285/693 [01:15<01:08,  5.93it/s]Loading weights:  42%|████▏     | 289/693 [01:17<01:23,  4.86it/s]Loading weights:  42%|████▏     | 292/693 [01:19<02:13,  3.00it/s]Loading weights:  44%|████▎     | 303/693 [01:20<01:10,  5.53it/s]Loading weights:  44%|████▍     | 308/693 [01:24<02:12,  2.91it/s]Loading weights:  50%|█████     | 349/693 [01:24<00:32, 10.66it/s]Loading weights:  62%|██████▏   | 431/693 [01:24<00:08, 32.10it/s]Loading weights:  72%|███████▏  | 501/693 [01:24<00:03, 56.45it/s]Loading weights:  81%|████████  | 562/693 [01:24<00:01, 83.73it/s]Loading weights: 100%|██████████| 693/693 [01:24<00:00,  8.16it/s]
+Some parameters are on the meta device because they were offloaded to the cpu.
+model ready
+  [  1] case  0 prefix_at_sentence layers=41 tok=2739
+  [  2] case  0 prefix_at_path     layers=41 tok=2740
+  [  3] case  1 prefix_at_sentence layers=41 tok=1238
+  [  4] case  1 prefix_at_path     layers=41 tok=1245
+  [  5] case  2 prefix_at_sentence layers=41 tok=1286
+  [  6] case  2 prefix_at_path     layers=41 tok=1293
+  [  7] case  3 prefix_at_sentence layers=41 tok=1384
+  [  8] case  3 prefix_at_path     layers=41 tok=1385
+  [  9] case  4 prefix_at_sentence layers=41 tok=2639
+  [ 10] case  4 prefix_at_path     layers=41 tok=2640
+  [ 11] case  5 prefix_at_sentence layers=41 tok=2634
+  [ 12] case  5 prefix_at_path     layers=41 tok=2634
+  [ 13] case  6 prefix_at_sentence layers=41 tok=1270
+  [ 14] case  6 prefix_at_path     layers=41 tok=1278
+  [ 15] case  7 prefix_at_sentence layers=41 tok=1363
+  [ 16] case  7 prefix_at_path     layers=41 tok=1363
+  [ 17] case  8 prefix_at_sentence layers=41 tok=2852
+  [ 18] case  8 prefix_at_path     layers=41 tok=2856
+  [ 19] case  9 prefix_at_sentence layers=41 tok=2943
+  [ 20] case  9 prefix_at_path     layers=41 tok=2949
+  [ 21] case 10 prefix_at_sentence layers=41 tok=2939
+  [ 22] case 10 prefix_at_path     layers=41 tok=2944
+  [ 23] case 11 prefix_at_sentence layers=41 tok=3800
+  [ 24] case 11 prefix_at_path     layers=41 tok=3800
+  [ 25] case 12 prefix_at_sentence layers=41 tok=3813
+  [ 26] case 12 prefix_at_path     layers=41 tok=3813
+  [ 27] case 13 prefix_at_sentence layers=41 tok=1205
+  [ 28] case 13 prefix_at_path     layers=41 tok=1206
+  [ 29] case 14 prefix_at_sentence layers=41 tok=1249
+  [ 30] case 14 prefix_at_path     layers=41 tok=1253
+  [ 31] case 15 prefix_at_sentence layers=41 tok=1401
+  [ 32] case 15 prefix_at_path     layers=41 tok=1406
+  [ 33] case 16 prefix_at_sentence layers=41 tok=2495
+  [ 34] case 16 prefix_at_path     layers=41 tok=2495
+  [ 35] case 17 prefix_at_sentence layers=41 tok=2558
+  [ 36] case 17 prefix_at_path     layers=41 tok=2578
+  [ 37] case 18 prefix_at_sentence layers=41 tok=2602
+  [ 38] case 18 prefix_at_path     layers=41 tok=2611
+  [ 39] case 19 prefix_at_sentence layers=41 tok=2748
+  [ 40] case 19 prefix_at_path     layers=41 tok=2754
+  [ 41] case 20 prefix_at_sentence layers=41 tok=3898
+  [ 42] case 20 prefix_at_path     layers=41 tok=3908
+  [ 43] case 21 prefix_at_sentence layers=41 tok=2520
+  [ 44] case 21 prefix_at_path     layers=41 tok=2528
+  [ 45] case 22 prefix_at_sentence layers=41 tok=3811
+  [ 46] case 22 prefix_at_path     layers=41 tok=3815
+  [ 47] case 23 prefix_at_sentence layers=41 tok=3658
+  [ 48] case 23 prefix_at_path     layers=41 tok=3658
+  [ 49] case 24 prefix_at_sentence layers=41 tok=1597
+  [ 50] case 24 prefix_at_path     layers=41 tok=1602
+  [ 51] case 25 prefix_at_sentence layers=41 tok=1310
+  [ 52] case 25 prefix_at_path     layers=41 tok=1312
+  [ 53] case 26 prefix_at_sentence layers=41 tok=2352
+  [ 54] case 26 prefix_at_path     layers=41 tok=2353
+  [ 55] case 27 prefix_at_sentence layers=41 tok=3811
+  [ 56] case 27 prefix_at_path     layers=41 tok=3813
+  [ 57] case 28 prefix_at_sentence layers=41 tok=1154
+  [ 58] case 28 prefix_at_path     layers=41 tok=1154
+  [ 59] case 29 prefix_at_sentence layers=41 tok=1192
+  [ 60] case 29 prefix_at_path     layers=41 tok=1199
+  [ 61] case 30 prefix_at_sentence layers=41 tok=3760
+  [ 62] case 30 prefix_at_path     layers=41 tok=3761
+  [ 63] case 31 prefix_at_sentence layers=41 tok=3745
+  [ 64] case 31 prefix_at_path     layers=41 tok=3743
+  [ 65] case 32 prefix_at_sentence layers=41 tok=3728
+  [ 66] case 32 prefix_at_path     layers=41 tok=3728
+  [ 67] case 33 prefix_at_sentence layers=41 tok=3757
+  [ 68] case 33 prefix_at_path     layers=41 tok=3755
+  [ 69] case 34 prefix_at_sentence layers=41 tok=3854
+  [ 70] case 34 prefix_at_path     layers=41 tok=3854
+  [ 71] case 35 prefix_at_sentence layers=41 tok=3910
+  [ 72] case 35 prefix_at_path     layers=41 tok=3911
+  [ 73] case 36 prefix_at_sentence layers=41 tok=3912
+  [ 74] case 36 prefix_at_path     layers=41 tok=3913
+  [ 75] case 37 prefix_at_sentence layers=41 tok=3084
+  [ 76] case 37 prefix_at_path     layers=41 tok=3085
+  [ 77] case 38 prefix_at_sentence layers=41 tok=3683
+  [ 78] case 38 prefix_at_path     layers=41 tok=3694
+  [ 79] case 39 prefix_at_sentence layers=41 tok=3092
+  [ 80] case 39 prefix_at_path     layers=41 tok=3099
+  [ 81] case 40 prefix_at_sentence layers=41 tok=1253
+  [ 82] case 40 prefix_at_path     layers=41 tok=1253
+  [ 83] case 41 prefix_at_sentence layers=41 tok=3065
+  [ 84] case 41 prefix_at_path     layers=41 tok=3068
+  [ 85] case 42 prefix_at_sentence layers=41 tok=3764
+  [ 86] case 42 prefix_at_path     layers=41 tok=3764
+  [ 87] case 43 prefix_at_sentence layers=41 tok=3765
+  [ 88] case 43 prefix_at_path     layers=41 tok=3765
+  [ 89] case 44 prefix_at_sentence layers=41 tok=3769
+  [ 90] case 44 prefix_at_path     layers=41 tok=3771
+  [ 91] case 45 prefix_at_sentence layers=41 tok=1510
+  [ 92] case 45 prefix_at_path     layers=41 tok=1516
+  [ 93] case 46 prefix_at_sentence layers=41 tok=1643
+  [ 94] case 46 prefix_at_path     layers=41 tok=1648
+  [ 95] case 47 prefix_at_sentence layers=41 tok=1684
+  [ 96] case 47 prefix_at_path     layers=41 tok=1689
+  [ 97] case 48 prefix_at_sentence layers=41 tok=4062
+  [ 98] case 48 prefix_at_path     layers=41 tok=4062
+  [ 99] case 49 prefix_at_sentence layers=41 tok=3034
+  [100] case 49 prefix_at_path     layers=41 tok=3036
+  [101] case 50 prefix_at_sentence layers=41 tok=2951
+  [102] case 50 prefix_at_path     layers=41 tok=2961
+  [103] case 51 prefix_at_sentence layers=41 tok=3078
+  [104] case 51 prefix_at_path     layers=41 tok=3084
+  [105] case 52 prefix_at_sentence layers=41 tok=3118
+  [106] case 52 prefix_at_path     layers=41 tok=3118
+  [107] case 53 prefix_at_sentence layers=41 tok=3861
+  [108] case 53 prefix_at_path     layers=41 tok=3858
+  [109] case 54 prefix_at_sentence layers=41 tok=3874
+  [110] case 54 prefix_at_path     layers=41 tok=3873
+  [111] case 55 prefix_at_sentence layers=41 tok=3397
+  [112] case 55 prefix_at_path     layers=41 tok=3399
+  [113] case 56 prefix_at_sentence layers=41 tok=3719
+  [114] case 56 prefix_at_path     layers=41 tok=3720
+  [115] case 57 prefix_at_sentence layers=41 tok=1592
+  [116] case 57 prefix_at_path     layers=41 tok=1597
+  [117] case 58 prefix_at_sentence layers=41 tok=3261
+  [118] case 58 prefix_at_path     layers=41 tok=3262
+  [119] case 59 prefix_at_sentence layers=41 tok=3267
+  [120] case 59 prefix_at_path     layers=41 tok=3268
+  [121] case 60 prefix_at_sentence layers=41 tok=4096
+  [122] case 60 prefix_at_path     layers=41 tok=4096
+  [123] case 61 prefix_at_sentence layers=41 tok=3777
+  [124] case 61 prefix_at_path     layers=41 tok=3777
+  [125] case 62 prefix_at_sentence layers=41 tok=1489
+  [126] case 62 prefix_at_path     layers=41 tok=1489
+  [127] case 63 prefix_at_sentence layers=41 tok=3205
+  [128] case 63 prefix_at_path     layers=41 tok=3208
+  [129] case 64 prefix_at_sentence layers=41 tok=3255
+  [130] case 64 prefix_at_path     layers=41 tok=3261
+  [131] case 65 prefix_at_sentence layers=41 tok=3848
+  [132] case 65 prefix_at_path     layers=41 tok=3850
+  [133] case 66 prefix_at_sentence layers=41 tok=1472
+  [134] case 66 prefix_at_path     layers=41 tok=1472
+  [135] case 67 prefix_at_sentence layers=41 tok=3156
+  [136] case 67 prefix_at_path     layers=41 tok=3165
+  [137] case 68 prefix_at_sentence layers=41 tok=1493
+  [138] case 68 prefix_at_path     layers=41 tok=1495
+  [139] case 69 prefix_at_sentence layers=41 tok=2991
+  [140] case 69 prefix_at_path     layers=41 tok=2991
+  [141] case 70 prefix_at_sentence layers=41 tok=1497
+  [142] case 70 prefix_at_path     layers=41 tok=1514
+  [143] case 71 prefix_at_sentence layers=41 tok=1482
+  [144] case 71 prefix_at_path     layers=41 tok=1482
+  [145] case 72 prefix_at_sentence layers=41 tok=1575
+  [146] case 72 prefix_at_path     layers=41 tok=1575
+  [147] case 73 prefix_at_sentence layers=41 tok=2274
+  [148] case 73 prefix_at_path     layers=41 tok=2282
+  [149] case 74 prefix_at_sentence layers=41 tok=2843
+  [150] case 74 prefix_at_path     layers=41 tok=2852
+
+wrote /content/resid.npz: 150 readouts, 19,574,093 bytes
+EXTRACT WRAPPER FINISHED

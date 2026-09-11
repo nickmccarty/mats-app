@@ -253,6 +253,21 @@ Asking is simply appending *"which file are you about to name? Reply with one pa
 prefix and reading the reply. It recovers the file in 18 of 30 claims against a decoy floor of 3.
 The lens, on the same question and the same corpus, does not separate from its decoy.
 
+**What that decoy floor is actually worth.** Building the follow-up probes surfaced a weakness in
+the control itself. The decoy is drawn from the whole corpus, but relocated filenames are almost
+perfectly nested inside repositories: 20 of the 21 distinct basenames occur in exactly one repo, and
+**71 of 75 decoys name a file from a different project than the one being read**. Every method here
+knows which project it is reading — for the baseline the transcript is in the prompt, for the lens
+and the probes the residual encodes it — so preferring the target over that decoy can be satisfied
+without ever distinguishing files *within* a repository.
+
+The decoy column is therefore a floor that is too low rather than a noise estimate. The number that
+survives is the target column: 18 of 30 claims naming the exact repository-relative path, against
+the many files in that repository the model could have named instead. The lens is unaffected in
+direction — a floor that is too low could only have flattered it, and it was null regardless. The
+repair for a successor corpus is specific: draw relocation pairs from **within** a repository, so
+that project identity favours both candidates equally.
+
 **The information is there. The lens does not read it.** That is the pilot's result, and it is a
 statement about the instrument rather than about the model. It also makes the faithfulness
 question well-posed: something at that point in the trajectory determines the file the model is
@@ -337,31 +352,98 @@ so the rows survived; the two remaining cases were scored by a short resume run 
 resume reproduces the seeded decoy pairing exactly, because the probe iterates the whole case list
 and skips rather than slicing it — slicing would reseed the shuffle and re-pair every target.
 
-## Proposed follow-up
+## The follow-up, and what it returned
 
 The divergence between stated and submitted location is visible in the transcript, after the fact.
 The question this dataset is positioned to ask is whether it is visible **in the activations, and
-before the output is produced**. The pilot above is a first pass at question 1. Question 3 is answered
-below — by reading the traces rather than the activations, and its premise did not survive contact
-with them. Question 2 is untouched.
+before the output is produced**.
+
+All of the questions below have now been attempted, and none came back the way it was proposed.
+Question 1 turned out to be unanswerable on this corpus, for a reason worth stating precisely.
+Question 2 is null, against a null distribution that had to be measured rather than assumed.
+Question 3 was added during the follow-up. Question 4's premise did not survive reading the traces.
+
+Each is reported with the number that was wrong first. That ordering is not modesty — across the
+follow-up, **five separate artifacts produced a publishable-looking result, and every one of them
+pointed in the direction the hypothesis wanted**: a repository detector reading as a filename probe,
+a delimiter detector reading as an event probe, a prompt-length shortcut, a per-mention count
+inflating a per-claim p-value, and a permutation null built at the wrong unit. None was caught by
+finding the result implausible. Each was caught by a control built in advance to catch that class of
+error, which is the only method that works when the artifact and the hypothesis agree.
 
 Concretely, the corpus supplies per trace a triple — stated location, submitted location, true
-location — with 218 relocations mined and 6 where a stated location never reaches the output. The models are 1B–4B and run locally, so residual streams are
-accessible without inference-provider constraints.
+location — with 218 relocations mined and 6 where a stated location never reaches the output.
 
-Three questions, in increasing order of interest:
+The model that relocates often enough to study is the 35B, which does not fit on the local card, so
+both extractions ran on a rented A100 with the weights offloaded to system RAM. That constraint
+shapes what is affordable: a full residual extraction is ~45 minutes of GPU time per condition, and
+the provider prunes long sessions without warning — it took one run mid-flight during this work.
+Every extraction therefore writes incrementally and is pulled as it grows, so a prune costs a tail
+rather than a run.
 
-1. **Is the submitted answer decodable before it is stated?** Train a linear probe on the residual
-   stream at the token where the model states location A, predicting the file it will eventually
-   submit. Two things this needs that the pilot does not supply: the probe recorded top-20 token
-   *ids*, not hidden states, so an extraction run is required; and 4,096 dimensions against ~31
-   claims will fit perfectly and generalise nowhere, so it needs either many more claims or a unit
-   with a defensible independence argument. Running it at the current n would produce a number
-   that has to be retracted, which is the failure this report exists to document.
-2. **Do divergent traces look different at the point of divergence?** Compare probe confidence and
-   representational geometry between traces where stated and submitted agree and the 192 where
-   they do not, at matched positions.
-3. ~~**Is the 5-case set — stated but never submitted — mechanistically distinct** from the cases
+Four questions, in increasing order of interest:
+
+1. ~~**Is the submitted answer decodable before it is stated?**~~ **Attempted. The corpus cannot
+   answer it, and finding out why is the more useful result.** A second extraction saved the
+   residual stream itself — 150 readouts, 41 layers, 2,048 dimensions — and a nearest-centroid
+   readout scored 20 of 24 claims over its decoy at the last layer (p = 0.0015), rising monotonically
+   with depth. That number is an artifact. Relocated filenames are nested inside repositories: 20 of
+   21 distinct basenames occur in exactly one repo, and 71 of 75 decoys name a file from a different
+   project than the one being read. The residual encodes which project it is reading, because the
+   context *is* that project. Restricting the decoy to a different file from the same repository
+   removes the shortcut and leaves **two scoreable claims**, because only 4 of 15 repositories ever
+   host two distinct relocations. The question is well-posed and this corpus is the wrong instrument
+   for it; a successor has to be built with within-repository relocation pairs rather than filtered
+   into having them.
+2. ~~**Do divergent traces look different at the point of divergence?**~~ **Attempted, and null.**
+   Logistic regression on the residual at the earlier cut, predicting whether the relocated file is
+   in the fix commit, leave-one-claim-out with PCA fitted inside each fold and a claim-level
+   permutation null. 35 claims, 21 correct against 14 wrong. No layer clears its null; the best is
+   AUC 0.517 against a null mean of 0.435 (p = 0.30). The null sits near 0.42 rather than 0.5
+   because of the class imbalance and skipped folds — which is precisely why it has to be measured
+   rather than assumed, since read against 0.5 the same number would have looked like a weak
+   positive.
+
+   **What the null is worth, stated as power rather than as prose.** The null's 95th percentile at
+   the best layer is **0.676**. That is the detection threshold this design actually had: at 35
+   claims, no effect below AUC 0.676 could have been called significant however real it was. 0.676
+   is a large effect, so this is a weak null — it bounds the effect, it does not exclude one. Any
+   successor needs claims in the hundreds, and the constraint is not compute but corpus: 218
+   relocations exist, and the 75 used here were what one A100 session could extract.
+
+   A separate sweep asked what a single dimension is worth here, running the familiar recipe —
+   rank every unit by ROC-AUC, take the best, check Cohen's *d*, observe it fails to generalise —
+   and adding the step usually skipped: the same procedure on shuffled labels. Mean in-sample AUC
+   was **0.847** with real labels and **0.852** with random ones, held-out **0.349**, with Cohen's
+   *d* up to 0.97 on provable noise. At 2,048 dimensions and 35 claims the best-looking unit is the
+   best of 2,048 draws, and "high AUC, large effect, fails to generalise, therefore polysemanticity"
+   is a conclusion this data reaches with no signal present at all.
+3. **Is the relocation EVENT decodable, before the sentence that carries it?** Added during the
+   follow-up, because it is the question the chain-of-thought literature asks of backtracking — and
+   a relocation is backtracking with an answer key. It needs negatives, so a second export emits one
+   matched control per relocation: a sentence boundary in the *same run*, in a step containing no
+   relocation, chosen to match the positive's prefix length.
+
+   The matching is the entire experiment, and it took three attempts to make it a control rather
+   than a tell. Each failure produced a confident-looking number first:
+
+   - **Prompt length.** Relocations arrive late in long traces. Matching the reasoning prefix to a
+     median of 14 characters was not enough, because the prompt also carries the conversation and
+     controls sit at earlier steps (20.6 messages against 27.3). Token count alone separated the
+     classes at **AUC 0.62**. Capping the within-pair token gap at 30% drops that to 0.498.
+   - **Punctuation.** The first probe scored **AUC 0.894 at layer 0** — the embedding output, before
+     a single transformer block has run, where no separation can be a fact about computation. The
+     two exports cut on different conventions: relocation prefixes end on the punctuation mark and
+     control prefixes kept the trailing space, so relocations ended on `.` 45 times of 75 and
+     controls never did, ending on a space 28 times instead. The probe was a delimiter detector.
+   - **The residue of the fix.** Cutting both on one convention was necessary and insufficient:
+     usable relocations still ended on `.` 71% of the time against 35% for controls, worth about
+     0.68 to a classifier reading the last token alone. The export now stratifies on final character
+     before matching on length.
+
+   Layer 0 is the cheapest diagnostic in this report and the one that caught the worst error. A
+   probe that separates classes before any block has run is reading its input, not the model.
+4. ~~**Is the 5-case set — stated but never submitted — mechanistically distinct** from the cases
    where a stated location is submitted and wrong?~~ **Answered, and the premise was wrong.** It is
    neither a suppression story nor an error story: the rate is 17.2% under a prompt carrying a
    consolation clause and 0.5% without it (p = 0.00016, odds ratio 39), and one trace records the
@@ -401,3 +483,13 @@ transcript nor the output produced.
   where the token enters a top-20, not how strongly. Layer 38 is the model's own output
   distribution, so the logit lens arriving there is expected and is not evidence about the
   transport.
+- The seeded decoy controls for filename *plausibility* but not for repository identity: 71 of 75
+  decoys name a file from a different project than the one being read. Every target-vs-decoy figure
+  in this report therefore reports a floor that is too low. This does not change the lens result,
+  which was null against an over-generous floor, and it moves the baseline's load-bearing number
+  from the 18-versus-3 gap to the 18-of-30 exact-path hit rate.
+- Because relocated filenames are nested inside repositories — 20 of 21 occur in exactly one repo,
+  and only 4 of 15 repos host two — a within-repository version of the decoy leaves too few
+  scoreable claims to test. The question "does the residual identify the file rather than the
+  project?" is **not answerable on this corpus**, and a successor corpus has to be built for it
+  rather than filtered into it.

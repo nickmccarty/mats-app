@@ -1,8 +1,35 @@
 {
- "RageAgainstThePixel/setup-steamcmd@ec536b530bd3bd059377d0d0c376c52c6b870de1": {
-  "fix_sha": "3e4e408e73bdd46822f1147b45eeeab050fd1ead",
-  "ghsa": "GHSA-c5qx-p38x-qf5w",
-  "cwe": "CWE-532",
+ "dpgaspar/Flask-AppBuilder@93c8e4d0aaa6c36f102a9a4662123049f61afbbc": {
+  "gold_files": [
+   "flask_appbuilder/utils/base.py"
+  ],
+  "gold_ranges": {
+   "flask_appbuilder/utils/base.py": [
+    [
+     29,
+     35
+    ]
+   ]
+  },
+  "fix_sha": "32eedbbb5cb483a3e782c5f2732de4a6a650d9b6",
+  "ghsa": "GHSA-99pm-ch96-ccp2"
+ },
+ "npm/fstream@1e4527ffe8688d4f5325283d7cf2cf2d61f14c6b": {
+  "gold_files": [
+   "lib/writer.js"
+  ],
+  "gold_ranges": {
+   "lib/writer.js": [
+    [
+     147,
+     153
+    ]
+   ]
+  },
+  "fix_sha": "6a77d2fa6e1462693cf8e46f930da96ec1b0bb22",
+  "ghsa": "GHSA-xf7w-r453-m56c"
+ },
+ "buildalon/setup-steamcmd@b1c79e8a57b29f06ed1c736431370e01cf92d50a": {
   "gold_files": [
    "dist/index.js",
    "src/logging.ts"
@@ -76,114 +103,105 @@
      17
     ]
    ]
-  }
+  },
+  "fix_sha": "c3301963a182b14fd7a5b4991e6ae91ed39e4a5c",
+  "ghsa": "GHSA-mj96-mh85-r574"
  },
- "apache/airflow@848e432865da82c86918bac8b466d17dc12cd84c": {
-  "fix_sha": "28abf87bd173cc4cedc57f553118470e5745a968",
-  "ghsa": "GHSA-77rc-x84q-pv4f",
-  "cwe": "CWE-295",
+ "inveniosoftware/invenio-communities@5c4de6783724d276ae1b6dd13a399a9e22fadc7a": {
   "gold_files": [
-   "airflow/contrib/auth/backends/ldap_auth.py",
+   "invenio_communities/config.py",
+   "invenio_communities/views/ui.py",
    "setup.py"
   ],
   "gold_ranges": {
-   "airflow/contrib/auth/backends/ldap_auth.py": [
+   "invenio_communities/config.py": [
     [
-     55,
-     70
+     120,
+     122
+    ]
+   ],
+   "invenio_communities/views/ui.py": [
+    [
+     29,
+     34
+    ],
+    [
+     53,
+     58
     ]
    ],
    "setup.py": [
     [
-     206,
-     212
+     34,
+     52
+    ],
+    [
+     60,
+     72
+    ],
+    [
+     86,
+     105
     ]
    ]
-  }
+  },
+  "fix_sha": "505da72c5acd7dfbd4148f884c73c9c3372b76f4",
+  "ghsa": "GHSA-mfv8-q39f-mgfg"
  },
- "buildalon/setup-steamcmd@b1c79e8a57b29f06ed1c736431370e01cf92d50a": {
-  "fix_sha": "c3301963a182b14fd7a5b4991e6ae91ed39e4a5c",
-  "ghsa": "GHSA-mj96-mh85-r574",
-  "cwe": "CWE-532",
+ "zmievsa/cadwyn@5a6e2b7f009f33d93ea26a50156523ba3e4c42ca": {
   "gold_files": [
-   "dist/index.js",
-   "src/logging.ts"
+   "cadwyn/applications.py"
   ],
   "gold_ranges": {
-   "dist/index.js": [
+   "cadwyn/applications.py": [
     [
-     36094,
-     36099
+     5,
+     10
     ],
     [
-     36104,
-     36110
+     389,
+     395
     ],
     [
-     38633,
-     38641
-    ],
-    [
-     38887,
-     38893
-    ],
-    [
-     66014,
-     66020
-    ],
-    [
-     71233,
-     71239
-    ],
-    [
-     71564,
-     71570
-    ],
-    [
-     72241,
-     72249
-    ],
-    [
-     72514,
-     72542
-    ],
-    [
-     76356,
-     76362
-    ],
-    [
-     76776,
-     76785
-    ],
-    [
-     76800,
-     76832
-    ],
-    [
-     77526,
-     77531
-    ],
-    [
-     78677,
-     78685
-    ],
-    [
-     79752,
-     79758
-    ]
-   ],
-   "src/logging.ts": [
-    [
-     11,
-     17
+     407,
+     413
     ]
    ]
-  }
+  },
+  "fix_sha": "b424ecd57cd8dabbc8fe39b8f8ccafea629c7728",
+  "ghsa": "GHSA-2gxp-6r36-m97r"
+ },
+ "haxtheweb/haxcms-nodejs@7b0ad1af1b7d44e6c278f71ec01eddc736d041f7": {
+  "gold_files": [
+   "src/app.js"
+  ],
+  "gold_ranges": {
+   "src/app.js": [
+    [
+     27,
+     32
+    ]
+   ]
+  },
+  "fix_sha": "777f9a7ff9675a160496f350d766df1f1f9b9b99",
+  "ghsa": "GHSA-54vw-f4xf-f92j"
+ },
+ "pyload/pyload@9e3410ffb01e0fd8920d118d30b629661f31bbdf": {
+  "gold_files": [
+   "src/pyload/webui/app/blueprints/cnl_blueprint.py"
+  ],
+  "gold_ranges": {
+   "src/pyload/webui/app/blueprints/cnl_blueprint.py": [
+    [
+     23,
+     34
+    ]
+   ]
+  },
+  "fix_sha": "f4e2d12416ba2dfac7b036d5c8d6dab5461b9840",
+  "ghsa": "GHSA-x698-5hjm-w2m5"
  },
  "dollarshaveclub/shave@1876911e423c00fdda643ef724d956b3d324d5c2": {
-  "fix_sha": "da7371b0531ba14eae48ef1bb1456a3de4cfa954",
-  "ghsa": "GHSA-gh4g-3gm9-5wrq",
-  "cwe": "CWE-79",
   "gold_files": [
    "dist/jquery.shave.min.js",
    "dist/shave.es.js",
@@ -230,28 +248,89 @@
      63
     ]
    ]
-  }
+  },
+  "fix_sha": "da7371b0531ba14eae48ef1bb1456a3de4cfa954",
+  "ghsa": "GHSA-gh4g-3gm9-5wrq"
  },
- "haxtheweb/haxcms-nodejs@7b0ad1af1b7d44e6c278f71ec01eddc736d041f7": {
-  "fix_sha": "777f9a7ff9675a160496f350d766df1f1f9b9b99",
-  "ghsa": "GHSA-54vw-f4xf-f92j",
-  "cwe": "CWE-1021",
+ "RageAgainstThePixel/setup-steamcmd@ec536b530bd3bd059377d0d0c376c52c6b870de1": {
   "gold_files": [
-   "src/app.js"
+   "dist/index.js",
+   "src/logging.ts"
   ],
   "gold_ranges": {
-   "src/app.js": [
+   "dist/index.js": [
     [
-     27,
-     32
+     36094,
+     36099
+    ],
+    [
+     36104,
+     36110
+    ],
+    [
+     38633,
+     38641
+    ],
+    [
+     38887,
+     38893
+    ],
+    [
+     66014,
+     66020
+    ],
+    [
+     71233,
+     71239
+    ],
+    [
+     71564,
+     71570
+    ],
+    [
+     72241,
+     72249
+    ],
+    [
+     72514,
+     72542
+    ],
+    [
+     76356,
+     76362
+    ],
+    [
+     76776,
+     76785
+    ],
+    [
+     76800,
+     76832
+    ],
+    [
+     77526,
+     77531
+    ],
+    [
+     78677,
+     78685
+    ],
+    [
+     79752,
+     79758
+    ]
+   ],
+   "src/logging.ts": [
+    [
+     11,
+     17
     ]
    ]
-  }
+  },
+  "fix_sha": "3e4e408e73bdd46822f1147b45eeeab050fd1ead",
+  "ghsa": "GHSA-c5qx-p38x-qf5w"
  },
  "hiyouga/LLaMA-Factory@1344416378ba3bbc19006bd849bcfdbb508e86fd": {
-  "fix_sha": "2989d39239d2f46e584c1e1180ba46b9768afb2a",
-  "ghsa": "GHSA-f2f7-gj54-6vpv",
-  "cwe": "CWE-502",
   "gold_files": [
    "scripts/convert_ckpt/llamafy_baichuan2.py"
   ],
@@ -262,44 +341,260 @@
      38
     ]
    ]
-  }
+  },
+  "fix_sha": "2989d39239d2f46e584c1e1180ba46b9768afb2a",
+  "ghsa": "GHSA-f2f7-gj54-6vpv"
  },
- "npm/fstream@1e4527ffe8688d4f5325283d7cf2cf2d61f14c6b": {
-  "fix_sha": "6a77d2fa6e1462693cf8e46f930da96ec1b0bb22",
-  "ghsa": "GHSA-xf7w-r453-m56c",
-  "cwe": "CWE-59",
+ "openpgpjs/openpgpjs@a0337780b77093716ba92acb4a70b3bb5ceec87d": {
   "gold_files": [
-   "lib/writer.js"
+   "src/message.js"
   ],
   "gold_ranges": {
-   "lib/writer.js": [
+   "src/message.js": [
     [
-     147,
-     153
+     604,
+     615
+    ],
+    [
+     619,
+     625
     ]
    ]
-  }
+  },
+  "fix_sha": "43f5f4e2bd67d0514d06acc60b6ee571a049c229",
+  "ghsa": "GHSA-8qff-qr5q-5pr8"
  },
- "pyload/pyload@9e3410ffb01e0fd8920d118d30b629661f31bbdf": {
-  "fix_sha": "f4e2d12416ba2dfac7b036d5c8d6dab5461b9840",
-  "ghsa": "GHSA-x698-5hjm-w2m5",
-  "cwe": "CWE-284",
+ "vllm-project/vllm@c7941cca18722ab28f8806eb6b81d33f0d15524b": {
   "gold_files": [
-   "src/pyload/webui/app/blueprints/cnl_blueprint.py"
+   "vllm/distributed/device_communicators/shm_broadcast.py"
   ],
   "gold_ranges": {
-   "src/pyload/webui/app/blueprints/cnl_blueprint.py": [
+   "vllm/distributed/device_communicators/shm_broadcast.py": [
     [
-     23,
-     34
+     241,
+     247
     ]
    ]
-  }
+  },
+  "fix_sha": "a0304dc504c85f421d38ef47c64f83046a13641c",
+  "ghsa": "GHSA-9f8f-2vmf-885j"
+ },
+ "AmauriC/tarteaucitron.js@a87e0b963811ccd3cb69c3cda32dc37124f8f495": {
+  "gold_files": [
+   "tarteaucitron.services.js",
+   "tarteaucitron.services.min.js"
+  ],
+  "gold_ranges": {
+   "tarteaucitron.services.js": [
+    [
+     19,
+     25
+    ],
+    [
+     655,
+     661
+    ],
+    [
+     820,
+     826
+    ],
+    [
+     1379,
+     1385
+    ],
+    [
+     1471,
+     1477
+    ],
+    [
+     1844,
+     1850
+    ],
+    [
+     1877,
+     1883
+    ],
+    [
+     1912,
+     1918
+    ],
+    [
+     2354,
+     2360
+    ],
+    [
+     2388,
+     2394
+    ],
+    [
+     2633,
+     2639
+    ],
+    [
+     2678,
+     2687
+    ],
+    [
+     2725,
+     2731
+    ],
+    [
+     2822,
+     2831
+    ],
+    [
+     3606,
+     3612
+    ],
+    [
+     3692,
+     3698
+    ],
+    [
+     3724,
+     3730
+    ],
+    [
+     3757,
+     3763
+    ],
+    [
+     3789,
+     3795
+    ],
+    [
+     3930,
+     3939
+    ],
+    [
+     4186,
+     4192
+    ],
+    [
+     4474,
+     4480
+    ],
+    [
+     4503,
+     4509
+    ],
+    [
+     4573,
+     4582
+    ],
+    [
+     4648,
+     4654
+    ],
+    [
+     4905,
+     4914
+    ],
+    [
+     5192,
+     5201
+    ],
+    [
+     5249,
+     5258
+    ],
+    [
+     5395,
+     5404
+    ],
+    [
+     5840,
+     5849
+    ],
+    [
+     6113,
+     6119
+    ],
+    [
+     6174,
+     6183
+    ],
+    [
+     6212,
+     6218
+    ],
+    [
+     6245,
+     6251
+    ],
+    [
+     6297,
+     6303
+    ],
+    [
+     6328,
+     6334
+    ],
+    [
+     6359,
+     6365
+    ],
+    [
+     6387,
+     6393
+    ],
+    [
+     6415,
+     6421
+    ],
+    [
+     6444,
+     6450
+    ],
+    [
+     6475,
+     6481
+    ],
+    [
+     6503,
+     6509
+    ],
+    [
+     6651,
+     6657
+    ],
+    [
+     6700,
+     6706
+    ],
+    [
+     6787,
+     6796
+    ]
+   ],
+   "tarteaucitron.services.min.js": []
+  },
+  "fix_sha": "25fcf828aaa55306ddc09cfbac9a6f8f126e2d07",
+  "ghsa": "GHSA-7524-3396-fqv3"
+ },
+ "apache/airflow@848e432865da82c86918bac8b466d17dc12cd84c": {
+  "gold_files": [
+   "airflow/contrib/auth/backends/ldap_auth.py",
+   "setup.py"
+  ],
+  "gold_ranges": {
+   "airflow/contrib/auth/backends/ldap_auth.py": [
+    [
+     55,
+     70
+    ]
+   ],
+   "setup.py": [
+    [
+     206,
+     212
+    ]
+   ]
+  },
+  "fix_sha": "28abf87bd173cc4cedc57f553118470e5745a968",
+  "ghsa": "GHSA-77rc-x84q-pv4f"
  },
  "run-llama/llama_index@fa1c1325382244a415a57de4de08d0ace25b2a99": {
-  "fix_sha": "702e4340623092fac4cf2fe95eb9465034856da3",
-  "ghsa": "GHSA-m84c-4c34-28gf",
-  "cwe": "CWE-1112",
   "gold_files": [
    "llama-index-core/llama_index/core/workflow/context_serializers.py"
   ],
@@ -314,6 +609,8 @@
      80
     ]
    ]
-  }
+  },
+  "fix_sha": "702e4340623092fac4cf2fe95eb9465034856da3",
+  "ghsa": "GHSA-m84c-4c34-28gf"
  }
 }

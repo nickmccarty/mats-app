@@ -27,6 +27,8 @@ The application material is the faithfulness draft plus the Jacobian-lens pilot 
 | `site/index.html` | The web version. Open from `file://`; §8 "Asking the activations" is the pilot. |
 | `site/deck.html` | 10-slide deck. Slides 9–10 are the pilot and what its control caught. |
 | `notebooks/jlens_reloc_replication.ipynb` | Reproduces the pilot end to end on a Colab A100. |
+| `verify/verify_findings.ipynb` | Recomputes every claimed number from raw files. No GPU. |
+| `verify/probe_q1_q2.ipynb` | The two follow-up probes, each against its permutation null. No GPU. |
 
 ## What the pilot found
 
@@ -41,6 +43,22 @@ measured only where that cut is genuinely earlier than the naming sentence:
 
 The information is there and the lens does not read it. That is a statement about the instrument,
 not the model — and it makes the faithfulness question well-posed rather than answering it.
+
+**A third correction, found while building the follow-up probes, and it reaches this table.** The
+decoy in every row is another case's real target, drawn from the whole corpus. But relocated
+filenames are almost perfectly nested inside repositories: **20 of 21 distinct basenames occur in
+exactly one repo, and 71 of 75 decoys name a file from a different project than the one being
+read.** A method can prefer the target over that decoy by recognising the repository — which every
+method here has free access to, because the entire context is that project's source.
+
+So the *decoy* column is a floor that is too low, not a noise estimate. What survives is the
+*target* column: **18 of 30 claims where the model named the exact repository-relative path**, out
+of the many files it could have named instead. The lens is unaffected in direction — a floor that
+is too low could only have flattered it, and it was null regardless.
+
+`code/decoy_scope_audit.py` reproduces the published 30/18/3 from the stored replies and then
+re-states it. The repair for a future corpus is concrete: relocation pairs must be drawn from
+**within** a repository, so that repo identity favours both candidates equally.
 
 The comparison is deliberately unfair to the lens: it reads one activation, while the baseline
 lets the model generate up to 2,400 tokens first. A baseline that strong losing would have settled
@@ -71,6 +89,7 @@ report/       the draft, its MyST source, and the four figures
 notebooks/    the Colab replication notebook and the script that generates it
 code/         the probe, the analyses, and the Colab session helpers
 data/         inputs and the raw readouts downloaded from Colab
+verify/       the two checking notebooks and the exact inputs they re-derive from
 site/         the web version, openable from file://
 ```
 
@@ -89,6 +108,12 @@ site/         the web version, openable from file://
 - `jlens_reloc_probe.py` — the probe. Records **top-20 token ids at every layer**, not a hit count
 - `jlens_layer_curve.py` — emergence curves and symmetric distinctive-token scoring
 - `jlens_reloc_stats.py` — per-claim collapse and paired McNemar test
+- `extract_residuals.py` — saves the residual stream itself, for the follow-up probes. No lens
+- `dump_token_embeddings.py` — the candidate filenames in the same space, sliced from the cached
+  safetensors without loading the model
+- `label_relocations.py` — the only script in the probe pipeline that reads gold, and it reads it
+  *after* every relocation already exists. Nothing it writes re-enters a locate prompt
+- `probe_q1_q2.py` — both follow-up probes: grouped folds, permutation nulls, per-layer
 - `colab/` — session helpers. `colab exec` is a blocking HTTP call on a shared kernel, so the
   download and the probe both run detached with a tiny status script polling them
 
@@ -133,7 +158,8 @@ repositories do not include it.
 
 ## Reproducing
 
-Three things can be reproduced, in increasing order of cost. Only the second needs a GPU.
+Five things can be reproduced, in increasing order of cost. Only the second and fourth need a GPU;
+the fifth reuses the fourth's extraction.
 
 ### 1. Check every number — no GPU, no model, ~2 seconds
 
@@ -207,6 +233,108 @@ exactly one repository-relative path"*, and scores the reply against the target 
 decoy the lens was scored against. `max_tokens` is 2400 because this model reasons before
 answering and a smaller budget returns an empty string — which scores as a miss and would
 manufacture a negative. Empty replies are excluded and counted, not scored as misses.
+
+### 4. Re-run the follow-up probes — Colab A100, ~15 min weights + ~100 min extraction
+
+Two questions the lens run could not answer, because it saved the readout's *verdict* (top-20 token
+ids) and not the readout's *input*:
+
+- **Q1** — is the file linearly decodable at the cut by a readout **trained on this task**, rather
+  than by the published lens? A negative lens result is consistent with "the information is absent"
+  and with "that lens does not read it", and those are different conclusions.
+- **Q2** — does the residual at that moment distinguish a relocation that turns out to be **right**
+  from one that turns out to be **wrong**? If so, there is something to build a gate on.
+
+No lens is involved: `output_hidden_states=True` returns the residual stream directly.
+
+```
+colab new -s resid --gpu A100
+colab install -s resid accelerate safetensors
+colab upload -s resid data/reloc_cases.json        /content/reloc_cases.json
+colab upload -s resid code/extract_residuals.py    /content/extract_residuals.py
+
+colab exec -s resid -f code/colab/colab_prefetch.py            # detached, 135 GB
+colab exec -s resid -f code/colab/colab_prefetch_status.py     # until PREFETCH DONE
+
+colab exec -s resid -f code/colab/colab_run_extract.py         # detached
+colab exec -s resid -f code/colab/colab_extract_status.py      # poll
+
+# pull as it grows -- the npz is rewritten every 4 readouts for exactly this reason
+MSYS_NO_PATHCONV=1 colab download -s resid /content/resid.npz       resid.npz
+MSYS_NO_PATHCONV=1 colab download -s resid /content/resid_meta.json resid_meta.json
+
+# the candidate filenames in the same space, sliced from the cached safetensors -- no model load
+colab upload -s resid code/dump_token_embeddings.py /content/dump_token_embeddings.py
+colab exec   -s resid -f code/dump_token_embeddings.py
+MSYS_NO_PATHCONV=1 colab download -s resid /content/tok_emb.npz       tok_emb.npz
+MSYS_NO_PATHCONV=1 colab download -s resid /content/tok_emb_names.json tok_emb_names.json
+colab stop -s resid
+
+python code/label_relocations.py     # gold -> reloc_labels.json, 51/75 mentions, 21/17 claims
+python code/probe_q1_q2.py           # both probes, per layer, with permutation nulls
+```
+
+`colab.exe` and every analysis script here need **numpy, sklearn, matplotlib**; run them with the
+interpreter that has them, not a bare `python`.
+
+**Why most of the probe code is null-estimation.** There are 38 distinct claims and 4,096
+dimensions per layer. A linear classifier in that regime separates *random* labels nearly
+perfectly, so an AUC on its own means nothing. Three precautions, each demonstrated in the notebook
+rather than promised:
+
+| precaution | what it prevents |
+|---|---|
+| folds are **leave-one-claim-out**, never leave-one-row-out | one claim appears as several mentions and at two cut points; a random split puts near-duplicates of the test row in training. The notebook prints the naive number beside the honest one — the gap *is* the artefact |
+| a **permutation null**, 500 shuffles per layer | the reported p is the fraction of label shuffles that beat the real labels, so the null is measured on this data rather than assumed to be 0.5 |
+| PCA fitted **inside** each fold | fitting once on everything leaks the test fold into the projection |
+
+One more choice worth knowing about: Q2's labels come from matching the relocated file against gold.
+Matching on the exact repo-relative path gives **21 correct / 17 wrong** across 38 claims; also
+accepting a bare-filename match gives **27 / 11**. The looser rule hands the classifier a class
+balance manufactured by the scoring rule, so the strict labels are the ones used.
+`python code/label_relocations.py --allow-basename` regenerates the loose set, and
+`code/probe_q1_q2.py --labels <file>` re-runs against it.
+
+### 5. The event probe and the single-dimension sweep
+
+Two further questions the same residuals support.
+
+**Is the *event* decodable — was the model about to change its mind at all?** This is the question
+the backtracking literature asks of reasoning traces, and it needs negatives. `export_control_cuts.py`
+emits one matched control per relocation: a sentence boundary in the **same run**, in a step
+containing **no** relocation, chosen to match the positive's prefix length. Matching is what makes
+it a control — relocations arrive late in long traces, so unmatched negatives would let a
+classifier score well by detecting context length alone.
+
+```
+python code/export_control_cuts.py            # 74 of 75 matched, median length gap 14 chars
+colab upload -s resid data/control_cases.json /content/control_cases.json
+colab exec   -s resid -f code/colab/colab_run_controls.py      # refuses if the first pass is live
+colab exec   -s resid -f code/colab/colab_controls_status.py
+MSYS_NO_PATHCONV=1 colab download -s resid /content/resid_ctrl.npz resid_ctrl.npz
+python code/probe_event.py
+```
+
+`probe_event.py` reports the AUC of a classifier given **only the token count** before it reports
+anything about activations. That is the floor the real probe has to clear, and folds are
+leave-one-**run**-out because a positive and its matched negative share a run.
+
+**What is the best single dimension worth?** `dim_auc_sweep.py` runs the standard recipe — score
+every unit by ROC-AUC, take the best, note its Cohen's *d*, check whether it generalises — and adds
+the step that is usually skipped: the same procedure on **shuffled labels**.
+
+```
+python code/dim_auc_sweep.py
+```
+
+With 2,048 dimensions and 35 claims, the best-looking dimension is the best of 2,048 draws from
+noise. Reading its in-sample AUC against 0.5 rather than against the shuffled baseline is how a
+selection artifact becomes a finding about polysemanticity.
+
+Everything above is also packaged as `verify/probe_q1_q2.ipynb` — upload it with `resid.npz`,
+`resid_meta.json`, `reloc_labels.json`, `tok_emb.npz`, `tok_emb_names.json` and (for §9)
+`resid_ctrl.npz` and `resid_ctrl_meta.json`, then Run all. No GPU; the forward passes have already
+happened.
 
 ### What "reproduce" means here
 

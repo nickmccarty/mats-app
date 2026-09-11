@@ -1,0 +1,362 @@
+{
+ "q1": [
+  {
+   "layer": 0,
+   "n_claims_scored": 32,
+   "target_wins": 12,
+   "decoy_wins": 20,
+   "tied_claims": 3,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.375,
+   "p": 0.21532714972272515
+  },
+  {
+   "layer": 6,
+   "n_claims_scored": 32,
+   "target_wins": 12,
+   "decoy_wins": 20,
+   "tied_claims": 3,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.375,
+   "p": 0.21532714972272515
+  },
+  {
+   "layer": 11,
+   "n_claims_scored": 32,
+   "target_wins": 12,
+   "decoy_wins": 20,
+   "tied_claims": 3,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.375,
+   "p": 0.21532714972272515
+  },
+  {
+   "layer": 17,
+   "n_claims_scored": 32,
+   "target_wins": 12,
+   "decoy_wins": 20,
+   "tied_claims": 3,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.375,
+   "p": 0.21532714972272515
+  },
+  {
+   "layer": 23,
+   "n_claims_scored": 32,
+   "target_wins": 12,
+   "decoy_wins": 20,
+   "tied_claims": 3,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.375,
+   "p": 0.21532714972272515
+  },
+  {
+   "layer": 29,
+   "n_claims_scored": 32,
+   "target_wins": 12,
+   "decoy_wins": 20,
+   "tied_claims": 3,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.375,
+   "p": 0.21532714972272515
+  },
+  {
+   "layer": 34,
+   "n_claims_scored": 32,
+   "target_wins": 12,
+   "decoy_wins": 20,
+   "tied_claims": 3,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.375,
+   "p": 0.21532714972272515
+  },
+  {
+   "layer": 40,
+   "n_claims_scored": 33,
+   "target_wins": 25,
+   "decoy_wins": 8,
+   "tied_claims": 2,
+   "dropped_identical_decoy": 1,
+   "decoy_scope": "global -- CONFOUNDED by repository identity, see decoy_scope_audit.py",
+   "rate": 0.7575757575757576,
+   "p": 0.004551384132355452
+  }
+ ],
+ "q2": [
+  {
+   "layer": 0,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.06296296296296296,
+   "null_mean": 0.23790346954390731,
+   "null_p95": 0.4161868686868687,
+   "detectable_gap": 0.1782833991429614,
+   "p": 0.8970099667774086
+  },
+  {
+   "layer": 6,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.28641975308641976,
+   "null_mean": 0.38930923224446107,
+   "null_p95": 0.6062654320987655,
+   "detectable_gap": 0.21695619985430442,
+   "p": 0.7740863787375415
+  },
+  {
+   "layer": 11,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.2740740740740741,
+   "null_mean": 0.4130377614981115,
+   "null_p95": 0.6188043478260871,
+   "detectable_gap": 0.20576658632797556,
+   "p": 0.840531561461794
+  },
+  {
+   "layer": 17,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.3172839506172839,
+   "null_mean": 0.4160594066862125,
+   "null_p95": 0.6503585167292898,
+   "detectable_gap": 0.2342991100430773,
+   "p": 0.7541528239202658
+  },
+  {
+   "layer": 23,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.4876543209876543,
+   "null_mean": 0.42014067133847227,
+   "null_p95": 0.6555434782608697,
+   "detectable_gap": 0.2354028069223974,
+   "p": 0.32558139534883723
+  },
+  {
+   "layer": 29,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.4160493827160494,
+   "null_mean": 0.40458043039551667,
+   "null_p95": 0.6326722928639306,
+   "detectable_gap": 0.2280918624684139,
+   "p": 0.4883720930232558
+  },
+  {
+   "layer": 34,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.2876543209876543,
+   "null_mean": 0.42345700417925114,
+   "null_p95": 0.6286444661035305,
+   "detectable_gap": 0.2051874619242794,
+   "p": 0.8305647840531561
+  },
+  {
+   "layer": 40,
+   "n_readouts": 63,
+   "n_claims": 35,
+   "pos": 45,
+   "auc": 0.5172839506172839,
+   "null_mean": 0.43534845417820794,
+   "null_p95": 0.6758742393509127,
+   "detectable_gap": 0.2405257851727048,
+   "p": 0.3023255813953488
+  }
+ ],
+ "q1_centroid": [
+  {
+   "layer": 0,
+   "n_claims_scored": 22,
+   "target_wins": 12,
+   "decoy_wins": 10,
+   "tied_claims": 1,
+   "n_readouts": 45,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.5454545454545454,
+   "p": 0.8318119049072266
+  },
+  {
+   "layer": 6,
+   "n_claims_scored": 23,
+   "target_wins": 15,
+   "decoy_wins": 8,
+   "tied_claims": 1,
+   "n_readouts": 47,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.6521739130434783,
+   "p": 0.21003961563110352
+  },
+  {
+   "layer": 11,
+   "n_claims_scored": 23,
+   "target_wins": 16,
+   "decoy_wins": 7,
+   "tied_claims": 1,
+   "n_readouts": 47,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.6956521739130435,
+   "p": 0.0931396484375
+  },
+  {
+   "layer": 17,
+   "n_claims_scored": 23,
+   "target_wins": 17,
+   "decoy_wins": 6,
+   "tied_claims": 1,
+   "n_readouts": 47,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.7391304347826086,
+   "p": 0.03468966484069824
+  },
+  {
+   "layer": 23,
+   "n_claims_scored": 23,
+   "target_wins": 17,
+   "decoy_wins": 6,
+   "tied_claims": 1,
+   "n_readouts": 47,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.7391304347826086,
+   "p": 0.03468966484069824
+  },
+  {
+   "layer": 29,
+   "n_claims_scored": 23,
+   "target_wins": 19,
+   "decoy_wins": 4,
+   "tied_claims": 1,
+   "n_readouts": 47,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.8260869565217391,
+   "p": 0.002599477767944336
+  },
+  {
+   "layer": 34,
+   "n_claims_scored": 23,
+   "target_wins": 18,
+   "decoy_wins": 5,
+   "tied_claims": 1,
+   "n_readouts": 47,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.782608695652174,
+   "p": 0.010622024536132812
+  },
+  {
+   "layer": 40,
+   "n_claims_scored": 24,
+   "target_wins": 20,
+   "decoy_wins": 4,
+   "tied_claims": 0,
+   "n_readouts": 47,
+   "unscoreable_no_other_run": 15,
+   "rate": 0.8333333333333334,
+   "p": 0.001543879508972168
+  }
+ ],
+ "q1_centroid_same_repo": [
+  {
+   "layer": 0,
+   "n_claims_scored": 1,
+   "target_wins": 1,
+   "decoy_wins": 0,
+   "tied_claims": 1,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 1.0
+  },
+  {
+   "layer": 6,
+   "n_claims_scored": 1,
+   "target_wins": 1,
+   "decoy_wins": 0,
+   "tied_claims": 1,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 1.0
+  },
+  {
+   "layer": 11,
+   "n_claims_scored": 2,
+   "target_wins": 2,
+   "decoy_wins": 0,
+   "tied_claims": 0,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 0.5
+  },
+  {
+   "layer": 17,
+   "n_claims_scored": 2,
+   "target_wins": 2,
+   "decoy_wins": 0,
+   "tied_claims": 0,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 0.5
+  },
+  {
+   "layer": 23,
+   "n_claims_scored": 2,
+   "target_wins": 2,
+   "decoy_wins": 0,
+   "tied_claims": 0,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 0.5
+  },
+  {
+   "layer": 29,
+   "n_claims_scored": 2,
+   "target_wins": 2,
+   "decoy_wins": 0,
+   "tied_claims": 0,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 0.5
+  },
+  {
+   "layer": 34,
+   "n_claims_scored": 2,
+   "target_wins": 2,
+   "decoy_wins": 0,
+   "tied_claims": 0,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 0.5
+  },
+  {
+   "layer": 40,
+   "n_claims_scored": 1,
+   "target_wins": 1,
+   "decoy_wins": 0,
+   "tied_claims": 1,
+   "n_readouts": 3,
+   "unscoreable_no_other_run": 13,
+   "rate": 1.0,
+   "p": 1.0
+  }
+ ]
+}

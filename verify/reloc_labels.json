@@ -1,0 +1,677 @@
+[
+ {
+  "case": 0,
+  "run_id": "20260901-231236-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 1,
+  "run_id": "20260901-232831-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 2,
+  "run_id": "20260901-232831-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 3,
+  "run_id": "20260901-232831-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 4,
+  "run_id": "20260901-232831-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 5,
+  "run_id": "20260901-232831-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": true
+ },
+ {
+  "case": 6,
+  "run_id": "20260902-002023-eval005",
+  "repo": "inveniosoftware/invenio-communities",
+  "target_path": "invenio_communities/views/ui.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 7,
+  "run_id": "20260902-013153-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "src/pyload/webui/app/blueprints/cnl_blueprint.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": true
+ },
+ {
+  "case": 8,
+  "run_id": "20260902-013153-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "cnl_blueprint.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": false
+ },
+ {
+  "case": 9,
+  "run_id": "20260902-013153-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "src/pyload/webui/app/blueprints/cnl_blueprint.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 10,
+  "run_id": "20260902-013153-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "cnl_blueprint.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": false
+ },
+ {
+  "case": 11,
+  "run_id": "20260902-013153-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "json_blueprint.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 12,
+  "run_id": "20260902-013153-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "json_blueprint.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 13,
+  "run_id": "20260902-020259-eval008",
+  "repo": "zmievsa/cadwyn",
+  "target_path": "cadwyn/applications.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 14,
+  "run_id": "20260902-020259-eval008",
+  "repo": "zmievsa/cadwyn",
+  "target_path": "applications.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": false
+ },
+ {
+  "case": 15,
+  "run_id": "20260902-023103-eval009",
+  "repo": "openpgpjs/openpgpjs",
+  "target_path": "src/message.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 16,
+  "run_id": "20260902-030052-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": true
+ },
+ {
+  "case": 17,
+  "run_id": "20260902-030052-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 18,
+  "run_id": "20260902-030052-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "llamafy_baichuan2.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": false
+ },
+ {
+  "case": 19,
+  "run_id": "20260902-030052-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 20,
+  "run_id": "20260902-030052-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 21,
+  "run_id": "20260902-042315-eval015",
+  "repo": "vllm-project/vllm",
+  "target_path": "vllm/utils.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 22,
+  "run_id": "20260902-042315-eval015",
+  "repo": "vllm-project/vllm",
+  "target_path": "vllm/utils.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 23,
+  "run_id": "20260902-054906-eval018",
+  "repo": "run-llama/llama_index",
+  "target_path": "context_serializers.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": false
+ },
+ {
+  "case": 24,
+  "run_id": "20260902-062512-eval020",
+  "repo": "dollarshaveclub/shave",
+  "target_path": "src/shave.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 25,
+  "run_id": "20260902-094757-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 26,
+  "run_id": "20260902-094757-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 27,
+  "run_id": "20260902-094757-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 28,
+  "run_id": "20260902-100450-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": true
+ },
+ {
+  "case": 29,
+  "run_id": "20260902-100450-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 30,
+  "run_id": "20260902-100450-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 31,
+  "run_id": "20260902-100450-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 32,
+  "run_id": "20260902-100450-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 33,
+  "run_id": "20260902-100450-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 34,
+  "run_id": "20260902-112100-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 35,
+  "run_id": "20260902-112100-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 36,
+  "run_id": "20260902-112100-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 37,
+  "run_id": "20260902-114302-eval002",
+  "repo": "haxtheweb/haxcms-nodejs",
+  "target_path": "src/app.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 38,
+  "run_id": "20260902-131832-eval006",
+  "repo": "apache/airflow",
+  "target_path": "aws_hook.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 39,
+  "run_id": "20260902-131832-eval006",
+  "repo": "apache/airflow",
+  "target_path": "aws_hook.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 40,
+  "run_id": "20260902-134455-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "src/pyload/core/api/__init__.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": true
+ },
+ {
+  "case": 41,
+  "run_id": "20260902-134455-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "ClickNLoad.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 42,
+  "run_id": "20260902-134455-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "src/pyload/webui/app/blueprints/cnl_blueprint.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 43,
+  "run_id": "20260902-134455-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "cnl_blueprint.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": true
+ },
+ {
+  "case": 44,
+  "run_id": "20260902-134455-eval007",
+  "repo": "pyload/pyload",
+  "target_path": "cnl_blueprint.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": false
+ },
+ {
+  "case": 45,
+  "run_id": "20260902-141826-eval008",
+  "repo": "zmievsa/cadwyn",
+  "target_path": "cadwyn/applications.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 46,
+  "run_id": "20260902-141826-eval008",
+  "repo": "zmievsa/cadwyn",
+  "target_path": "cadwyn/applications.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 47,
+  "run_id": "20260902-141826-eval008",
+  "repo": "zmievsa/cadwyn",
+  "target_path": "cadwyn/applications.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 48,
+  "run_id": "20260902-141826-eval008",
+  "repo": "zmievsa/cadwyn",
+  "target_path": "cadwyn/applications.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 49,
+  "run_id": "20260902-144341-eval009",
+  "repo": "openpgpjs/openpgpjs",
+  "target_path": "src/openpgp.js",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 50,
+  "run_id": "20260902-151227-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 51,
+  "run_id": "20260902-151227-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 52,
+  "run_id": "20260902-151227-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": true
+ },
+ {
+  "case": 53,
+  "run_id": "20260902-151227-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 54,
+  "run_id": "20260902-151227-eval010",
+  "repo": "hiyouga/LLaMA-Factory",
+  "target_path": "scripts/convert_ckpt/llamafy_baichuan2.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 55,
+  "run_id": "20260902-165050-eval015",
+  "repo": "vllm-project/vllm",
+  "target_path": "vllm/utils.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 56,
+  "run_id": "20260902-182137-eval018",
+  "repo": "run-llama/llama_index",
+  "target_path": "llama-index-core/llama_index/core/workflow/context_serializers.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 57,
+  "run_id": "20260902-185108-eval020",
+  "repo": "dollarshaveclub/shave",
+  "target_path": "src/shave.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 58,
+  "run_id": "20260904-100337-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 59,
+  "run_id": "20260904-100337-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 60,
+  "run_id": "20260904-100337-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 61,
+  "run_id": "20260904-100337-eval001",
+  "repo": "buildalon/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 62,
+  "run_id": "20260904-153454-eval012",
+  "repo": "RageAgainstThePixel/setup-steamcmd",
+  "target_path": "src/setup.ts",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": true
+ },
+ {
+  "case": 63,
+  "run_id": "20260904-153454-eval012",
+  "repo": "RageAgainstThePixel/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 64,
+  "run_id": "20260904-153454-eval012",
+  "repo": "RageAgainstThePixel/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 65,
+  "run_id": "20260904-153454-eval012",
+  "repo": "RageAgainstThePixel/setup-steamcmd",
+  "target_path": "src/logging.ts",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 66,
+  "run_id": "20260904-174137-eval016",
+  "repo": "dpgaspar/Flask-AppBuilder",
+  "target_path": "flask_appbuilder/utils/base.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": true
+ },
+ {
+  "case": 67,
+  "run_id": "20260904-174137-eval016",
+  "repo": "dpgaspar/Flask-AppBuilder",
+  "target_path": "flask_appbuilder/utils/base.py",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 68,
+  "run_id": "20260904-191425-eval019",
+  "repo": "npm/fstream",
+  "target_path": "lib/writer.js",
+  "correct": true,
+  "how": "path",
+  "cut_identical": false
+ },
+ {
+  "case": 69,
+  "run_id": "20260904-191425-eval019",
+  "repo": "npm/fstream",
+  "target_path": "lib/link-writer.js",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": true
+ },
+ {
+  "case": 70,
+  "run_id": "20260904-195436-eval020",
+  "repo": "AmauriC/tarteaucitron.js",
+  "target_path": "tarteaucitron.js",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ },
+ {
+  "case": 71,
+  "run_id": "20260904-195436-eval020",
+  "repo": "AmauriC/tarteaucitron.js",
+  "target_path": "tarteaucitron.js",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": true
+ },
+ {
+  "case": 72,
+  "run_id": "20260904-195436-eval020",
+  "repo": "AmauriC/tarteaucitron.js",
+  "target_path": "tarteaucitron.js",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": true
+ },
+ {
+  "case": 73,
+  "run_id": "20260907-104932-eval001",
+  "repo": "pyload/pyload",
+  "target_path": "cnl_blueprint.py",
+  "correct": false,
+  "how": "basename",
+  "cut_identical": false
+ },
+ {
+  "case": 74,
+  "run_id": "20260907-111923-eval001",
+  "repo": "pyload/pyload",
+  "target_path": "clicknload_thread.py",
+  "correct": false,
+  "how": "miss",
+  "cut_identical": false
+ }
+]

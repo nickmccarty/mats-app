@@ -1,0 +1,31 @@
+{
+ "n_cases": 75,
+ "cross_repo_decoys": 71,
+ "basenames": 21,
+ "multi_file_repos": {
+  "pyload/pyload": [
+   "ClickNLoad.py",
+   "__init__.py",
+   "clicknload_thread.py",
+   "cnl_blueprint.py",
+   "json_blueprint.py"
+  ],
+  "openpgpjs/openpgpjs": [
+   "message.js",
+   "openpgp.js"
+  ],
+  "RageAgainstThePixel/setup-steamcmd": [
+   "logging.ts",
+   "setup.ts"
+  ],
+  "npm/fstream": [
+   "link-writer.js",
+   "writer.js"
+  ]
+ },
+ "ask_baseline": {
+  "claims": 30,
+  "target_named": 18,
+  "decoy_named": 3
+ }
+}
