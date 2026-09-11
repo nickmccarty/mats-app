@@ -101,9 +101,9 @@
   <p class="sub">504 agent trajectories where the correct answer is known independently of the model, and a headline result that does not survive de-duplication</p>
 
   <div class="chips">
-      <span class="chip todo"><b>Verify every number</b><span>Re-derives each published figure from the raw files. No GPU, about two seconds. <i>— link to follow</i></span></span>
-      <span class="chip todo"><b>The follow-up probes</b><span>Four activation-level questions, each against a measured permutation null. <i>— link to follow</i></span></span>
-      <span class="chip todo"><b>Reproduce the lens pilot</b><span>The full Colab A100 run: weights, extraction, scoring. <i>— link to follow</i></span></span>
+      <a class="chip" href="https://colab.research.google.com/github/nickmccarty/mats-app/blob/main/verify/verify_findings.ipynb" target="_blank" rel="noopener"><b>Verify every number</b><span>Re-derives each published figure from the raw files. No GPU, about two seconds. 40 of 40 pass.</span></a>
+      <a class="chip" href="https://colab.research.google.com/github/nickmccarty/mats-app/blob/main/verify/probe_q1_q2.ipynb" target="_blank" rel="noopener"><b>The follow-up probes</b><span>Four activation-level questions, each against a measured permutation null. No GPU, ~15 min.</span></a>
+      <a class="chip" href="https://colab.research.google.com/github/nickmccarty/mats-app/blob/main/notebooks/jlens_reloc_replication.ipynb" target="_blank" rel="noopener"><b>Reproduce the lens pilot</b><span>The full A100 run: weights, extraction, scoring. Needs a GPU and about two hours.</span></a>
   </div>
 
   <div class="abstract"><p>Agentic harnesses for vulnerability localization emit long reasoning traces and then reduce
