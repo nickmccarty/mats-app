@@ -21,13 +21,52 @@ Agentic harnesses for vulnerability localization emit long reasoning traces and 
 > corrected value rather than only the survivor. Numbers may change.
 
 
+## Executive summary
+
+**The problem.** Agentic harnesses for vulnerability localization produce long reasoning traces and then reduce them to a ranked list of files. The reasoning is discarded. Whether it carried information the ranked list does not is a chain-of-thought faithfulness question, and it is normally unanswerable, because the reasoning and the output are both model artifacts with nothing independent to check them against.
+
+**Why this corpus can answer it.** Every task is a real CVE at the commit before its fix. The fix commit was written by the project's maintainers rather than by an annotator reading model output, and it names the true files. That gives three independent objects per trace: what the model **said**, what it **submitted**, and what was **true**. 594 tasks produced 1,288 casefiles and 504 recorded trajectories.
+
+**Three questions.**
+
+1. Does the reasoning contain conclusions the structured output loses?
+2. Is the relocated file recoverable from activations *before* the model writes it?
+3. Do activations distinguish a relocation that turns out to be right from one that is wrong?
+
+### What we found
+
+**Our own headline did not survive de-duplication.** A *relocation* is a statement where a run abandons the file it was asked about and names another. Counted per mention, relocations name a true gold file 81.4% of the time, apparently beating the 49.8% calibration they are measured against. Counted per distinct claim — the unit that calibration uses — precision is 40.5% on 37 claims, below it. Three tasks are half the population and one claim is restated 55 times. The inflated number is the one a regex returns by default.
+
+**The reasoning is not being discarded, but the exceptions are ours.** Of 218 relocations mined from reasoning, 212 reach the structured output. The six that do not are not suppression and not error: 5 of 29 under an enricher prompt carrying a consolation clause (*"then cite the closest line in the file you were asked about"*), 1 of 189 after the clause was removed. Fisher exact p = 0.00016, odds ratio 39. One trace records the model locating the weakness, resolving to cite it, and being redirected by the instruction mid-sentence.
+
+**A cheap baseline beats the instrument.** At the token before the model writes the relocated file, asking it outright recovers the file in 18 of 30 claims; a Jacobian lens on the same claims reaches 11 of 31. Something at that point determines the answer and this readout does not reach it, which is a result about the instrument rather than about the model.
+
+
+> **[ INSERT FIGURE 1 — `report/figures/baseline.png` ]**
+
+*Figure 1. Both methods with their decoy floors drawn across the bars rather than beside them: a hit rate is unreadable without the floor it has to clear.*
+
+**Every activation-level probe returned a null or an artifact.** We extracted the residual stream directly — 150 readouts, 41 layers — and ran four probes. A trained readout recovers the file in 20 of 24 claims at its best layer, but it is identifying the repository rather than the file, and deconfounded it scores two. Right-versus-wrong relocation is null at a detection threshold of AUC 0.676. Whether a relocation is *coming* is suggestive at late layers and survives no correction for multiple comparisons.
+
+**Five measurements looked publishable and were wrong**, each in the direction the hypothesis wanted: a repository detector reading as a filename probe; a delimiter detector separating classes at the embedding layer, before any transformer block had run; a prompt-length shortcut; a per-mention count inflating a per-claim p-value; a permutation null built at the wrong unit. The mistaken value is reported beside the corrected one throughout.
+
+### What this does not show
+
+- **n is small.** 37 claims in the mining result, ~30–35 in the pilot, 23 matched pairs in the event probe. The Q2 probe could not have detected anything below AUC 0.676, which is a large effect, so the nulls bound the effects rather than excluding them.
+- **One model, one corpus, one cut point.** Qwen3.6-35B-A3B across 15 repositories.
+- **The decoy controls for filename plausibility, not repository identity.** 71 of 75 decoys name a file from a different project, so every target-vs-decoy floor is too low.
+- **The baseline is not an interpretability result.** It lets the model generate up to 2,400 tokens before answering, while the lens reads one activation.
+- **Gold is fix-commit files**, which under-credits tests, callers and configuration a real fix touches but the reference patch does not.
+
+Everything above is stated again in full below, with the method and the corrections.
+
 ## Why this setting has ground truth
 
 Faithfulness experiments usually cannot check a model's stated target against an objective answer. The stated reasoning and the final output are both model artifacts; a third, independent statement of what the answer *is* rarely exists.
 
 Vulnerability localization supplies one. A task is a repository checked out at the parent of a known fix commit. The weakness is present at that commit and absent at its child. The fix commit is a diff, so it names the files and line ranges that were actually wrong, and it was written by the project's own maintainers rather than by an annotator reading model output.
 
-The model is given a symptom, the repository, and nothing else — no path, no CWE identifier, no advisory text. It explores with `glob`, `grep` and `read`, then submits files and cites lines. Its transcript, its structured output, and the true answer are three independent objects.
+The model is given a symptom, the repository, and nothing else. It explores with tool calls — `glob`, `grep`, `read` — then submits files; cited lines are supplied by FastContext. Its transcript, its structured output, and the true answer are three independent objects.
 
 This yields a triple per trace: what the model **said**, what it **submitted**, and what was **true**. Faithfulness questions that are normally circular become measurable.
 
@@ -40,13 +79,13 @@ Three models with different jobs, on one workstation, with two model-free retrie
 | stage | model | job |
 |---|---|---|
 | locate | Antares-1B | ranks candidate files; run k times per task for agreement |
-| plan / judge | Qwen3.6-35B-A3B | selects files to examine, scores |
+| plan / judge | Qwen3.6-35B-A3B | examines selected files, scores |
 | enrich | FastContext-4B | explores inside a chosen file and cites lines |
 | evidence | — | resolves every claim against the real checkout |
 
-Everything is local, so full activations are reachable for the follow-up proposed in §7. Every run writes an ATIF trajectory (per-node step records, tool calls, reasoning text) and a casefile (the structured output, ranked candidates, cited line ranges).
+Everything is local, so full activations are reachable. Every run writes an ATIF trajectory (per-node step records, tool calls, reasoning text) and a casefile (the structured output, ranked candidates, cited line ranges).
 
-Locate is run three times per task. The number of passes that name a file calibrates how likely it is to be gold: 1 of 3 → 8.0%, 2 of 3 → 22.6%, 3 of 3 → 49.8%, measured on this corpus. That calibration is the baseline any mined signal has to beat, and §4 turns on the fact that it is measured per distinct file, not per mention.
+Locate is run three times per task. The number of passes that name a file calibrates how likely it is to be gold: 1 of 3 → 8.0%, 2 of 3 → 22.6%, 3 of 3 → 49.8%, measured on this corpus. That calibration is the baseline any mined signal has to beat, and the result below turns on it being measured per distinct file, not per mention.
 
 ## Relocations
 
@@ -60,8 +99,6 @@ Most apparent contradictions are not contradictions. Four filters, validated on 
 4. **Hedge detection.** "This may live in X instead" is not an assertion that it does.
 
 192 relocations survive across the corpus, covering 37 distinct (task, file) claims.
-
-Those two numbers are the same evidence counted two ways.
 
 ## The result, and its retraction
 
@@ -109,7 +146,7 @@ It located the weakness, resolved to cite it, and was redirected by the instruct
 
 So the answer to the third follow-up question below is neither of the two it proposes. The never-submitted set is not a suppression story and not an error story — it is instruction following, and the instruction was ours. So the 97% measures a prompt as much as it measures a reduction: under a prompt that asked for a consolation citation, one relocation in six was lost.
 
-Whether those conclusions are *weighted* correctly is a separate question. On current evidence we do not know, and §4 is the reason we decline to claim otherwise.
+Whether those conclusions are *weighted* correctly is a separate question. On current evidence we do not know, and for the reason given above we decline to claim otherwise.
 
 ## Instrument validation
 
@@ -149,9 +186,9 @@ Each case replays a real trajectory to the moment **before** the model names the
 The lens row is given under both scoring rules because the obvious objection is that it loses only because the permissive rule inflates its decoy. It does not: at this cut the two rules give the same 11 of 31 against the same floor of 5. The shared-token contamination is real but lives entirely at the later cut, where correcting it drops the decoy from 21 of 31 to 4.
 
 
-> **[ INSERT FIGURE 1 — `report/figures/baseline.png` ]**
+> **[ INSERT FIGURE 2 — `report/figures/baseline.png` ]**
 
-*Figure 1. The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unreadable without the floor it has to clear. Scored only on claims whose cut is genuinely earlier than the naming sentence.*
+*Figure 2. The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unreadable without the floor it has to clear. Scored only on claims whose cut is genuinely earlier than the naming sentence.*
 
 
 Asking is simply appending *"which file are you about to name? Reply with one path"* to the same prefix and reading the reply. It recovers the file in 18 of 30 claims against a decoy floor of 3. The lens, on the same question and the same corpus, does not separate from its decoy.
@@ -165,9 +202,9 @@ The decoy column is therefore a floor that is too low rather than a noise estima
 The comparison is unfair to the lens, in the direction that makes the negative safe: the lens reads a single activation, while the baseline lets the model generate — up to 2,400 tokens, and on these cases it uses them. So the baseline shows the answer is reachable *with additional forward computation*, not that it sits in the residual stream. A baseline that strong losing would have been decisive for the lens; a baseline that strong winning only bounds what the lens failed to find.
 
 
-> **[ INSERT FIGURE 2 — `report/figures/emergence.png` ]**
+> **[ INSERT FIGURE 3 — `report/figures/emergence.png` ]**
 
-*Figure 2. Where the relocated file becomes decodable, by layer, on the first 30-case export. At `at_path` the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer, where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This figure describes the later cut, where the model is already mid-sentence; it is not evidence about the earlier cut, where the lens does not beat its decoy.*
+*Figure 3. Where the relocated file becomes decodable, by layer, on the first 30-case export. At `at_path` the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer, where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This figure describes the later cut, where the model is already mid-sentence; it is not evidence about the earlier cut, where the lens does not beat its decoy.*
 
 
 ### What survives about the transport
@@ -175,9 +212,9 @@ The comparison is unfair to the lens, in the direction that makes the negative s
 Against the plain logit lens the Jacobian transport is **never worse on any of the 60 readouts** of the first export, carrying 4.2× the layer-hits before the naming sentence and 2.7× after. That is a real property of the transport and it is orthogonal to the result above: being a better readout than the logit lens does not make it a sufficient one.
 
 
-> **[ INSERT FIGURE 3 — `report/figures/transport.png` ]**
+> **[ INSERT FIGURE 4 — `report/figures/transport.png` ]**
 
-*Figure 3. Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagonal. Per *claim* the two look close at `at_path` — 16 of 17 against 14 of 17 — which is the conservative test and stays the headline.*
+*Figure 4. Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagonal. Per *claim* the two look close at `at_path` — 16 of 17 against 14 of 17 — which is the conservative test and stays the headline.*
 
 
 ### The scoring defect the control found
@@ -185,17 +222,17 @@ Against the plain logit lens the Jacobian transport is **never worse on any of t
 A hit was counted when **any** token of a filename entered the top 20. Two unrelated files sharing `.py` therefore scored for the target and the decoy at once.
 
 
-> **[ INSERT FIGURE 4 — `report/figures/shared.png` ]**
+> **[ INSERT FIGURE 5 — `report/figures/shared.png` ]**
 
-*Figure 4. The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts at 0.11 mean layers; sharing one token — always `.py` — on 83% at 8.17. Name *length* was the first hypothesis and the data rejected it: r = 0.183 over 120 observations, and the four-token name outscores the eleven-token one.*
+*Figure 5. The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts at 0.11 mean layers; sharing one token — always `.py` — on 83% at 8.17. Name *length* was the first hypothesis and the data rejected it: r = 0.183 over 120 observations, and the four-token name outscores the eleven-token one.*
 
 
 Correcting it symmetrically — dropping shared tokens from target and decoy alike — tightened `at_path` and left `at_sentence` unchanged. We had expected it to rescue the result; a one-sided correction appeared to, and was not licensed.
 
 
-> **[ INSERT FIGURE 5 — `report/figures/control.png` ]**
+> **[ INSERT FIGURE 6 — `report/figures/control.png` ]**
 
-*Figure 5. Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a two-character token.*
+*Figure 6. Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a two-character token.*
 
 
 ### Provenance of the numbers
@@ -259,9 +296,9 @@ That number is an artifact. Relocated filenames are nested inside repositories: 
 The question is well-posed and this corpus is the wrong instrument for it. A successor has to be built with within-repository relocation pairs rather than filtered into having them.
 
 
-> **[ INSERT FIGURE 6 — `report/figures/confound.png` ]**
+> **[ INSERT FIGURE 7 — `report/figures/confound.png` ]**
 
-*Figure 6. Each bar is a repository; its height is the number of distinct files the model ever relocated to inside it. Only the four above the dashed line can supply a same-repository decoy at all. With filenames nested inside projects this way, "prefers the target over the decoy" is satisfiable by recognizing the repository — which every method under test can do, because the context is that repository's source.*
+*Figure 7. Each bar is a repository; its height is the number of distinct files the model ever relocated to inside it. Only the four above the dashed line can supply a same-repository decoy at all. With filenames nested inside projects this way, "prefers the target over the decoy" is satisfiable by recognizing the repository — which every method under test can do, because the context is that repository's source.*
 
 ### Q2. Do divergent traces look different at the point of divergence?
 
@@ -274,9 +311,9 @@ Logistic regression on the residual at the earlier cut, predicting whether the r
 A separate sweep asked what a single dimension is worth here, running the familiar recipe — rank every unit by ROC-AUC, take the best, check Cohen's *d*, observe it fails to generalize — and adding the step usually skipped: the same procedure on shuffled labels. Mean in-sample AUC was **0.847** with real labels and **0.852** with random ones, held-out **0.349**, with Cohen's *d* reaching 0.65 on provable noise. At 2,048 dimensions and 35 claims the best-looking unit is the best of 2,048 draws, and "high AUC, large effect, fails to generalize, therefore polysemanticity" is a conclusion this data reaches with no signal present at all.
 
 
-> **[ INSERT FIGURE 7 — `report/figures/noise.png` ]**
+> **[ INSERT FIGURE 8 — `report/figures/noise.png` ]**
 
-*Figure 7. Three curves over depth: real labels in-sample, the same procedure on shuffled labels in-sample, and real labels scored on held-out claims. The first two are the same number. The recipe that ends in "polysemanticity" reaches that conclusion here with nothing present.*
+*Figure 8. Three curves over depth: real labels in-sample, the same procedure on shuffled labels in-sample, and real labels scored on held-out claims. The first two are the same number. The recipe that ends in "polysemanticity" reaches that conclusion here with nothing present.*
 
 One detail of that sweep is itself a lesson. The first version drew a fresh claim-split for each permutation while scoring the real labels on one fixed split, which compares a single draw against an average over draws. Pinning the split changed mean Cohen's *d* from 0.97 to 0.65 and made the real and shuffled curves converge — the corrected version is the stronger result, and the uncorrected one would have been the more impressive-looking figure.
 
@@ -302,9 +339,9 @@ A probe that separates classes before any block has run is reading its input, no
 | 40 | 0.650 | 0.630 | 0.040 |
 
 
-> **[ INSERT FIGURE 8 — `report/figures/nullband.png` ]**
+> **[ INSERT FIGURE 9 — `report/figures/nullband.png` ]**
 
-*Figure 8. Each panel draws its own permutation null as a band (mean to 95th percentile) for the identical procedure; a filled dot is a layer above its null. The event probe starts inside its band at layer 0 and rises out of it late. Right-vs-wrong never leaves its band. Reading either curve against 0.5 instead of against its band would give the wrong answer in both panels.*
+*Figure 9. Each panel draws its own permutation null as a band (mean to 95th percentile) for the identical procedure; a filled dot is a layer above its null. The event probe starts inside its band at layer 0 and rises out of it late. Right-vs-wrong never leaves its band. Reading either curve against 0.5 instead of against its band would give the wrong answer in both panels.*
 
 Layer 0 is now non-significant, which is the diagnostic passing: nothing is separable before the model computes anything, and what separation exists appears late. But eight layers are eight tests, and Benjamini–Hochberg [[Benjamini et al. (1995)]] at q = 0.05 requires the smallest p below 0.00625. The smallest is 0.033. **Nothing survives correction**, and at 23 pairs the detection threshold was AUC 0.635 — so a real late-layer effect of ordinary size would have been invisible regardless.
 
@@ -335,18 +372,19 @@ The value of the setting is that Q1 can be scored against an answer key that nei
 
 # Appendix A — Figures to insert
 
-All 8 are in `mats-app/report/figures/`. The three probe figures are SVG and stay sharp at any size; the rest are 2x PNG. None of them duplicates information that is also in the prose.
+All 9 are in `mats-app/report/figures/`. The three probe figures are SVG and stay sharp at any size; the rest are 2x PNG. None of them duplicates information that is also in the prose.
 
 | # | file | what it shows |
 |---|---|---|
-| 1 | `baseline.png` | The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unreadable without the floor it has to clear. Scored only on claims whose cut is genuinely earlier than the naming sentence. |
-| 2 | `emergence.png` | Where the relocated file becomes decodable, by layer, on the first 30-case export. At `at_path` the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer, where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This figure describes the later cut, where the model is already mid-sentence; it is not evidence about the earlier cut, where the lens does not beat its decoy. |
-| 3 | `transport.png` | Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagonal. Per *claim* the two look close at `at_path` — 16 of 17 against 14 of 17 — which is the conservative test and stays the headline. |
-| 4 | `shared.png` | The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts at 0.11 mean layers; sharing one token — always `.py` — on 83% at 8.17. Name *length* was the first hypothesis and the data rejected it: r = 0.183 over 120 observations, and the four-token name outscores the eleven-token one. |
-| 5 | `control.png` | Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a two-character token. |
-| 6 | `confound.png` | Why the decoy controlled for less than it looked |
-| 7 | `noise.png` | What the best single dimension is worth |
-| 8 | `nullband.png` | Both probes against the nulls they have to clear |
+| 1 | `baseline.png` | Asking the model against the Jacobian lens, each with its decoy floor |
+| 2 | `baseline.png` | The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unreadable without the floor it has to clear. Scored only on claims whose cut is genuinely earlier than the naming sentence. |
+| 3 | `emergence.png` | Where the relocated file becomes decodable, by layer, on the first 30-case export. At `at_path` the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer, where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This figure describes the later cut, where the model is already mid-sentence; it is not evidence about the earlier cut, where the lens does not beat its decoy. |
+| 4 | `transport.png` | Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagonal. Per *claim* the two look close at `at_path` — 16 of 17 against 14 of 17 — which is the conservative test and stays the headline. |
+| 5 | `shared.png` | The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts at 0.11 mean layers; sharing one token — always `.py` — on 83% at 8.17. Name *length* was the first hypothesis and the data rejected it: r = 0.183 over 120 observations, and the four-token name outscores the eleven-token one. |
+| 6 | `control.png` | Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a two-character token. |
+| 7 | `confound.png` | Why the decoy controlled for less than it looked |
+| 8 | `noise.png` | What the best single dimension is worth |
+| 9 | `nullband.png` | Both probes against the nulls they have to clear |
 
 
 # Appendix B — What is in the handover folder

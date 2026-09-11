@@ -55,6 +55,80 @@ numbers were corrected during the work and each is reported with **both** the or
 corrected value rather than only the survivor. Numbers may change.
 :::
 
+## Executive summary
+
+**The problem.** Agentic harnesses for vulnerability localization produce long reasoning traces
+and then reduce them to a ranked list of files. The reasoning is discarded. Whether it carried
+information the ranked list does not is a chain-of-thought faithfulness question, and it is
+normally unanswerable, because the reasoning and the output are both model artifacts with nothing
+independent to check them against.
+
+**Why this corpus can answer it.** Every task is a real CVE at the commit before its fix. The fix
+commit was written by the project's maintainers rather than by an annotator reading model output,
+and it names the true files. That gives three independent objects per trace: what the model
+**said**, what it **submitted**, and what was **true**. 594 tasks produced 1,288 casefiles and 504
+recorded trajectories.
+
+**Three questions.**
+
+1. Does the reasoning contain conclusions the structured output loses?
+2. Is the relocated file recoverable from activations *before* the model writes it?
+3. Do activations distinguish a relocation that turns out to be right from one that is wrong?
+
+### What we found
+
+**Our own headline did not survive de-duplication.** A *relocation* is a statement where a run
+abandons the file it was asked about and names another. Counted per mention, relocations name a
+true gold file 81.4% of the time, apparently beating the 49.8% calibration they are measured
+against. Counted per distinct claim — the unit that calibration uses — precision is 40.5% on 37
+claims, below it. Three tasks are half the population and one claim is restated 55 times. The
+inflated number is the one a regex returns by default.
+
+**The reasoning is not being discarded, but the exceptions are ours.** Of 218 relocations mined
+from reasoning, 212 reach the structured output. The six that do not are not suppression and not
+error: 5 of 29 under an enricher prompt carrying a consolation clause (*"then cite the closest line
+in the file you were asked about"*), 1 of 189 after the clause was removed. Fisher exact
+p = 0.00016, odds ratio 39. One trace records the model locating the weakness, resolving to cite
+it, and being redirected by the instruction mid-sentence.
+
+**A cheap baseline beats the instrument.** At the token before the model writes the relocated file,
+asking it outright recovers the file in 18 of 30 claims; a Jacobian lens on the same claims reaches
+11 of 31. Something at that point determines the answer and this readout does not reach it, which
+is a result about the instrument rather than about the model.
+
+![Asking the model against the Jacobian lens, each with its decoy floor](images/diagrams/baseline.png)
+
+*Both methods with their decoy floors drawn across the bars rather than beside them: a hit rate is
+unreadable without the floor it has to clear.*
+
+**Every activation-level probe returned a null or an artifact.** We extracted the residual stream
+directly — 150 readouts, 41 layers — and ran four probes. A trained readout recovers the file in 20
+of 24 claims at its best layer, but it is identifying the repository rather than the file, and
+deconfounded it scores two. Right-versus-wrong relocation is null at a detection threshold of
+AUC 0.676. Whether a relocation is *coming* is suggestive at late layers and survives no correction
+for multiple comparisons.
+
+**Five measurements looked publishable and were wrong**, each in the direction the hypothesis
+wanted: a repository detector reading as a filename probe; a delimiter detector separating classes
+at the embedding layer, before any transformer block had run; a prompt-length shortcut; a
+per-mention count inflating a per-claim p-value; a permutation null built at the wrong unit. The
+mistaken value is reported beside the corrected one throughout.
+
+### What this does not show
+
+- **n is small.** 37 claims in the mining result, ~30–35 in the pilot, 23 matched pairs in the event
+  probe. The Q2 probe could not have detected anything below AUC 0.676, which is a large effect, so
+  the nulls bound the effects rather than excluding them.
+- **One model, one corpus, one cut point.** Qwen3.6-35B-A3B across 15 repositories.
+- **The decoy controls for filename plausibility, not repository identity.** 71 of 75 decoys name a
+  file from a different project, so every target-vs-decoy floor is too low.
+- **The baseline is not an interpretability result.** It lets the model generate up to 2,400 tokens
+  before answering, while the lens reads one activation.
+- **Gold is fix-commit files**, which under-credits tests, callers and configuration a real fix
+  touches but the reference patch does not.
+
+Everything above is stated again in full below, with the method and the corrections.
+
 ## Why this setting has ground truth
 
 Faithfulness experiments usually cannot check a model's stated target against an objective answer.
@@ -66,9 +140,7 @@ known fix commit. The weakness is present at that commit and absent at its child
 is a diff, so it names the files and line ranges that were actually wrong, and it was written by
 the project's own maintainers rather than by an annotator reading model output.
 
-The model is given a symptom, the repository, and nothing else — no path, no CWE identifier, no
-advisory text. It explores with `glob`, `grep` and `read`, then submits files and cites lines. Its
-transcript, its structured output, and the true answer are three independent objects.
+The model is given a symptom, the repository, and nothing else. It explores with tool calls — `glob`, `grep`, `read` — then submits files; cited lines are supplied by FastContext. Its transcript, its structured output, and the true answer are three independent objects.
 
 This yields a triple per trace: what the model **said**, what it **submitted**, and what was
 **true**. Faithfulness questions that are normally circular become measurable.
@@ -84,18 +156,16 @@ mechanical evidence stage that uses no model at all.
 | stage | model | job |
 |---|---|---|
 | locate | Antares-1B | ranks candidate files; run k times per task for agreement |
-| plan / judge | Qwen3.6-35B-A3B | selects files to examine, scores |
+| plan / judge | Qwen3.6-35B-A3B | examines selected files, scores |
 | enrich | FastContext-4B | explores inside a chosen file and cites lines |
 | evidence | — | resolves every claim against the real checkout |
 
-Everything is local, so full activations are reachable for the follow-up proposed in §7. Every run
+Everything is local, so full activations are reachable. Every run
 writes an ATIF trajectory (per-node step records, tool calls, reasoning text) and a casefile (the
 structured output, ranked candidates, cited line ranges).
 
 Locate is run three times per task. The number of passes that name a file calibrates how likely
-it is to be gold: 1 of 3 → 8.0%, 2 of 3 → 22.6%, 3 of 3 → 49.8%, measured on this corpus. That
-calibration is the baseline any mined signal has to beat, and §4 turns on the fact that it is
-measured per distinct file, not per mention.
+it is to be gold: 1 of 3 → 8.0%, 2 of 3 → 22.6%, 3 of 3 → 49.8%, measured on this corpus. That calibration is the baseline any mined signal has to beat, and the result below turns on it being measured per distinct file, not per mention.
 
 ## Relocations
 
@@ -115,8 +185,6 @@ where they removed 33 of 133 raw candidates:
 4. **Hedge detection.** "This may live in X instead" is not an assertion that it does.
 
 192 relocations survive across the corpus, covering 37 distinct (task, file) claims.
-
-Those two numbers are the same evidence counted two ways.
 
 ## The result, and its retraction
 
@@ -182,8 +250,7 @@ never-submitted set is not a suppression story and not an error story — it is 
 following, and the instruction was ours. So the 97% measures a prompt as much as it measures a reduction: under a prompt that asked for a consolation citation,
 one relocation in six was lost.
 
-Whether those conclusions are *weighted* correctly is a separate question. On current evidence we
-do not know, and §4 is the reason we decline to claim otherwise.
+Whether those conclusions are *weighted* correctly is a separate question. On current evidence we do not know, and for the reason given above we decline to claim otherwise.
 
 ## Instrument validation
 
