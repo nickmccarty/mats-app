@@ -2,7 +2,7 @@
 
 **Nicholas McCarty** · Upskilled Consulting Working draft — please do not redistribute, post, or cite.
 
-*504 agent trajectories where the correct answer is known independently of the model, and a headline result that does not survive de-duplication*
+*Auditing 504 agent trajectories against the commits that fixed the bugs*
 
 ---
 

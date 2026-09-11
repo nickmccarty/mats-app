@@ -1,6 +1,6 @@
 ---
 title: "Chain-of-Thought Faithfulness With Ground Truth"
-subtitle: "504 agent trajectories where the correct answer is known independently of the model, and a headline result that does not survive de-duplication"
+subtitle: "Auditing 504 agent trajectories against the commits that fixed the bugs"
 short_title: Faithfulness with Ground Truth
 keywords:
   - chain-of-thought faithfulness

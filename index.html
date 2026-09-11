@@ -37,13 +37,17 @@
   .sub { font-size:clamp(1rem,2.2vw,1.1rem); color:var(--muted); margin:0 0 2rem;
          text-wrap:pretty; }
 
-  /* The notebooks sit above the write-up because they are the part a reader can check. */
-  .chips { display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule);
-           border-radius:10px; overflow:hidden; margin:0 0 2.5rem;
-           grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr)); }
-  .chip { background:var(--surface); padding:.9rem 1rem; text-decoration:none; color:inherit;
-          display:block; }
-  a.chip:hover { background:var(--sunk); }
+  /* The notebooks sit above the write-up because they are the part a reader can check.
+
+     FLEX, NOT GRID. The grid version drew its hairlines by showing a 1px background through the
+     gaps, which means an unfilled cell shows through as a gray block -- and three items in a
+     two-column auto-fit grid always leave one. Flex has no cells to leave empty: the last row's
+     items simply grow. Each chip carries its own border instead. */
+  .chips { display:flex; flex-wrap:wrap; gap:.55rem; margin:0 0 2.5rem; }
+  .chip { flex:1 1 13rem; background:var(--surface); border:1px solid var(--rule);
+          border-radius:10px; padding:.85rem 1rem; text-decoration:none; color:inherit;
+          transition:border-color .12s ease, background .12s ease; }
+  a.chip:hover { background:var(--sunk); border-color:var(--accent); }
   .chip b { display:block; font-size:.92rem; margin-bottom:.2rem; }
   .chip span { display:block; font-size:.79rem; color:var(--muted); line-height:1.45; }
   .chip.todo { opacity:.62; }
@@ -69,9 +73,13 @@
                color:var(--muted); }
   img { max-width:100%; height:auto; display:block; margin:1.6rem auto .6rem;
         background:#fff; border:1px solid var(--rule); border-radius:8px; }
-  /* A figure's caption is the italic paragraph the source puts after the image. */
-  img + em, p > em:only-child { display:block; font-size:.84rem; color:var(--muted);
-                                line-height:1.55; }
+  /* A figure's caption is the italic paragraph the source puts after the image, tagged `.cap` at
+     build time. It was once selected with `p > em:only-child`, which is wrong in a way that is
+     easy to miss: `:only-child` counts ELEMENT children and ignores text nodes, so a paragraph of
+     prose containing a single italicised word matches it. That put `display:block` on 18 inline
+     italics and broke each of those sentences across three lines. */
+  p.cap { margin-top:.1rem; }
+  p.cap em { display:block; font-size:.84rem; color:var(--muted); line-height:1.55; }
   .tw { overflow-x:auto; margin:1.4rem 0; border:1px solid var(--rule); border-radius:8px; }
   table { border-collapse:collapse; width:100%; font-size:.87rem; }
   th, td { text-align:left; padding:.5rem .75rem; border-bottom:1px solid var(--rule);
@@ -98,7 +106,7 @@
 <div class="wrap">
   <div class="eyebrow">Working draft &middot; not for redistribution</div>
   <h1>Chain-of-Thought Faithfulness With Ground Truth</h1>
-  <p class="sub">504 agent trajectories where the correct answer is known independently of the model, and a headline result that does not survive de-duplication</p>
+  <p class="sub">Auditing 504 agent trajectories against the commits that fixed the bugs</p>
 
   <div class="chips">
       <a class="chip" href="https://colab.research.google.com/github/nickmccarty/mats-app/blob/main/verify/verify_findings.ipynb" target="_blank" rel="noopener"><b>Verify every number</b><span>Re-derives each published figure from the raw files. No GPU, about two seconds. 40 of 40 pass.</span></a>
@@ -399,7 +407,7 @@ because the permissive rule inflates its decoy. It does not: at this cut the two
 same 11 of 31 against the same floor of 5. The shared-token contamination is real but lives
 entirely at the later cut, where correcting it drops the decoy from 21 of 31 to 4.</p>
 <img src="report/figures/baseline.png" alt="The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unread" loading="lazy">
-<p><em>The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unreadable without the floor it has to clear. Scored only on claims whose cut is genuinely earlier than the naming sentence.</em></p>
+<p class="cap"><em>The two methods with their decoy floors drawn across the bars rather than beside them, because a hit rate here is unreadable without the floor it has to clear. Scored only on claims whose cut is genuinely earlier than the naming sentence.</em></p>
 <p>Asking is simply appending <em>&quot;which file are you about to name? Reply with one path&quot;</em> to the same
 prefix and reading the reply. It recovers the file in 18 of 30 claims against a decoy floor of 3.
 The lens, on the same question and the same corpus, does not separate from its decoy.</p>
@@ -428,24 +436,24 @@ safe: the lens reads a single activation, while the baseline lets the model gene
 strong losing would have been decisive for the lens; a baseline that strong winning only bounds
 what the lens failed to find.</p>
 <img src="report/figures/emergence.png" alt="Where the relocated file becomes decodable, by layer, on the first 30-case export. At `at_path` the transport recovers t" loading="lazy">
-<p><em>Where the relocated file becomes decodable, by layer, on the first 30-case export. At <code>at_path</code> the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer, where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This figure describes the later cut, where the model is already mid-sentence; it is not evidence about the earlier cut, where the lens does not beat its decoy.</em></p>
+<p class="cap"><em>Where the relocated file becomes decodable, by layer, on the first 30-case export. At <code>at_path</code> the transport recovers the target from layer 20 and reaches 53% of claims by layer 30; the plain logit lens sits at or below 6% through layer 34 and arrives only at layer 38 — the final layer, where it is decoding the answer the model is about to emit. The decoy stays flat below 6%. This figure describes the later cut, where the model is already mid-sentence; it is not evidence about the earlier cut, where the lens does not beat its decoy.</em></p>
 <h3>What survives about the transport</h3>
 <p>Against the plain logit lens the Jacobian transport is <strong>never worse on any of the 60 readouts</strong>
 of the first export, carrying 4.2× the layer-hits before the naming sentence and 2.7× after. That
 is a real property of the transport and it is orthogonal to the result above: being a better
 readout than the logit lens does not make it a sufficient one.</p>
 <img src="report/figures/transport.png" alt="Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagon" loading="lazy">
-<p><em>Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagonal. Per <em>claim</em> the two look close at <code>at_path</code> — 16 of 17 against 14 of 17 — which is the conservative test and stays the headline.</em></p>
+<p class="cap"><em>Jacobian transport against the plain logit lens, per readout, same forward pass. Every point sits on or above the diagonal. Per <em>claim</em> the two look close at <code>at_path</code> — 16 of 17 against 14 of 17 — which is the conservative test and stays the headline.</em></p>
 <h3>The scoring defect the control found</h3>
 <p>A hit was counted when <strong>any</strong> token of a filename entered the top 20. Two unrelated files sharing
 <code>.py</code> therefore scored for the target and the decoy at once.</p>
 <img src="report/figures/shared.png" alt="The decoy&#x27;s noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts " loading="lazy">
-<p><em>The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts at 0.11 mean layers; sharing one token — always <code>.py</code> — on 83% at 8.17. Name <em>length</em> was the first hypothesis and the data rejected it: r = 0.183 over 120 observations, and the four-token name outscores the eleven-token one.</em></p>
+<p class="cap"><em>The decoy's noise floor, split by whether it shares a token with the target. Sharing nothing it fires on 6% of readouts at 0.11 mean layers; sharing one token — always <code>.py</code> — on 83% at 8.17. Name <em>length</em> was the first hypothesis and the data rejected it: r = 0.183 over 120 observations, and the four-token name outscores the eleven-token one.</em></p>
 <p>Correcting it symmetrically — dropping shared tokens from target and decoy alike — tightened
 <code>at_path</code> and left <code>at_sentence</code> unchanged. We had expected it to rescue the result; a one-sided
 correction appeared to, and was not licensed.</p>
 <img src="report/figures/control.png" alt="Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a" loading="lazy">
-<p><em>Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a two-character token.</em></p>
+<p class="cap"><em>Why the decoy is not decoration. Most readouts sit against the vertical axis. The six in the tie band are traceable to a two-character token.</em></p>
 <h3>Provenance of the numbers</h3>
 <p>Two exports and two runs sit behind this section, and they measure different things:</p>
 <div class="tw"><table>
@@ -633,7 +641,7 @@ relocations.</p>
 <p>The question is well-posed and this corpus is the wrong instrument for it. A successor has to be
 built with within-repository relocation pairs rather than filtered into having them.</p>
 <p><img src="report/figures/confound.svg" alt="Why the decoy controlled for less than it looked" /></p>
-<p><em>Each bar is a repository; its height is the number of distinct files the model ever relocated to
+<p class="cap"><em>Each bar is a repository; its height is the number of distinct files the model ever relocated to
 inside it. Only the four above the dashed line can supply a same-repository decoy at all. With
 filenames nested inside projects this way, &quot;prefers the target over the decoy&quot; is satisfiable by
 recognizing the repository — which every method under test can do, because the context is that
@@ -660,7 +668,7 @@ on provable noise. At 2,048 dimensions and 35 claims the best-looking unit is th
 draws, and &quot;high AUC, large effect, fails to generalize, therefore polysemanticity&quot; is a conclusion
 this data reaches with no signal present at all.</p>
 <p><img src="report/figures/noise.svg" alt="What the best single dimension is worth" /></p>
-<p><em>Three curves over depth: real labels in-sample, the same procedure on shuffled labels in-sample,
+<p class="cap"><em>Three curves over depth: real labels in-sample, the same procedure on shuffled labels in-sample,
 and real labels scored on held-out claims. The first two are the same number. The recipe that ends
 in &quot;polysemanticity&quot; reaches that conclusion here with nothing present.</em></p>
 <p>One detail of that sweep is itself a lesson. The first version drew a fresh claim-split for each
@@ -732,7 +740,7 @@ behaves the way a real signal should and still fails to clear the bar:</p>
 </tbody>
 </table></div>
 <p><img src="report/figures/nullband.svg" alt="Both probes against the nulls they have to clear" /></p>
-<p><em>Each panel draws its own permutation null as a band (mean to 95th percentile) for the identical
+<p class="cap"><em>Each panel draws its own permutation null as a band (mean to 95th percentile) for the identical
 procedure; a filled dot is a layer above its null. The event probe rises out of its band late and
 starts inside it at layer 0 — the right shape. Right-vs-wrong never leaves its band. Reading either
 curve against 0.5 instead of against its band would give the wrong answer in both panels.</em></p>
