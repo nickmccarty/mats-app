@@ -63,6 +63,12 @@ measured only where that cut is genuinely earlier than the naming sentence:
 | Jacobian lens, any-token scoring | 31 | 11 | 5 | 0.146 |
 | Jacobian lens, distinctive tokens | 31 | 11 | 5 | 0.146 |
 
+![Asking the model against the Jacobian lens, each with its decoy floor](report/figures/baseline.png)
+
+*The two methods with their decoy floors drawn across the bars rather than beside them, because a
+hit rate is unreadable without the floor it has to clear. Scored only on claims whose cut is
+genuinely earlier than the naming sentence.*
+
 The information is there and the lens does not read it. That is a statement about the instrument,
 not the model — and it makes the faithfulness question well-posed rather than answering it.
 
@@ -77,6 +83,14 @@ So the *decoy* column is a floor that is too low, not a noise estimate. What sur
 *target* column: **18 of 30 claims where the model named the exact repository-relative path**, out
 of the many files it could have named instead. The lens is unaffected in direction — a floor that
 is too low could only have flattered it, and it was null regardless.
+
+![Distinct relocated files per repository, with the two-file line a within-repository decoy must clear](report/figures/confound.png)
+
+*Each bar is a repository; its height is the number of distinct files the model ever relocated to
+inside it. Only the four above the dashed line can supply a same-repository decoy at all. With
+filenames nested inside projects this way, "prefers the target over the decoy" is satisfiable by
+recognising the repository — which every method under test can do, because the context is that
+repository's source.*
 
 `code/decoy_scope_audit.py` reproduces the published 30/18/3 from the stored replies and then
 re-states it. The repair for a future corpus is concrete: relocation pairs must be drawn from
@@ -103,6 +117,37 @@ evidence about the earlier cut.
 "before the sentence" prefix was byte-identical to the mid-sentence one, and scored a hit when any
 token of a filename entered the top 20 — so two unrelated files sharing `.py` scored for target
 and decoy at once. `verify/verify_findings.ipynb` recomputes both the old and corrected values.
+
+## What the follow-up found
+
+Four activation-level questions. All of them returned a null, or returned an artifact that had to
+be taken apart. The full account is in the write-up; these are the two figures that carry it.
+
+![Both probes against the permutation nulls they have to clear](report/figures/nullband.png)
+
+*Each panel draws its **own** permutation null as a band (mean to 95th percentile) for the identical
+procedure; a filled dot is a layer above its null. The event probe rises out of its band late and
+starts inside it at layer 0 — which is the right shape, because layer 0 is the embedding output and
+nothing should be separable before the model computes anything. Right-versus-wrong never leaves its
+band. Reading either curve against 0.5 instead of against its band gives the wrong answer in both
+panels.*
+
+Even the suggestive one does not survive. Eight layers are eight tests, and Benjamini–Hochberg at
+q = 0.05 needs the smallest p below 0.00625; the smallest is 0.033. At 23 matched pairs the
+detection threshold was AUC 0.635 anyway, so a real late-layer effect of ordinary size would have
+been invisible.
+
+![The best single dimension: real labels, shuffled labels, and held-out claims](report/figures/noise.png)
+
+*The familiar recipe — rank every unit by ROC-AUC, take the best, note its Cohen's d, observe it
+fails to generalise, conclude polysemanticity — run here with the step that is usually skipped: the
+same procedure on **shuffled** labels. Mean in-sample AUC is 0.847 with real labels and 0.852 with
+random ones. The two curves are the same curve. Held-out drops to 0.349, and Cohen's d reaches 0.65
+on labels carrying no information at all.*
+
+With 2,048 dimensions and 35 claims, the best-looking unit is the best of 2,048 draws from noise.
+That is the whole finding: at this sample size the standard recipe reaches its own conclusion with
+nothing present.
 
 ## Layout
 
