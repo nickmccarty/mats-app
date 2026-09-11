@@ -128,7 +128,10 @@ check("cases with gold present", len(cases) - len(missing), 30)
 demo = next(c for c in cases if "pyload" in c["repo"] and "cnl_blueprint" in c["target_path"])
 g = gold[key_of(demo)]
 print(f"\ndemo task: {demo['repo']} @ {demo['sha'][:9]}")
-print(f"  advisory   {g['ghsa']}  ({g['cwe']})")
+# `.get`, not `[...]`: this line only prints provenance, and the gold export has been regenerated
+# once since without a `cwe` field. A missing display value stopped the whole verification run
+# partway through, which is the one thing a verification notebook must not do quietly.
+print(f"  advisory   {g.get('ghsa', '?')}  ({g.get('cwe', 'CWE not in this export')})")
 print(f"  fix commit {g['fix_sha']}")
 print(f"  gold files {g['gold_files']}")
 print(f"  gold lines {g['gold_ranges']}")

@@ -179,6 +179,51 @@ def convert(text: str) -> str:
     return "\n".join(out)
 
 
+def unwrap(text: str) -> str:
+    """Reflow each paragraph onto a single line.
+
+    The source is hard-wrapped at ~95 characters, which is right for a file under version control
+    and wrong for this one. Markdown treats a single newline inside a paragraph as a space, but
+    Google Docs' paste converter does not reliably: it breaks at the wrap, and around inline
+    emphasis sitting near one it breaks on BOTH sides, so `*relocations*` lands alone on its own
+    line and the sentence reads as three fragments.
+
+    Joining each paragraph into one long line changes no Markdown semantics and removes the
+    ambiguity entirely. Structural lines keep their own breaks, because joining them would destroy
+    them: table rows, headings, fences, list items, and blockquote lines are all line-oriented.
+    """
+    out: list[str] = []
+    buf: list[str] = []
+    in_fence = False
+
+    def flush():
+        if buf:
+            out.append(" ".join(x.strip() for x in buf))
+            buf.clear()
+
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("```"):
+            flush(); in_fence = not in_fence; out.append(line); continue
+        if in_fence:
+            out.append(line); continue
+
+        # Blank, table row, heading, blockquote and rule are line-oriented: emit as they are.
+        if not s or s.startswith(("|", "#", ">", "---", "***")):
+            flush(); out.append(line); continue
+
+        # A LIST ITEM STARTS A BLOCK; IT DOES NOT END ONE. The first version treated the marker
+        # line like a heading and flushed after it, which left each item's continuation as a
+        # separate unindented paragraph -- and an unindented paragraph after a bullet terminates
+        # the list. Buffering the marker line means the continuation lines join onto it.
+        if re.match(r"^([-*+]|\d+\.)\s", s):
+            flush(); buf.append(s); continue
+
+        buf.append(line)
+    flush()
+    return "\n".join(out)
+
+
 def artifact_rows() -> str:
     """Describe what is actually in the bundle. A hand-written table here listed a slide deck and a
     video for a day after both were deleted."""
@@ -246,7 +291,7 @@ def main() -> int:
         parts += ["", "# Appendix C — References", "", refs, ""]
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text("\n".join(parts), encoding="utf-8")
+    OUT.write_text(unwrap("\n".join(parts)), encoding="utf-8")
     print(f"wrote {OUT}  ({OUT.stat().st_size:,} bytes)")
     print(f"  abstract: {'lifted from frontmatter' if meta.get('abstract') else 'MISSING'}")
     print(f"  figures:  {len(FIGURES)} marker(s)")

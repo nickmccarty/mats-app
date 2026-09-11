@@ -59,7 +59,7 @@ Both need the residual vectors themselves, so they were re-extracted with `outpu
 | `reloc_labels.json` | per case, whether the relocated file is in the fix commit (gold from `vulns.db`) |
 | `tok_emb.npz` | unembedding rows for every target and decoy filename token |
 | `tok_emb_names.json` | filename → token ids, and the seeded decoy pairing |
-| `reloc_cases.json` | the case export — repo, sha, target, and both cut points per case |
+| `reloc_cases_75.json` | the corrected case export — repo, sha, target, and both cut points |
 
 No GPU and no model. The forward passes already happened.
 
@@ -382,8 +382,8 @@ favours both candidates equally, and anything above chance has to come from tell
     code(r"""
 import collections, random
 
-cases = json.loads(_p.Path("reloc_cases.json").read_text(encoding="utf-8"))[:75] \
-        if _p.Path("reloc_cases.json").exists() else None
+cases = json.loads(_p.Path("reloc_cases_75.json").read_text(encoding="utf-8"))[:75] \
+        if _p.Path("reloc_cases_75.json").exists() else None
 
 # Derive the decoy pairing from the seed rather than trusting the uploaded artifact, so this cell
 # runs whether or not tok_emb_names.json is present -- and so a drift between the two is visible.

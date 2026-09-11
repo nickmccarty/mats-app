@@ -1,35 +1,56 @@
-# MATS application artifacts — confidential working draft
+# Chain-of-thought faithfulness, with an answer key
 
-Assembled 2026-09-08. **Not for redistribution.** The findings are provisional: the pilot rests
-on ~30 distinct claims and its lens arm is not statistically significant. Two scoring rules have
-already been corrected. The lens run covers all 75 cases: the main run was pruned by the provider
-at row 145 of 150 and the remaining two cases were scored by a resume run and merged.
+**Working draft — not for redistribution.**
 
-**Every number is independently checkable.** `verify/verify_findings.ipynb` runs in Colab with no
-GPU and no model, re-derives each figure from the raw files beside it, and prints computed against
-claimed with PASS/FAIL. It currently reports 35 of 35.
+Agentic harnesses for vulnerability localisation emit long reasoning traces and then reduce them to
+a ranked list of files, discarding the reasoning. Whether that discarded text carries information
+the output does not is a chain-of-thought faithfulness question — and unusually, one with an answer
+key: each task is a real CVE at the commit before its fix, so the fix commit names the true files
+independently of anything the model said.
 
-The lens is shown under **both** scoring rules because the obvious objection is that it loses only
-to the permissive any-token rule, which inflates its decoy. It does not: at this cut both rules
-give 11 of 31 against a floor of 5. That rule does inflate the decoy — but only at the later cut,
-where correcting it drops the decoy from 21 of 31 to 4.
-
-Everything below was produced by `ctarp`, a local multi-model vulnerability-localisation harness.
-The application material is the faithfulness draft plus the Jacobian-lens pilot it now contains.
-
----
-
-## Start here
+**Read it here → <https://nickmccarty.me/mats-app/>**
 
 | | |
 |---|---|
-| `report/ctarp-faithfulness.pdf` | **The draft.** 9pp. Confidential banner, no open-access stamp. |
-| `site/index.html` | The web version. Open from `file://`; §8 "Asking the activations" is the pilot. |
-| `index.html` | **The write-up as a web page**, generated from `report/nanda.md` so it cannot drift from the PDF. |
-| `SUBMISSION.md` | The same write-up as plain Markdown, for pasting into a Google Doc. Figures are named as `[ INSERT FIGURE n ]` markers because a Doc cannot resolve a relative path. |
-| `notebooks/jlens_reloc_replication.ipynb` | Reproduces the pilot end to end on a Colab A100. |
-| `verify/verify_findings.ipynb` | Recomputes every claimed number from raw files. No GPU. |
-| `verify/probe_q1_q2.ipynb` | The two follow-up probes, each against its permutation null. No GPU. |
+| **[The write-up](https://nickmccarty.me/mats-app/)** | The whole thing as a web page, generated from `report/nanda.md` so it cannot drift from the PDF. |
+| **[The report, PDF](report/ctarp-faithfulness.pdf)** | The same text, typeset, with all eight figures placed. |
+| **[Check the numbers](verify/verify_findings.ipynb)** | Re-derives every published figure from the raw files. Colab, no GPU, no model, ~2s. **40 of 40 pass.** |
+| **[The follow-up probes](verify/probe_q1_q2.ipynb)** | Four activation-level questions, each against a measured permutation null. No GPU. |
+| **[The trajectories](site/traces/trajectory.html)** | All 32 runs behind the claims, searchable, openable from `file://`. |
+
+`SUBMISSION.md` is the same write-up as plain Markdown, for pasting into a Google Doc.
+
+---
+
+## The short version
+
+**We retract our own headline.** Counted per mention, mined relocations name a true gold file 81.4%
+of the time — apparently beating the 49.8% calibration they are measured against. Counted per
+distinct claim, which is the unit that baseline uses, precision is **40.5% on 37 claims**, below it.
+One claim is restated 55 times. Three tasks are half the population.
+
+**The cheap baseline beats the instrument.** At the token before the model writes the relocated
+file, asking it outright recovers the file in **18 of 30 claims**; a Jacobian lens on the same
+claims gets 11 of 31. Something at that point determines the answer and this readout does not reach
+it — a statement about the instrument, not the model.
+
+**Every activation-level follow-up came back null, or came back an artifact.** A trained readout
+appears to recover the file at 20 of 24 claims; it is detecting the *repository*, and deconfounded
+it scores two. Right-versus-wrong relocation is null at a detection threshold of AUC 0.676. Whether
+a relocation is *coming* is suggestive at late layers and survives no correction for multiple
+comparisons.
+
+**Five numbers in this work looked publishable and were not — and every one of them pointed the way
+the hypothesis wanted.** A repository detector reading as a filename probe; a delimiter detector
+separating classes *at the embedding layer*, before any transformer block had run; a prompt-length
+shortcut; a per-mention count inflating a per-claim p-value; and a permutation null built at the
+wrong unit. None was caught by finding the result implausible. Each was caught by a control built in
+advance to catch that class of error, which is the only method that works when the artifact and the
+hypothesis agree.
+
+That last paragraph is what this repository is for. The corrections are reported with **both**
+values, and `verify/verify_findings.ipynb` recomputes both so a correction is arithmetic a reader
+can run rather than a claim they have to take.
 
 ## What the pilot found
 
@@ -78,7 +99,7 @@ the 60 readouts of the first export, and at the *later* cut it recovers the file
 39 while the logit lens arrives only at layer 38. That is a property of the transport, not
 evidence about the earlier cut.
 
-**Two corrections are reproduced rather than hidden.** Earlier figures counted claims whose
+**The first two corrections, reproduced rather than hidden.** Earlier figures counted claims whose
 "before the sentence" prefix was byte-identical to the mid-sentence one, and scored a hit when any
 token of a filename entered the top 20 — so two unrelated files sharing `.py` scored for target
 and decoy at once. `verify/verify_findings.ipynb` recomputes both the old and corrected values.
@@ -86,22 +107,38 @@ and decoy at once. `verify/verify_findings.ipynb` recomputes both the old and co
 ## Layout
 
 ```
-report/       the draft, its MyST source, and the four figures
-notebooks/    the Colab replication notebook and the script that generates it
-code/         the probe, the analyses, and the Colab session helpers
+index.html    the write-up as a web page, generated from report/nanda.md
+SUBMISSION.md the same write-up as plain Markdown, for pasting into a Doc
+report/       the PDF, its MyST source, and all eight figures
+code/         the probes, the analyses, and the Colab session helpers
 data/         inputs and the raw readouts downloaded from Colab
 verify/       the two checking notebooks and the exact inputs they re-derive from
-site/         the web version, openable from file://
+site/         the longer harness write-up and the trajectory viewer
 ```
+
+Both `index.html` and `SUBMISSION.md` are **generated** from `report/nanda.md`, which is also what
+the PDF is built from. Editing either by hand reintroduces the drift they exist to prevent — a
+stale annotated abstract and an abstract claiming "11 of 29" where every other surface said 31 both
+happened before they were generated.
 
 ### `report/`
 
-- `ctarp-faithfulness.pdf` — the draft as circulated
+- `ctarp-faithfulness.pdf` — the write-up as circulated
 - `nanda.md` — MyST source (built with `myst build --pdf`; needs the typst CLI)
+- `references.bib` — ten entries, all resolving at build
 - `figures/emergence.png` — where the file becomes decodable, by layer
 - `figures/transport.png` — Jacobian transport against plain logit lens, per readout
 - `figures/control.png` — what the decoy caught
 - `figures/shared.png` — the decoy's noise floor, split by shared tokens
+- `figures/baseline.png` — the two methods with their decoy floors drawn across the bars
+- `figures/nullband.{svg,png}` — both probes against the nulls they have to clear
+- `figures/noise.{svg,png}` — what the best single dimension is worth: real vs shuffled vs held-out
+- `figures/confound.{svg,png}` — distinct relocated files per repository, and why the decoy failed
+- `figures/make_probe_figs.py`, `figures/probes.html` — the D3 source for the last three, so they
+  can be rebuilt from the result JSONs rather than trusted
+
+The three probe figures ship as **both** SVG and PNG: typst embeds the vector in the PDF, and
+Google Docs accepts PNG/JPEG/GIF but cannot insert an SVG at all.
 
 ### `code/`
 
@@ -174,7 +211,7 @@ the fifth reuses the fourth's extraction.
 ```
 
 Each cell recomputes a figure from the raw files and prints it beside the claimed value with
-PASS/FAIL. It currently reports **35 of 35**. Where a number was corrected during the work, both
+PASS/FAIL. It currently reports **40 of 40**. Where a number was corrected during the work, both
 the original and the corrected value are computed, so a correction is visible as arithmetic rather
 than asserted in prose.
 
@@ -343,3 +380,28 @@ Two independent lens runs over the same cases produced identical per-case counts
 is deterministic. The prompt baseline is `temperature=0` but is a generation, so exact
 reproduction is not guaranteed; the claim rests on 30 claims at p = 0.0003, not on any single
 answer.
+
+## What this does not show
+
+Stated plainly, because a reader should not have to find these in the prose.
+
+- **n is small.** 37 distinct claims in the mining result, ~30–35 in the pilot, 23 matched pairs in
+  the event probe. Every null here is weak: the Q2 probe could not have detected anything below
+  AUC 0.676, and 0.676 is a large effect. The nulls bound the effects; they do not exclude them.
+- **One model, one corpus, one cut point.** Qwen3.6-35B-A3B on 15 repositories. Nothing here
+  establishes that any of it generalises.
+- **The decoy controls for filename plausibility, not repository identity.** 71 of 75 decoys name a
+  file from a different project. Every target-vs-decoy figure therefore reports a floor that is too
+  low. It does not change the lens result, which was null against an over-generous floor.
+- **The question "does the residual identify the file rather than the project?" is not answerable on
+  this corpus.** Relocated filenames are nested inside repositories, and a within-repository decoy
+  leaves two scoreable claims. A successor has to be *built* for that question, not filtered into it.
+- **The baseline is not an interpretability result.** It lets the model generate up to 2,400 tokens
+  before answering, while the lens reads one activation. It bounds what the lens failed to find; it
+  does not show the answer sits in the residual stream.
+- **Gold is fix-commit files.** That under-credits tests, callers and configuration that a real fix
+  touches but the reference patch does not — a limitation `@fastcontext2026` states of their own
+  patch-derived evaluation, and one this corpus inherits.
+- **`BerriAI/litellm` is a holdout** in the wider corpus and contributes nothing here. The pilot's
+  15 repositories do not include it; `verify/probe_q1_q2.ipynb` asserts this rather than promising
+  it.
