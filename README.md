@@ -35,7 +35,8 @@ claims gets 11 of 31. Something at that point determines the answer and this rea
 it — a statement about the instrument, not the model.
 
 **Every activation-level follow-up came back null, or came back an artifact.** A trained readout
-appears to recover the file at 20 of 24 claims; it is detecting the *repository*, and deconfounded
+appears to recover the file at 20 of 24 claims at its best layer; it is detecting the *repository*,
+and deconfounded
 it scores two. Right-versus-wrong relocation is null at a detection threshold of AUC 0.676. Whether
 a relocation is *coming* is suggestive at late layers and survives no correction for multiple
 comparisons.

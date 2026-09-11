@@ -39,25 +39,27 @@ parts:
     readout is scored a second time against a seeded decoy, every probe is cross-validated
     leave-one-claim-out with dimensionality reduction fitted inside each fold, and every AUC is
     reported against a permutation null for the identical procedure rather than against 0.5.
+    Denominators differ between results because the admission rules do — a genuinely earlier cut, a
+    gold label, an available cross-run centroid, a balanced control — and each is stated where it
+    applies rather than chosen after the fact.
     Counted per mention, relocations name a true gold file 81.4% of the time, apparently beating
     the 49.8% calibration of three-of-three pass agreement; counted per distinct (task, file)
     claim — the unit the baseline is measured on — precision is 40.5% on 37 claims, below the
-    baseline, with three tasks contributing over half the population and one a single correct
-    claim restated 55 times; and at the token before the file is named, asking the model outright
+    baseline, with one claim restated 55 times; and at the token before the file is named, asking
+    the model outright
     recovers it in 18 of 30 claims against a decoy floor of 3 (p = 0.0003) while a Jacobian lens
     recovers 11 of 31 against a floor of 5 (p = 0.15). The activation-level follow-ups are weaker
     still and are reported as such: a trained readout appears to recover the file at 20 of 24
-    claims, but relocated filenames are nested inside repositories and the deconfounded version
-    scores two; right-versus-wrong relocation is null with a detection threshold of AUC 0.676 at
-    35 claims; and whether a relocation is coming is suggestive at late layers while surviving no
-    correction for multiple comparisons. For trace mining specifically, the unit of analysis
+    claims at its best layer, but relocated filenames are nested inside repositories and the
+    deconfounded version scores two; right-versus-wrong relocation is null with a detection
+    threshold of AUC 0.676 at 35 claims; and whether a relocation is coming is suggestive at late
+    layers while surviving no correction for multiple comparisons. For trace mining specifically, the unit of analysis
     determines the headline, and repetition within a trace is not independent evidence. More
-    broadly, five separate artifacts in this work each produced a publishable-looking number and
-    every one pointed the way the hypothesis wanted — a repository detector, a delimiter detector
-    separating classes at the embedding layer before any block had run, a prompt-length shortcut,
-    a per-mention count, and a permutation null built at the wrong unit — none caught by finding
-    the result implausible, and each caught by a control built in advance to catch that class of
-    error.
+    broadly, five artifacts here each produced a publishable-looking number and every one pointed
+    the way the hypothesis wanted — a repository detector, a delimiter detector separating classes
+    at the embedding layer, a prompt-length shortcut, a per-mention count, and a permutation null
+    built at the wrong unit — none caught by finding the result implausible, each caught by a
+    control built in advance.
 ---
 
 :::{warning} Confidential working draft
@@ -470,6 +472,24 @@ the provider prunes long sessions without warning — it took one run mid-flight
 Every extraction therefore writes incrementally and is pulled as it grows, so a prune costs a tail
 rather than a run.
 
+### Why the denominators differ
+
+Five populations appear below and they are not the same set. That is worth stating plainly, because
+a shifting denominator is exactly what selective reporting looks like from the outside.
+
+| n | population | admission rule |
+|---|---|---|
+| 37 claims | corpus-wide mining | the 192 relocations across all 504 trajectories, collapsed to distinct (task, file) claims |
+| 38 claims | the extraction | the 75 mentions exported for the probes, collapsed the same way |
+| 30 / 31 claims | the pilot comparison | the cut is genuinely earlier than the naming sentence. The baseline scores 30 and the lens 31: one mention is excluded from the baseline for an empty reply, and excluding it is the honest choice, since scoring an empty string as a miss would manufacture a negative |
+| 35 claims | Q2, right vs wrong | a gold label exists **and** the cut is genuinely earlier |
+| 22–24 claims | Q1b, nearest centroid | the target filename recurs in **another run**, so a centroid can be built without using the readout being scored. The count moves with the layer because which readouts survive does |
+| 23 pairs | Q3, the event probe | the control is matched to its positive on both prompt length and final punctuation |
+
+Each restriction removes a way of being wrong, and each was fixed before the number it produces was
+looked at. The direction is always the same — every filter *shrinks* the sample and none of them
+was relaxed after a result came back unwelcome.
+
 Four questions, in increasing order of interest.
 
 ### Q1. Is the submitted answer decodable before it is stated?
@@ -478,7 +498,9 @@ Four questions, in increasing order of interest.
 
 A second extraction saved the residual stream itself — 150 readouts, 41 layers, 2,048 dimensions —
 and a nearest-centroid readout scored 20 of 24 claims over its decoy at the last layer
-(p = 0.0015), rising monotonically with depth.
+(p = 0.0015), rising with depth from 12 of 22 at the embeddings. The denominator moves with the
+layer because a claim is scoreable only where both its target and its decoy have a centroid built
+from *other* runs; 22 to 24 of the 38 claims qualify, depending on which readouts survive.
 
 That number is an artifact. Relocated filenames are nested inside repositories: 20 of 21 distinct
 basenames occur in exactly one repo, and 71 of 75 decoys name a file from a different project than
