@@ -172,7 +172,7 @@ rows = [m for m in META if usable(m)]
 claims = sorted({claim_of(m) for m in rows})
 ident = sum(1 for m in META if m["cut"] == AT and m["case"] in LABELS
             and LABELS[m["case"]].get("cut_identical"))
-print(f"{len(rows)} readouts at '{AT}' → {len(claims)} distinct claims")
+print(f"{len(rows)} readouts at '{AT}' -> {len(claims)} distinct claims")
 print(f"({ident} readouts excluded: their 'before the sentence' cut is byte-identical to the "
       "mid-sentence one, so they sit after naming has begun)")
 

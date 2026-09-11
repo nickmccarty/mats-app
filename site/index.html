@@ -10,7 +10,7 @@
 <meta name="description" content="Chain-of-thought faithfulness measured on a task with ground truth: 504 agent trajectories, a retracted headline, and a Jacobian-lens pilot.">
 <link rel="canonical" href="https://upskilled.consulting/ctarp/">
 <meta property="og:title" content="ctarp — a faithfulness question with an answer key">
-<meta property="og:description" content="A local harness for vulnerability localisation, and the measurement discipline around it.">
+<meta property="og:description" content="A local harness for vulnerability localization, and the measurement discipline around it.">
 <meta property="og:url" content="https://upskilled.consulting/ctarp/">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -26,7 +26,7 @@
   /* LIGHT BY DEFAULT, NOT BY SYSTEM PREFERENCE. Four of the figures on this page are captured
      from the report, which is authored on white, and the PDF is white — on a dark OS they used
      to sit in the page as glaring plates with nothing around them to justify the brightness.
-     The document now commits to one look that matches the artefacts it carries. Dark is still
+     The document now commits to one look that matches the artifacts it carries. Dark is still
      reachable by stamping data-theme="dark", so the palette below is not dead code; it is just
      no longer chosen for the reader by their operating system. */
   :root[data-theme="dark"] {
@@ -124,7 +124,7 @@
   .keep { color:var(--good); font-weight:600; }
 
   /* Annotated abstract. Hue carries the role; the text stays readable on both grounds because
-     the highlight is an alpha wash over the page colour rather than a fixed pastel. */
+     the highlight is an alpha wash over the page color rather than a fixed pastel. */
   .dimnote { color:var(--muted); font-size:.9rem; }
   .abs { background:var(--surface); border:1px solid var(--rule); border-radius:8px;
          padding:1.1rem clamp(.9rem,3vw,1.4rem); margin:1.2rem 0; }
@@ -231,9 +231,9 @@
 
 <div class="wrap">
 
-  <div class="eyebrow">Local harness · vulnerability localisation</div>
+  <div class="eyebrow">Local harness · vulnerability localization</div>
   <h1>A faithfulness question<br>with an answer key</h1>
-  <p class="lede">ctarp localises real vulnerabilities in real repositories at the commit before
+  <p class="lede">ctarp localizes real vulnerabilities in real repositories at the commit before
   the fix, so every claim a model makes can be checked against the commit that fixed it. This page
   is the harness, what its reasoning traces turned out to contain — and the measurements that were
   wrong before they were checked, including our own headline.</p>
@@ -275,14 +275,14 @@
     <code>core/api/__init__.py</code> and reasons that the flaw is in
     <code>cnl_blueprint.py</code> lines 22-36 — the <code>local_check</code> decorator. The real fix
     commit touches <b>exactly that decorator, at lines 23-34</b>. The citation it finally emits
-    points at line 43. <b>The correct localisation was in the reasoning and did not survive the
+    points at line 43. <b>The correct localization was in the reasoning and did not survive the
     reduction to a structured answer</b> — which is the question this harness exists to ask.</p>
   </div>
 
 
   <h2 id="abstract">Annotated abstract</h2>
-  <p class="dimnote">Colour-coded by the role each sentence plays, following the annotated-abstract
-  format. The colours are the argument, and two of them are unusual: the <b>contribution</b>
+  <p class="dimnote">Color-coded by the role each sentence plays, following the annotated-abstract
+  format. The colors are the argument, and two of them are unusual: the <b>contribution</b>
   sentence is a <i>retraction</i>, and the <b>broad impact</b> is a claim about how easily this kind
   of work produces a number that looks like a result.</p>
 
@@ -294,46 +294,47 @@
       <span class="k g">Narrow impact</span><span class="k h">Broad impact</span>
     </div>
     <p class="abstext">
-      <span class="a">Agentic harnesses for vulnerability localisation emit long reasoning traces
-      and then reduce them to a ranked list of files, discarding the reasoning.</span>
-      <span class="b">Whether that discarded text carries information the structured output does
-      not is a chain-of-thought faithfulness question, and unusually it is one with an answer key:
-      each task is a real CVE at the commit before its fix, so the fix commit names the true files
-      independently of anything the model said.</span>
-      <span class="c">We mine 504 trajectories for <i>relocations</i> &mdash; statements where a run
-      contradicts the question it was given and names a different file &mdash; report that our own
-      headline result does not survive de-duplication, and then ask at the activation level whether
-      the relocated file, or the decision to relocate at all, is recoverable before the model writes
-      it.</span>
-      <span class="d">Relocations are extracted with four filters (position within the step,
-      supersession, a real-extension test, and hedge detection), which remove 33 of 133 raw
-      candidates on a held-out sample; every readout is scored a second time against a seeded
-      decoy, every probe is cross-validated leave-one-claim-out with dimensionality reduction
-      fitted inside each fold, and every AUC is reported against a permutation null for the
-      identical procedure rather than against 0.5.</span>
-      <span class="e">Counted per mention, relocations name a true gold file 81.4% of the time,
-      apparently beating the 49.8% calibration of three-of-three pass agreement; counted per
-      distinct (task, file) claim &mdash; the unit the baseline is measured on &mdash; precision is
-      40.5% on 37 claims, below the baseline, with three tasks contributing over half the
-      population and one a single correct claim restated 55 times; and at the token before the file
-      is named, asking the model outright recovers it in 18 of 30 claims against a decoy floor of 3
-      (p&nbsp;=&nbsp;0.0003) while a Jacobian lens recovers 11 of 31 against a floor of 5
-      (p&nbsp;=&nbsp;0.15).</span>
-      <span class="f">The activation-level follow-ups are weaker still and are reported as such: a
-      trained readout appears to recover the file at 20 of 24 claims at its best layer, but
-      relocated filenames are
-      nested inside repositories and the deconfounded version scores two; right-versus-wrong
-      relocation is null with a detection threshold of AUC 0.676 at 35 claims; and whether a
-      relocation is <i>coming</i> is suggestive at late layers while surviving no correction for
-      multiple comparisons.</span>
-      <span class="g">For trace mining specifically, the unit of analysis determines the headline,
-      and repetition within a trace is not independent evidence.</span>
-      <span class="h">More broadly, five separate artifacts in this work each produced a
-      publishable-looking number and every one pointed the way the hypothesis wanted &mdash; a
-      repository detector, a delimiter detector separating classes at the embedding layer before
-      any block had run, a prompt-length shortcut, a per-mention count, and a permutation null built
-      at the wrong unit &mdash; none caught by finding the result implausible, and each caught by a
-      control built in advance to catch that class of error.</span>
+      <span class="a">
+      Agentic harnesses for vulnerability localization emit long reasoning traces and then
+      reduce them to a ranked list of files, discarding the reasoning.
+      </span>
+      <span class="b">
+      Whether that discarded text carries information the ranked list does not is a
+      chain-of-thought faithfulness question, and it is normally unanswerable, because the
+      reasoning and the output are both model artifacts with nothing independent to check them
+      against.
+      </span>
+      <span class="c">
+      In this work we show that vulnerability localization supplies that missing third object
+      (every task sits at the commit before a real fix, so the fix commit names the true files
+      whatever the model said), and we use it to audit 504 agent trajectories.
+      </span>
+      <span class="d">
+      Specifically, we mine <i>relocations</i>, statements where a run abandons the file it was
+      asked about and names another, and find their precision is 81.4% counted per mention but
+      40.5% counted per distinct claim, below the baseline they had been reported as beating,
+      because three tasks are half the population and one claim is restated 55 times.
+      </span>
+      <span class="e">
+      Using the same corpus we then ask whether the relocated file can be read out before the
+      model writes it: asking the model outright recovers it in 18 of 30 claims against a decoy
+      floor of 3, while a Jacobian lens reaches 11 of 31 against a floor of 5, so the
+      information is present and this readout does not find it.
+      </span>
+      <span class="f">
+      Finally, we extract the residual stream and run four activation-level probes, each of
+      which returns a null or an artifact, including one that recovers the file in 20 of 24
+      claims by identifying the repository rather than the file.
+      </span>
+      <span class="g">
+      Our findings show that when mining assertions from transcripts the unit of analysis
+      decides the headline, and that repetition inside a trace is not independent evidence.
+      </span>
+      <span class="h">
+      More broadly, five measurements here looked publishable and were not, every one of them
+      flattering the hypothesis, and each was caught by a control fixed before the number was
+      seen rather than by doubting the number afterward.
+      </span>
     </p>
   </div>
 
@@ -366,7 +367,7 @@
 
   <figure class="diagram">
     <svg id="d-arch" role="img" aria-label="Architecture: models, retrieval stages, candidate pool"></svg>
-    <figcaption>Antares-1B is a localisation specialist; Qwen3.6-35B-A3B judges and plans;
+    <figcaption>Antares-1B is a localization specialist; Qwen3.6-35B-A3B judges and plans;
     FastContext-4B explores code. BM25, commit history and the differential stage use no model.
     Candidates land in a casefile with the evidence for each.</figcaption>
   </figure>
@@ -476,7 +477,7 @@
     <svg id="d-charge" role="img" aria-label="Three distinct ways to miss a gold file"></svg>
     <figcaption>Locate never submitting the file, enrichment never opening it, and enrichment
     opening it but citing the wrong lines are three different defects. The unopened branch used
-    to be charged to the line metric, which made a budget limit look like a localisation
+    to be charged to the line metric, which made a budget limit look like a localization
     failure.</figcaption>
   </figure>
 
@@ -556,7 +557,7 @@
   files in that repository the model could have named instead. The lens is unaffected in direction —
   a floor that is too low could only have flattered it, and it was null regardless. The repair for a
   successor corpus is specific: draw the pairs from <i>within</i> a repository, so project identity
-  favours both candidates equally.</p>
+  favors both candidates equally.</p>
 
   <div class="note warn">
     <p><b>The comparison is deliberately unfair to the lens.</b> The lens reads a single
@@ -667,7 +668,7 @@
   </div>
 
   <footer>
-    ctarp — a local harness for vulnerability localisation. Every number here is measured on this
+    ctarp — a local harness for vulnerability localization. Every number here is measured on this
     corpus and reproduces from the committed record. Where a measurement corrected an earlier
     one, both are shown. &nbsp;·&nbsp; <a href="https://upskilled.consulting/ctarp/">upskilled.consulting/ctarp</a>
     <!-- WHICH BUILD YOU ARE ACTUALLY LOOKING AT. index.html is cached independently of
@@ -768,7 +769,7 @@
   layered('#d-arch', [
     {id:'cwe', col:0, row:0, label:'advisory text'},
     {id:'repo', col:0, row:1, label:'repo @ commit', sub:'pre-fix parent'},
-    {id:'ant', col:1, row:0, label:'Antares-1B', sub:'localisation', kind:'model'},
+    {id:'ant', col:1, row:0, label:'Antares-1B', sub:'localization', kind:'model'},
     {id:'q35', col:1, row:1, label:'Qwen3.6-35B', sub:'judge / planner', kind:'model'},
     {id:'fc',  col:1, row:2, label:'FastContext-4B', sub:'explorer', kind:'model'},
     {id:'nom', col:1, row:3, label:'BM25 · history', sub:'no model'},
@@ -798,7 +799,7 @@
   ], {w:820, colW:210, rowH:62});
 
   // A DECISION, not a dataflow: the branch labels carry the content, which is why layered()
-  // grew edge labels. The two leaves are deliberately coloured by outcome rather than by stage
+  // grew edge labels. The two leaves are deliberately colored by outcome rather than by stage
   // -- the point of the figure is that one branch is worse than not branching at all.
   layered('#d-question', [
     {id:'sym', col:0, row:1, label:'symptom', sub:'0.311'},
@@ -838,7 +839,7 @@
     {id:'op', col:2, row:1, label:'enrichment', sub:'opened it?'},
     {id:'c',  col:3, row:0, label:'coverage failure', sub:'enrich_coverage', kind:'stop'},
     {id:'l',  col:3, row:1, label:'cited a gold line?'},
-    {id:'f',  col:4, row:0, label:'localisation failure', sub:'recall_cited', kind:'stop'},
+    {id:'f',  col:4, row:0, label:'localization failure', sub:'recall_cited', kind:'stop'},
     {id:'h',  col:4, row:1, label:'hit', kind:'good'},
   ], [
     {s:'g',t:'sub'},{s:'sub',t:'m',lab:'no'},{s:'sub',t:'op',lab:'yes'},
@@ -876,15 +877,15 @@
     const spans = X.filter(e => !/^(task|explorer|antares)$/.test(e.name));
 
     const lanes = [
-      {g: 'assistant', label: 'prefill', colour: css('--accent'),
+      {g: 'assistant', label: 'prefill', color: css('--accent'),
        items: llm.filter(e => (e.args || {}).prompt_ms)
                  .map(e => ({t: sec(e), d: e.args.prompt_ms / 1000}))},
-      {g: 'assistant', label: 'generation', colour: css('--good'),
+      {g: 'assistant', label: 'generation', color: css('--good'),
        items: llm.filter(e => (e.args || {}).eval_ms)
                  .map(e => ({t: sec(e) + ((e.args.prompt_ms || 0) / 1000),
                              d: e.args.eval_ms / 1000}))}
     ].concat(Object.keys(tools).sort((a, b) => tools[b].length - tools[a].length)
-      .map(n => ({g: 'tooling', label: n, colour: css('--warn'),
+      .map(n => ({g: 'tooling', label: n, color: css('--warn'),
                   items: tools[n].map(e => ({t: sec(e), d: Math.max(dur(e), wall / 400)}))})))
       .filter(l => l.items.length);
 
@@ -926,7 +927,7 @@
       svg.selectAll(null).data(l.items).join('rect')
         .attr('x', d => x(d.t)).attr('y', y)
         .attr('width', d => Math.max(1, x(d.t + d.d) - x(d.t)))
-        .attr('height', ROW - 4).attr('fill', l.colour).attr('opacity', .9);
+        .attr('height', ROW - 4).attr('fill', l.color).attr('opacity', .9);
       svg.append('text').attr('x', LBL - 6).attr('y', y + ROW - 6).attr('text-anchor', 'end')
         .attr('class', 'hvlbl').text(l.label);
       svg.append('text').attr('x', W - PAD).attr('y', y + ROW - 6).attr('text-anchor', 'end')
