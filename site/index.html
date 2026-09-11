@@ -310,8 +310,9 @@
 
   <h2 id="abstract">Annotated abstract</h2>
   <p class="dimnote">Colour-coded by the role each sentence plays, following the annotated-abstract
-  format. The colours are the argument: notice that the contribution sentence is a
-  <i>retraction</i>.</p>
+  format. The colours are the argument, and two of them are unusual: the <b>contribution</b>
+  sentence is a <i>retraction</i>, and the <b>broad impact</b> is a claim about how easily this kind
+  of work produces a number that looks like a result.</p>
 
   <div class="abs">
     <div class="abskey">
@@ -323,34 +324,43 @@
     <p class="abstext">
       <span class="a">Agentic harnesses for vulnerability localisation emit long reasoning traces
       and then reduce them to a ranked list of files, discarding the reasoning.</span>
-      <span class="b">Whether that discarded text contains information the structured output does
-      not is a chain-of-thought faithfulness question, and unusually it is one with ground truth:
-      each task has a known fix commit.</span>
-      <span class="c">We mine 504 trajectories for <i>relocations</i> — statements where a run
-      contradicts the question it was given and names a different file — report that our own
-      headline result does not survive de-duplication, and then ask with a Jacobian lens whether
-      the relocated file is already decodable before the model writes it.</span>
+      <span class="b">Whether that discarded text carries information the structured output does
+      not is a chain-of-thought faithfulness question, and unusually it is one with an answer key:
+      each task is a real CVE at the commit before its fix, so the fix commit names the true files
+      independently of anything the model said.</span>
+      <span class="c">We mine 504 trajectories for <i>relocations</i> &mdash; statements where a run
+      contradicts the question it was given and names a different file &mdash; report that our own
+      headline result does not survive de-duplication, and then ask at the activation level whether
+      the relocated file, or the decision to relocate at all, is recoverable before the model writes
+      it.</span>
       <span class="d">Relocations are extracted with four filters (position within the step,
       supersession, a real-extension test, and hedge detection), which remove 33 of 133 raw
-      candidates on a held-out sample; every lens readout is scored a second time against a
-      decoy — another case's target — and on distinctive tokens only, so a shared
-      <code>.py</code> cannot score for both.</span>
+      candidates on a held-out sample; every readout is scored a second time against a seeded
+      decoy, every probe is cross-validated leave-one-claim-out with dimensionality reduction
+      fitted inside each fold, and every AUC is reported against a permutation null for the
+      identical procedure rather than against 0.5.</span>
       <span class="e">Counted per mention, relocations name a true gold file 81.4% of the time,
       apparently beating the 49.8% calibration of three-of-three pass agreement; counted per
-      distinct (task, file) claim — the unit the baseline is measured on — precision is 40.5% on
-      37 claims, below the baseline, with three tasks contributing over half the population and
-      one a single correct claim restated 55 times; and in the pilot the transport recovers the
-      relocated file from layer 20 of 39 while a plain logit lens reaches it only at layer 38,
-      where it is decoding the model's own output.</span>
-      <span class="f">Two weaker results stand: only 5 of 192 relocations fail to reach the
-      structured output, so the information is not lost in the reduction but only weighted; and
-      the lens cut that would carry a faithfulness claim — before the naming sentence exists at
-      all — is underpowered at 9 of 17 claims against a 3 of 17 decoy floor, p = 0.109.</span>
+      distinct (task, file) claim &mdash; the unit the baseline is measured on &mdash; precision is
+      40.5% on 37 claims, below the baseline, with three tasks contributing over half the
+      population and one a single correct claim restated 55 times; and at the token before the file
+      is named, asking the model outright recovers it in 18 of 30 claims against a decoy floor of 3
+      (p&nbsp;=&nbsp;0.0003) while a Jacobian lens recovers 11 of 31 against a floor of 5
+      (p&nbsp;=&nbsp;0.15).</span>
+      <span class="f">The activation-level follow-ups are weaker still and are reported as such: a
+      trained readout appears to recover the file at 20 of 24 claims, but relocated filenames are
+      nested inside repositories and the deconfounded version scores two; right-versus-wrong
+      relocation is null with a detection threshold of AUC 0.676 at 35 claims; and whether a
+      relocation is <i>coming</i> is suggestive at late layers while surviving no correction for
+      multiple comparisons.</span>
       <span class="g">For trace mining specifically, the unit of analysis determines the headline,
       and repetition within a trace is not independent evidence.</span>
-      <span class="h">More broadly, agent transcripts invite metrics whose unit is chosen for
-      convenience — mention rather than claim, token rather than filename — which inflates in the
-      flattering direction unless a control is built to catch it.</span>
+      <span class="h">More broadly, five separate artifacts in this work each produced a
+      publishable-looking number and every one pointed the way the hypothesis wanted &mdash; a
+      repository detector, a delimiter detector separating classes at the embedding layer before
+      any block had run, a prompt-length shortcut, a per-mention count, and a permutation null built
+      at the wrong unit &mdash; none caught by finding the result implausible, and each caught by a
+      control built in advance to catch that class of error.</span>
     </p>
   </div>
 

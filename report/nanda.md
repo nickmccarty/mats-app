@@ -19,44 +19,45 @@ date: 2026-09-07
 # The abstract is a PART, not a `## Abstract` heading. The lapreprint template has a slot for it and
 # errors when the slot is empty ("'parts' missing required key: abstract"); a heading leaves the
 # slot empty and renders the abstract as an ordinary first section instead.
+# Written to the annotated-abstract structure: topic, motivation, contribution, detail, evidence,
+# weaker result, narrow impact, broad impact — one move per sentence, in that order. The site
+# renders the same text colour-coded by role (§"Annotated abstract"); here it reads as prose,
+# because the annotation is a claim about the argument rather than part of it.
 parts:
   abstract: |
     Agentic harnesses for vulnerability localisation emit long reasoning traces and then reduce
     them to a ranked list of files, discarding the reasoning. Whether that discarded text carries
     information the structured output does not is a chain-of-thought faithfulness question, and
     unusually it is one with an answer key: each task is a real CVE at the commit before its fix,
-    and the fix commit — written by the project's maintainers, not by an annotator reading model
-    output — names the true files and lines.
-
-    **A headline that did not survive de-duplication.** We mine 504 trajectories for *relocations*,
-    statements where a run contradicts the question it was given and names a different file.
+    so the fix commit names the true files independently of anything the model said. We mine 504
+    trajectories for *relocations* — statements where a run contradicts the question it was given
+    and names a different file — report that our own headline result does not survive
+    de-duplication, and then ask at the activation level whether the relocated file, or the
+    decision to relocate at all, is recoverable before the model writes it. Relocations are
+    extracted with four filters (position within the step, supersession, a real-extension test,
+    and hedge detection), which remove 33 of 133 raw candidates on a held-out sample; every
+    readout is scored a second time against a seeded decoy, every probe is cross-validated
+    leave-one-claim-out with dimensionality reduction fitted inside each fold, and every AUC is
+    reported against a permutation null for the identical procedure rather than against 0.5.
     Counted per mention, relocations name a true gold file 81.4% of the time, apparently beating
-    the 49.8% calibration of three-of-three pass agreement. Counted per distinct (task, file)
+    the 49.8% calibration of three-of-three pass agreement; counted per distinct (task, file)
     claim — the unit the baseline is measured on — precision is 40.5% on 37 claims, below the
-    baseline. Three tasks contribute over half the population and one is a single correct claim
-    restated 55 times. A separate result is unaffected: 5 of 192 relocations never reach the
-    structured output, so the information is weighted rather than lost.
-
-    **The instrument, not the model.** At the token before the relocated file is written, asking
-    the model outright recovers it in 18 of 30 distinct claims against a decoy floor of 3
-    (p = 0.0003); a Jacobian lens on the same claims recovers 11 of 31 against a floor of 5
-    (p = 0.15). Something at that point determines the file, and this readout does not reach it.
-
-    **Four follow-up questions, none of which returned what was proposed.** Extracting the residual
-    stream directly shows that the file is not decodable by a trained readout either — but only
-    because relocated filenames are nested inside repositories, so the obvious probe is a project
-    detector and the deconfounded version scores two claims. Right-versus-wrong relocation is null
-    against a measured permutation null, with a detection threshold of AUC 0.676 at 35 claims.
-    Whether a relocation is *coming* is suggestive at late layers and survives no correction for
-    multiple comparisons.
-
-    **What we think the contribution is.** Five separate artifacts in this work produced a
-    publishable-looking number, and every one pointed the way the hypothesis wanted: a repository
-    detector, a delimiter detector separating classes at the embedding layer, a prompt-length
-    shortcut, a per-mention count inflating a per-claim p-value, and a permutation null built at
-    the wrong unit. None was caught by finding the result implausible; each was caught by a control
-    built in advance. Every corrected number is reported with both values, and a notebook
-    re-derives all of them from the raw files.
+    baseline, with three tasks contributing over half the population and one a single correct
+    claim restated 55 times; and at the token before the file is named, asking the model outright
+    recovers it in 18 of 30 claims against a decoy floor of 3 (p = 0.0003) while a Jacobian lens
+    recovers 11 of 31 against a floor of 5 (p = 0.15). The activation-level follow-ups are weaker
+    still and are reported as such: a trained readout appears to recover the file at 20 of 24
+    claims, but relocated filenames are nested inside repositories and the deconfounded version
+    scores two; right-versus-wrong relocation is null with a detection threshold of AUC 0.676 at
+    35 claims; and whether a relocation is coming is suggestive at late layers while surviving no
+    correction for multiple comparisons. For trace mining specifically, the unit of analysis
+    determines the headline, and repetition within a trace is not independent evidence. More
+    broadly, five separate artifacts in this work each produced a publishable-looking number and
+    every one pointed the way the hypothesis wanted — a repository detector, a delimiter detector
+    separating classes at the embedding layer before any block had run, a prompt-length shortcut,
+    a per-mention count, and a permutation null built at the wrong unit — none caught by finding
+    the result implausible, and each caught by a control built in advance to catch that class of
+    error.
 ---
 
 :::{warning} Confidential working draft

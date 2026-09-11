@@ -332,7 +332,8 @@
   </div>
   <!-- tabindex="-1" so the back-to-top button can hand focus back to the scroller. Without it
        focus() is a no-op and the arrow keys keep scrolling wherever they were. -->
-  <div id="main" tabindex="-1"><div class="empty">pick a run on the left.</div></div>
+  <!-- Seen only in the moment before the first run resolves, or if the index is empty. -->
+  <div id="main" tabindex="-1"><div class="empty">loading the first run…</div></div>
 </div>
 <!-- Back to top. A finished run is 40-odd steps with the activity panel and the run header
      above them, so the way out of the bottom is a long scroll or a Home key that only works
@@ -486,6 +487,14 @@ Promise.all([
   INDEX = idx.map(r => ({...r, hay: [r.name, r.task, r.model, r.node, r.exit,
                                      ...(r.files || [])].join(" ").toLowerCase()}));
   drawRail("");
+  // OPEN THE FIRST RUN. "Pick a run on the left" is a page that has loaded 32 trajectories and
+  // shows none of them: the reader has to guess that the rail is clickable before seeing anything
+  // this page is for. Selecting the first run costs one fetch and makes the default state a
+  // worked example. A `#run=<name>` fragment wins over it, so a link to a specific trajectory
+  // still lands where it says.
+  const want = decodeURIComponent((location.hash.match(/^#run=(.+)$/) || [])[1] || "");
+  const first = INDEX.find(r => r.name === want) || INDEX.find(r => !r.unreadable) || INDEX[0];
+  if (first) load(first.name);
 }).catch(e => $("#runs").innerHTML = '<div class="empty">' + esc(e) + "</div>");
 
 // ---- the timeline, joined by step -------------------------------------------
@@ -638,6 +647,10 @@ function drawRail(filter) {
 // ---- one run ---------------------------------------------------------------
 async function load(name, lane) {
   CURRENT = name; drawRail($("#q").value.toLowerCase());
+  // Make the selection linkable. Wrapped because some browsers refuse history writes on file://,
+  // and the viewer is opened that way in the handover bundle -- a thrown SecurityError here would
+  // abort the load and leave the reader on a blank pane.
+  try { history.replaceState(null, "", "#run=" + encodeURIComponent(name)); } catch (_) {}
   $("#main").innerHTML = '<div class="empty">loading ' + esc(name) + "…</div>";
   try {
     const j = await (await fetch(name, {cache: "no-store"})).json();
