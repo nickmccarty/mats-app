@@ -48,6 +48,7 @@ each cell prints what it computed next to what was claimed and marks it PASS or 
 | `reloc_cases_75.json` | **corrected export**: 75 cases, cut from `reasoning_content` |
 | `reloc_rows_75.jsonl` | **the lens run that matters** — raw per-layer ids, 149 rows, all 75 cases |
 | `ask_baseline_75.json` | the model asked outright, same cases, same decoys |
+| `relocation_reach.json` | every mined relocation: run, path, whether it reached the casefile, prompt era |
 
 No GPU and no model needed. The lens has already been read; this re-scores its output.
 
@@ -492,8 +493,65 @@ if cases75:
           f"(missing: {[i for i in range(len(cases75)) if i not in set(covered)]})")
 """),
 
+
     md(r"""
-## 10. Verdict
+## 10. Why some stated conclusions never reach the output
+
+The report's third follow-up asked whether the never-submitted set is a *suppression* story or an
+*error* story. It is neither. The enricher prompt used to carry a consolation clause — "then cite
+the closest line in the file you were asked about" — and the model complied with it. The clause
+was removed on 2026-08-31.
+
+`relocation_reach.json` is every mined relocation with the run it came from, whether it reached
+the casefile, and which side of that date it falls on.
+"""),
+
+    code(r"""
+try:
+    reach = load("relocation_reach.json")
+except SystemExit as e:
+    print(e); reach = None
+
+if reach:
+    from math import comb
+    def fisher(a, b, c, d):
+        n = a + b + c + d
+        f = lambda a_, b_, c_, d_: (comb(a_+b_, a_) * comb(c_+d_, c_)) / comb(n, a_+c_)
+        obs = f(a, b, c, d); tot = 0.0
+        for x in range(0, min(a+b, a+c) + 1):
+            y, z = a+b-x, a+c-x; w = c+d-z
+            if min(x, y, z, w) < 0: continue
+            q = f(x, y, z, w)
+            if q <= obs + 1e-12: tot += q
+        return min(tot, 1.0)
+
+    era = {"before": [0, 0], "after": [0, 0]}   # [never reached, reached]
+    for r in reach:
+        era[r["era"]][1 if r["reached_casefile"] else 0] += 1
+    a, b = era["before"]; c, d = era["after"]
+
+    print(f"{'era':24} {'relocations':>12} {'never reached':>14} {'rate':>7}")
+    for lbl, (nv, rc) in (("before the prompt fix", era["before"]), ("on or after", era["after"])):
+        print(f"{lbl:24} {nv+rc:>12} {nv:>14} {nv/max(nv+rc,1):>6.1%}")
+    p_ = fisher(a, b, c, d)
+    print(f"odds ratio {a*d/max(b*c,1):.1f}x   Fisher exact two-sided p = {p_:.5f}")
+
+    check("relocations mined", len(reach), 218)
+    check("never reached, before fix", f"{a}/{a+b}", "5/29")
+    check("never reached, after fix",  f"{c}/{c+d}", "1/189")
+    check("Fisher exact p", round(p_, 5), 0.00016)
+
+    # the trace that records the mechanism in the model's own words
+    hit = [r for r in reach if not r["reached_casefile"] and "I should cite that file" in r["quote"]]
+    check("a trace shows the model redirected by the instruction", len(hit) >= 1, True)
+    if hit:
+        print()
+        print(hit[0]["run_id"], "->", hit[0]["path"])
+        print(" ", hit[0]["quote"][-200:])
+"""),
+
+    md(r"""
+## 11. Verdict
 """),
 
     code(r"""
@@ -519,6 +577,9 @@ else:
     print("  - what survives about the transport: never worse than the logit lens on any")
     print("    of the 60 readouts of the first export, and it recovers the file from layer")
     print("    20 at the LATER cut, where the model has already begun the sentence.")
+    print("  - the six relocations that never reach the output are not suppression and not")
+    print("    error: 5 of 29 under a prompt carrying a consolation clause, 1 of 189 after it")
+    print("    was removed (p = 0.00016). The model followed an instruction we wrote.")
 """),
 ]
 

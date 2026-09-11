@@ -46,6 +46,14 @@ The comparison is deliberately unfair to the lens: it reads one activation, whil
 lets the model generate up to 2,400 tokens first. A baseline that strong losing would have settled
 the matter; winning only bounds what the lens failed to find.
 
+**Why some stated conclusions never reach the output.** The six relocations that are stated in
+reasoning but never cited are not a suppression story and not an error story: 5 of 29 under a
+prompt carrying a consolation clause (*"then cite the closest line in the file you were asked
+about"*), 1 of 189 after that clause was removed — Fisher exact p = 0.00016, odds ratio 39. One
+trace records the model resolving to cite the right file and then being redirected by the
+instruction mid-sentence. The 97% figure is therefore partly a fact about a prompt, not only about
+the reduction from transcript to ranked list.
+
 **What survives about the transport:** against the plain logit lens it is never worse on any of
 the 60 readouts of the first export, and at the *later* cut it recovers the file from layer 20 of
 39 while the logit lens arrives only at layer 38. That is a property of the transport, not

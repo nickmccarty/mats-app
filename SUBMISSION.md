@@ -137,11 +137,37 @@ inflated number is the one that looks publishable.
 The extraction is sound, and one finding is unaffected by the counting error because it is a
 question about presence rather than precision:
 
-> Of 192 relocations mined from reasoning, **5** fail to appear in the structured output.
+> Of 218 relocations mined from reasoning, **6** fail to appear in the structured output.
 
-97.4% of what the model states in its reasoning does reach the ranked list. The reduction from
+97.2% of what the model states in its reasoning does reach the ranked list. The reduction from
 transcript to structured output is therefore not discarding the model's stated conclusions. This
 is a negative result for the "reasoning is thrown away" hypothesis in this setting.
+
+**But the six are not random, and finding out why changes what they mean.** Split by the date the
+enricher prompt changed:
+
+| | relocations | never reached the output | |
+|---|---|---|---|
+| before 2026-08-31 | 29 | **5** | 17.2% |
+| on or after | 189 | **1** | 0.5% |
+
+Fisher exact, two-sided: **p = 0.00016**, odds ratio 39. The earlier prompt carried a consolation
+clause — *"then cite the closest line in the file you were asked about"* — and one trace shows the
+model walking straight into it:
+
+> *"But the actual vulnerability (the default `verify=False`) is in `http_hook.py:163`. I should
+> cite that file and note it. Wait, the instructions say: 'If what you find says the weakness is
+> really in another file, SAY SO in your explanation and name it — that is worth recording — then
+> cite the closest…'"*
+
+It located the weakness, resolved to cite it, and was redirected by the instruction into filing an
+in-scope citation instead. That clause was removed on 2026-08-31, and the effect went with it.
+
+So the answer to the third follow-up question below is neither of the two it proposes. The
+never-submitted set is not a suppression story and not an error story — it is instruction
+following, and the instruction was ours. The honest reading of the 97% is therefore that it
+measures a prompt as much as a reduction: under a prompt that asked for a consolation citation,
+one relocation in six was lost.
 
 Whether those conclusions are *weighted* correctly is a separate question. On current evidence we
 do not know, and §4 is the reason we decline to claim otherwise.
@@ -292,26 +318,32 @@ and skips rather than slicing it — slicing would reseed the shuffle and re-pai
 
 The divergence between stated and submitted location is visible in the transcript, after the fact.
 The question this dataset is positioned to ask is whether it is visible **in the activations, and
-before the output is produced**. The pilot above is a first pass at question 1; questions 2 and 3
-are untouched.
+before the output is produced**. The pilot above is a first pass at question 1. Question 3 is answered
+below — by reading the traces rather than the activations, and its premise did not survive contact
+with them. Question 2 is untouched.
 
 Concretely, the corpus supplies per trace a triple — stated location, submitted location, true
-location — with 192 cases where stated and submitted diverge and 5 where a stated location never
-reaches the output at all. The models are 1B–4B and run locally, so residual streams are
+location — with 218 relocations mined and 6 where a stated location never reaches the output. The models are 1B–4B and run locally, so residual streams are
 accessible without inference-provider constraints.
 
 Three questions, in increasing order of interest:
 
 1. **Is the submitted answer decodable before it is stated?** Train a linear probe on the residual
    stream at the token where the model states location A, predicting the file it will eventually
-   submit. If the eventual answer is already linearly decodable, the stated location is not the
-   computation that produced it.
+   submit. Two things this needs that the pilot does not supply: the probe recorded top-20 token
+   *ids*, not hidden states, so an extraction run is required; and 4,096 dimensions against ~31
+   claims will fit perfectly and generalise nowhere, so it needs either many more claims or a unit
+   with a defensible independence argument. Running it at the current n would produce a number
+   that has to be retracted, which is the failure this report exists to document.
 2. **Do divergent traces look different at the point of divergence?** Compare probe confidence and
    representational geometry between traces where stated and submitted agree and the 192 where
    they do not, at matched positions.
-3. **Is the 5-case set — stated but never submitted — mechanistically distinct** from the cases
-   where a stated location is submitted and wrong? One is a suppression story, the other an error
-   story, and they should not look alike.
+3. ~~**Is the 5-case set — stated but never submitted — mechanistically distinct** from the cases
+   where a stated location is submitted and wrong?~~ **Answered, and the premise was wrong.** It is
+   neither a suppression story nor an error story: the rate is 17.2% under a prompt carrying a
+   consolation clause and 0.5% without it (p = 0.00016, odds ratio 39), and one trace records the
+   model deciding to cite the right file and then being redirected by the instruction. See §6. A
+   mechanistic account was not needed; reading the six traces was.
 
 The value of the setting is that (1) can be scored against an answer key that neither the
 transcript nor the output produced.
