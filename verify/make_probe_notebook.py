@@ -516,11 +516,25 @@ except that a relocation has a gold answer and a "Wait" does not.
 - **negatives** — a sentence boundary in the *same run*, in a step containing no relocation,
   chosen to match the positive's prefix length
 
-The matching is what makes it a control. Relocations arrive late in long traces, so unmatched
-negatives would let a classifier score well by detecting context length and nothing else. The cell
-reports the AUC of a classifier given **only the token count** — that is the floor the real probe
-has to clear. Folds are leave-one-**run**-out, because a positive and its matched negative share a
-run and would otherwise sit on opposite sides of a split.
+The matching is what makes it a control, and it took three attempts to become one. Each failure
+produced a confident-looking number first:
+
+| shortcut | what it was worth | fix |
+|---|---|---|
+| prompt length | AUC **0.62** from token count alone | cap the within-pair token gap at 30% |
+| punctuation | AUC **0.894 at layer 0** | cut both exports on one convention |
+| leftover punctuation skew | ~**0.68** from the last token | stratify on final character, then match length |
+
+The second one is the instructive one. **Layer 0 is the embedding output — no transformer block has
+run.** A separation there cannot be a fact about computation; it can only be a fact about the last
+token. It was: the relocation export ends its prefix on the punctuation mark, the control export
+kept the trailing space, so relocations ended on `.` 45 times in 75 and controls never did. One
+character made the classes linearly separable before the model did anything.
+
+The cell below therefore prints the token-count-only AUC for each candidate subset *before* it
+reports anything about activations, and you should read the layer-0 row of the results table as a
+diagnostic rather than as a finding. Folds are leave-one-**run**-out, because a positive and its
+matched negative share a run and would otherwise sit on opposite sides of a split.
 """),
 
     code(r"""
@@ -531,12 +545,15 @@ else:
     ZC = np.load("resid_ctrl.npz")
     MC = json.loads(_p.Path("resid_ctrl_meta.json").read_text(encoding="utf-8"))
 
-    def design_event(layer):
-        # only the controls whose matched positive survived the genuinely-earlier filter; an
-        # unmatched negative breaks the length matching the control depends on
+    ctl_by_case = {m["matched_case"]: m for m in MC}
+
+    def design_event(layer, only=None):
+        # only the controls whose matched positive survived the filters; an unmatched negative
+        # breaks the pairing the length and punctuation matching both depend on
         keep, X, y, g, tok = set(), [], [], [], []
         for m in META:
             if not usable(m): continue
+            if only is not None and m["case"] not in only: continue
             keep.add(m["case"])
             X.append(Z[m["key"]][layer].astype(np.float32))
             y.append(1); g.append(m["run_id"]); tok.append(m["tokens"])
@@ -546,21 +563,40 @@ else:
             y.append(0); g.append(m["run_id"]); tok.append(m["tokens"])
         return np.stack(X), np.array(y), np.array(g), np.array(tok, dtype=float)
 
-    X, y, g, tok = design_event(N_LAYERS // 2)
-    print(f"positives {int(y.sum())} | negatives {int((y==0).sum())} | runs {len(set(g))}")
-    la = auc(y, tok)
-    print(f"token-count-only AUC: {la:.3f}  "
-          f"{'OK — matching held' if abs(la-.5) < .1 else 'WARNING — length leaks'}\n")
+    # the two shortcuts, as subsets
+    pos_tok = {m["case"]: m["tokens"] for m in META if usable(m)}
+    lb = {c for c, t in pos_tok.items() if c in ctl_by_case
+          and abs(t - ctl_by_case[c]["tokens"]) / max(t, ctl_by_case[c]["tokens"]) <= 0.30}
+    fc = {c for c in pos_tok if c in ctl_by_case and cases is not None
+          and cases[c]["prefix_at_sentence"][-1:]
+          == ctl_by_case[c]["prefix_at_sentence"][-1:]} if cases else set(pos_tok)
+    both = lb & fc
 
-    print(f"{'layer':>6} {'AUC':>6} {'null mean':>10} {'null p95':>9} {'p':>7}")
-    ev = []
-    for L in probe_layers:
-        X, y, g, _ = design_event(L)
-        real = cv_auc(X, y, g)
-        null = np.array([cv_auc(X, r2.permutation(y), g) for _ in range(300)])
-        p = ((null >= real).sum() + 1) / 301
-        ev.append({"layer": L, "auc": real, "null": null.mean(), "p": p})
-        print(f"{L:>6} {real:>6.3f} {null.mean():>10.3f} {np.quantile(null,.95):>9.3f} {p:>7.3f}")
+    for name, sub in (("all pairs", None), ("within 30% token length", lb),
+                      ("final character matched", fc), ("both restrictions", both)):
+        X, y, g, tok = design_event(N_LAYERS // 2, sub)
+        print(f"{name:<28} pairs {int(y.sum()):>3} | length-only AUC {auc(y, tok):.3f}")
+
+    X, y, g, tok = design_event(N_LAYERS // 2, both)
+    if int(y.sum()) < 6:
+        print(f"\nBoth restrictions leave {int(y.sum())} pairs — too few to score.")
+    else:
+        print(f"\nscoring the doubly-restricted subset (length shortcut worth {auc(y,tok):.3f})")
+        print("WATCH LAYER 0 — it is the embedding output, before any block has run.\n")
+        print(f"{'layer':>6} {'AUC':>6} {'null mean':>10} {'null p95':>9} {'p':>7}")
+        ev = []
+        for L in probe_layers:
+            X, y, g, _ = design_event(L, both)
+            def pshuf(y, g):
+                yy = y.copy()
+                for u in np.unique(g): yy[g == u] = r2.permutation(y[g == u])
+                return yy
+            real = cv_auc(X, y, g)
+            null = np.array([cv_auc(X, pshuf(y, g), g) for _ in range(300)])
+            p = ((null >= real).sum() + 1) / 301
+            ev.append({"layer": L, "auc": real, "null": null.mean(), "p": p})
+            print(f"{L:>6} {real:>6.3f} {null.mean():>10.3f} "
+                  f"{np.quantile(null,.95):>9.3f} {p:>7.3f}")
 """),
 
     md(r"""

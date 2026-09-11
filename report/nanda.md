@@ -443,6 +443,29 @@ Four questions, in increasing order of interest:
 
    Layer 0 is the cheapest diagnostic in this report and the one that caught the worst error. A
    probe that separates classes before any block has run is reading its input, not the model.
+
+   **The corrected result: suggestive, and not a finding.** On the 23 pairs that are both
+   length-balanced and final-character matched — where the length shortcut is worth 0.499 — the
+   probe behaves the way a real signal should and still fails to clear the bar:
+
+   | layer | AUC | null 95th pct | p |
+   |---|---|---|---|
+   | 0 (embeddings) | 0.558 | 0.594 | 0.103 |
+   | 29 | 0.629 | 0.628 | 0.053 |
+   | 34 | 0.665 | 0.635 | 0.033 |
+   | 40 | 0.650 | 0.630 | 0.040 |
+
+   Layer 0 is now non-significant, which is the diagnostic passing: nothing is separable before the
+   model computes anything, and what separation exists appears late. That is the right shape. But
+   eight layers are eight tests, and Benjamini-Hochberg at q = 0.05 requires the smallest p below
+   0.00625. The smallest is 0.033. **Nothing survives correction**, and at 23 pairs the detection
+   threshold was AUC 0.635 — so a real late-layer effect of ordinary size would have been invisible
+   regardless.
+
+   The correct reading is that the experiment is now *well-formed* and *underpowered*, which is a
+   better place to be than the version that returned AUC 0.894 at layer 0. The design is reusable:
+   218 relocations exist against the 75 extracted here, and the matched-control export is the part
+   that took three attempts to get right.
 4. ~~**Is the 5-case set — stated but never submitted — mechanistically distinct** from the cases
    where a stated location is submitted and wrong?~~ **Answered, and the premise was wrong.** It is
    neither a suppression story nor an error story: the rate is 17.2% under a prompt carrying a

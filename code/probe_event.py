@@ -234,6 +234,24 @@ def main() -> int:
         res["layers"].append({"layer": int(L), "auc": real, "null_mean": float(null.mean()),
                               "null_p95": float(np.quantile(null, .95)), "p": p})
         print(f"{L:>6} {real:>6.3f} {null.mean():>10.3f} {np.quantile(null,.95):>9.3f} {p:>7.3f}")
+    # MULTIPLE COMPARISONS. Eight layers are eight tests, and the smallest of eight p-values is not
+    # the p-value of the finding. Benjamini-Hochberg at q=0.05 is the least conservative correction
+    # anyone would accept here, so it is the one reported -- and it is applied to our own result
+    # rather than left for a reader to apply.
+    if res["layers"]:
+        ps = sorted((r["p"], r["layer"]) for r in res["layers"])
+        m, q = len(ps), 0.05
+        survivors = [(p, L) for i, (p, L) in enumerate(ps, 1) if p <= i / m * q]
+        res["bh_q05_survivors"] = [L for _, L in survivors]
+        res["bh_threshold_smallest"] = q / m
+        print(f"\n  {m} layers tested. Benjamini-Hochberg at q=0.05 needs the smallest p below "
+              f"{q/m:.5f}.")
+        print(f"  smallest p is {ps[0][0]:.3f} at layer {ps[0][1]}; "
+              f"surviving layers: {res['bh_q05_survivors'] or 'none'}")
+        if not survivors:
+            print("  Nothing survives correction. The late-layer pattern is suggestive and"
+                  " underpowered,\n  not a result.")
+
     if res["layers"]:
         best = max(res["layers"], key=lambda r: r["auc"])
         print(f"\n  Best layer {best['layer']}: AUC {best['auc']:.3f} against a null 95th "

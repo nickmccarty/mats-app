@@ -574,6 +574,21 @@
   point determines the file the model is about to name, it is recoverable, and this lens fails to
   recover it.</p>
 
+  <p><b>What that decoy floor is actually worth — a third correction.</b> Building the follow-up
+  probes surfaced a weakness in the control itself. The decoy is drawn from the whole corpus, but
+  relocated filenames are nested inside repositories: <b>20 of 21</b> distinct basenames occur in
+  exactly one repo, and <b>71 of 75</b> decoys name a file from a different project than the one
+  being read. Every method here knows which project it is reading — the residual encodes it, because
+  the context <i>is</i> that project — so preferring the target over that decoy can be satisfied
+  without ever telling files apart <i>within</i> a repository.</p>
+
+  <p>So the decoy column is a floor that is too low, not a noise estimate. What survives is the
+  target column: <b>18 of 30 claims naming the exact repository-relative path</b>, against the many
+  files in that repository the model could have named instead. The lens is unaffected in direction —
+  a floor that is too low could only have flattered it, and it was null regardless. The repair for a
+  successor corpus is specific: draw the pairs from <i>within</i> a repository, so project identity
+  favours both candidates equally.</p>
+
   <div class="note warn">
     <p><b>The comparison is deliberately unfair to the lens.</b> The lens reads a single
     activation; the baseline lets the model generate — up to 2,400 tokens, and it uses them. So
@@ -690,7 +705,7 @@
          everything else, so a browser can serve a page from before a fix while the server has
          the fix — twice now that has been reported as a bug in code that was already correct,
          and there was no way to tell from the page itself. Now there is. -->
-    <span class="build">build 2026-09-10·619bc018</span>
+    <span class="build">build 2026-09-11·619bc018</span>
   </footer>
 </div>
 
