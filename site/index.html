@@ -202,41 +202,43 @@
   .video .ph { aspect-ratio:16/9; display:flex; align-items:center; justify-content:center;
                background:var(--sunk); color:var(--faint); font-family:var(--mono);
                font-size:.8rem; text-align:center; padding:1rem; }
-  .video iframe, .video video { display:block; width:100%; aspect-ratio:16/9; border:0; }
-  /* A slide is a page, not a frame: 16/9 crops every slide's prose. Tall enough that a slide
-     lands whole, capped so it never eats the scroll on a laptop. */
-  .video.deck iframe { aspect-ratio:auto; height:clamp(420px, 78vh, 720px); }
+  .video iframe { display:block; width:100%; border:0; }
 
-  /* ---- the clip and the deck, as siblings -------------------------------------------------
-     Two panes of equal height. The video is 1536x880 and the deck is taller than it is wide, so
-     they can only share a row if the video letterboxes into the deck's height rather than
-     dictating its own -- object-fit:contain on the same clamp(). Below 900px the row becomes a
-     column: side-by-side at phone width gives two panes too small to read either. */
-  .showcase { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-              gap:1rem; margin:1.5rem 0; align-items:start; }
-  .showcase .video { margin:0; display:flex; flex-direction:column; }
-  /* The clip keeps its own shape. Forcing it to the deck's height letterboxed a 16/9 frame into
-     a 644px box -- a small card adrift in black. The column is filled by the note underneath
-     instead, which is what a reader needs next to the clip anyway. */
-  .showcase .vid video { aspect-ratio:1536/880; height:auto; background:#121619; }
-  .showcase .deckbar { margin-top:auto; }
-  /* Shorter than the standalone deck: paired with the clip it only has to hold one slide
-     comfortably, and 720px against a 270px video made the row read as one tall thing and one
-     small thing. */
-  .showcase .deck iframe { height:clamp(400px, 60vh, 560px); }
-  .showcase .casenote { font-size:.86rem; line-height:1.6; color:var(--muted);
-                        background:var(--sunk); border:1px solid var(--rule);
-                        border-radius:8px; padding:.85rem 1rem; margin:.9rem 0 0; max-width:none; }
-  .showcase .casenote b { color:var(--ink); }
-  @media (max-width:900px) { .showcase { grid-template-columns:1fr; } }
-  .video .deckbar { display:flex; justify-content:space-between; align-items:baseline;
-                    gap:1rem; padding:.5rem .8rem; border-top:1px solid var(--rule);
-                    font-family:var(--mono); font-size:.72rem; color:var(--faint); }
+  /* ---- the deck, full width ---------------------------------------------------------------
+     A slide is a page, not a frame: 16/9 crops every slide's prose. Height is driven by the
+     viewport so a whole slide lands on any screen, with a floor that keeps it legible on a phone
+     and a ceiling so it never eats the scroll on a laptop. */
+  .deckwrap { margin:1.5rem 0; }
+  .deckwrap .video { margin:0; }
+  .video.deck iframe { height:clamp(460px, 72vh, 720px); }
+
+  /* PHONES. A slide is portrait-ish, so at narrow widths it needs proportionally MORE height, not
+     less -- the usual instinct to shrink embeds on mobile is what crops the text. The controls
+     below also stop being a justified row and become a stack of full-width tap targets, because
+     `justify-content:space-between` on a wrapped flex row leaves links stranded mid-line. */
+  @media (max-width:640px) {
+    .video.deck iframe { height:clamp(420px, 78vh, 620px); }
+    .video .deckbar { flex-direction:column; align-items:stretch; gap:.6rem; }
+    .video .deckacts { flex-direction:column; align-items:stretch; gap:.5rem; }
+    .video .deckbar a.btn { text-align:center; padding:.6em .7em; }
+  }
+
+  .casenote { font-size:.86rem; line-height:1.6; color:var(--muted);
+              background:var(--sunk); border:1px solid var(--rule);
+              border-radius:8px; padding:.85rem 1rem; margin:.9rem 0 0; max-width:none; }
+  .casenote b { color:var(--ink); }
+
+  .video .deckbar { display:flex; justify-content:space-between; align-items:center;
+                    gap:1rem; padding:.55rem .8rem; border-top:1px solid var(--rule);
+                    font-family:var(--mono); font-size:.72rem; color:var(--faint);
+                    flex-wrap:wrap; }
   .video .deckbar a { color:var(--accent); text-decoration:none; }
   .video .deckbar a:hover { text-decoration:underline; }
-  .video .deckacts { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap; }
+  .video .deckacts { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
+  /* Tap targets, not text links: 44px is the usual minimum and .6em padding clears it at this
+     font size. */
   .video .deckbar a.btn { border:1px solid var(--accent); border-radius:5px;
-                          padding:.25em .7em; color:var(--accent); }
+                          padding:.45em .8em; color:var(--accent); white-space:nowrap; }
   .video .deckbar a.btn:hover { background:var(--accent); color:var(--bg);
                                 text-decoration:none; }
 
@@ -272,37 +274,14 @@
     <div class="fig hot"><b>8</b><span>measurements that were wrong before they were checked</span></div>
   </div>
 
-  <!-- THE CASE AND THE ARGUMENT, SIDE BY SIDE. The deck makes the argument; the clip makes one
-       instance of it concrete, and a reader who has watched the thing happen reads the argument
-       differently. Neither is subordinate to the other, so they are siblings in a two-column
-       grid rather than stacked -- stacking put 720px of deck between the reader and the video.
-       Both panes are locked to the same height so the row reads as one object.
+  <!-- THE ARGUMENT, FULL WIDTH. This was a two-column row pairing the deck with a 49-second screen
+       capture. The clip is gone: it cost 3.5 MB, it was the slowest thing on the page, and on a
+       phone the two-up row collapsed into a video too small to read the code in. Its evidentiary
+       content is one concrete case, which is carried better by the prose beneath the deck than by
+       frames a reader has to scrub through.
 
-       The clip is built from frames captured out of the BROWSER, not off the screen: three
-       gdigrab takes were discarded, two to a container that was never finalised and one shot at
-       1520x950 on a 3840x2400 desktop. Frames are from one completed run,
-       20260907-111923-eval001. Muted, no autoplay -- it is evidence, not decoration. -->
-  <div class="showcase">
-    <div>
-      <figure class="video vid">
-        <video src="relocation.mp4" controls preload="metadata" playsinline
-               aria-label="A model asked about one file reasons the flaw is in another, and the fix
-                           commit agrees"></video>
-        <div class="deckbar">
-          <span>49s · no audio · one task</span>
-          <span class="deckacts">
-            <a href="relocation.mp4" target="_blank" rel="noopener">open full size ↗</a>
-          </span>
-        </div>
-      </figure>
-      <p class="casenote">The model is asked about <code>core/api/__init__.py</code> and reasons
-      that the flaw is in <code>cnl_blueprint.py</code> lines 22-36 — the <code>local_check</code>
-      decorator. The real fix commit touches <b>exactly that decorator, at lines 23-34</b>. The
-      citation it finally emits points at line 43. <b>The correct localisation was in the reasoning
-      and did not survive the reduction to a structured answer</b> — which is the question this
-      harness exists to ask.</p>
-    </div>
-
+       At full width the deck gets the height a slide actually needs, so prose no longer crops. -->
+  <div class="deckwrap">
     <div class="video deck">
       <iframe src="deck.html" title="Faithfulness with ground truth — ten slides"
               loading="lazy"></iframe>
@@ -310,15 +289,22 @@
         <span>arrow keys or scroll · 10 slides</span>
         <span class="deckacts">
           <!-- The PDF opens in a new tab rather than an iframe: the browser's own viewer is a
-               better PDF reader than anything embedded here, and the inline visual slot is
-               already spent. Copied into site/ by build_site.py from the myst export, so it
-               cannot go stale against the report it is built from. -->
+               better PDF reader than anything embedded here. Copied into site/ by build_site.py
+               from the myst export, so it cannot go stale against the report it is built from. -->
           <a href="ctarp-faithfulness.pdf" target="_blank" rel="noopener"
-             class="btn">Technical report (PDF, 11pp) ↗</a>
+             class="btn">Report (PDF) ↗</a>
+          <a href="https://github.com/nickmccarty/mats-app" target="_blank" rel="noopener"
+             class="btn">Source &amp; data ↗</a>
           <a href="deck.html" target="_blank" rel="noopener">open full screen ↗</a>
         </span>
       </div>
     </div>
+    <p class="casenote">One case, concretely. The model is asked about
+    <code>core/api/__init__.py</code> and reasons that the flaw is in
+    <code>cnl_blueprint.py</code> lines 22-36 — the <code>local_check</code> decorator. The real fix
+    commit touches <b>exactly that decorator, at lines 23-34</b>. The citation it finally emits
+    points at line 43. <b>The correct localisation was in the reasoning and did not survive the
+    reduction to a structured answer</b> — which is the question this harness exists to ask.</p>
   </div>
 
 

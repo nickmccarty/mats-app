@@ -38,7 +38,10 @@
   tr:last-child td { border-bottom:0; }
   .cards { display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule);
            border-radius:10px; overflow:hidden; margin:2rem 0;
-           grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr)); }
+           /* 20rem, not 15rem: at the 52rem wrap width 15rem gives three columns, and four cards
+              in three columns leaves an orphan beside a bare grey cell. 20rem gives two, so the
+              four land as a 2x2 and still collapse to one column on a phone. */
+           grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr)); }
   .card { background:var(--surface); padding:1rem 1.1rem; text-decoration:none; color:inherit;
           display:block; }
   .card:hover { background:var(--bg); }
@@ -46,6 +49,16 @@
   .card span { display:block; font-size:.8rem; color:var(--muted); line-height:1.45; }
   .note { font-size:.85rem; color:var(--muted); border-left:3px solid var(--rule);
           padding:.2rem 0 .2rem 1rem; margin:2rem 0; }
+  /* The two things a reader most likely came for. Full-width stacked tap targets on a phone,
+     inline on anything wider -- `flex-wrap` alone would leave a stranded half-width button. */
+  .actions { display:flex; flex-wrap:wrap; gap:.7rem; margin:2rem 0; }
+  .btn { flex:1 1 14rem; text-align:center; text-decoration:none; border-radius:8px;
+         border:1px solid var(--rule); background:var(--surface); color:var(--ink);
+         padding:.75rem 1.1rem; font-size:.92rem; font-weight:500;
+         transition:background .12s ease, border-color .12s ease; }
+  .btn:hover { border-color:var(--accent); }
+  .btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn.primary:hover { filter:brightness(1.08); }
   code { font-family:var(--mono); font-size:.85em; }
   footer { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--rule);
            font-family:var(--mono); font-size:.72rem; color:var(--faint); }
@@ -74,23 +87,31 @@
   rather than the model. The comparison is deliberately unfair to the lens: it reads one
   activation, while the baseline lets the model generate first.</p>
 
+  <div class="actions">
+    <a class="btn primary" href="report/ctarp-faithfulness.pdf">Read the report (PDF)</a>
+    <a class="btn" href="https://github.com/nickmccarty/mats-app">Source &amp; data on GitHub</a>
+  </div>
+
   <div class="cards">
     <a class="card" href="site/index.html"><b>The write-up &rarr;</b>
-      <span>The harness, the retraction, and the pilot. Includes a ten-slide deck and a 49-second
-      clip of one case end to end.</span></a>
-    <a class="card" href="report/ctarp-faithfulness.pdf"><b>The report, PDF &rarr;</b>
-      <span>10pp, typeset, with all five figures.</span></a>
+      <span>The harness, the retraction, and the pilot, with a ten-slide deck.</span></a>
     <a class="card" href="verify/verify_findings.ipynb"><b>Check the numbers &rarr;</b>
       <span>A notebook that re-derives every figure from the raw files. No GPU, no model, about
-      two seconds. Currently 35 of 35.</span></a>
+      two seconds.</span></a>
+    <a class="card" href="verify/probe_q1_q2.ipynb"><b>The follow-up probes &rarr;</b>
+      <span>Four activation-level questions, each against a measured permutation null. Also no
+      GPU &mdash; the forward passes have already happened.</span></a>
     <a class="card" href="site/traces/trajectory.html"><b>Read the trajectories &rarr;</b>
       <span>All 32 runs behind the claims, searchable, with their tool calls and reasoning.</span></a>
   </div>
 
-  <p class="note">Three corrections made during this work are reported with <em>both</em> the
-  original and the corrected value, because each one changed a conclusion: mention versus claim,
-  any-token versus distinctive-token scoring, and a &ldquo;before the sentence&rdquo; cut that was
-  byte-identical to the mid-sentence cut for a minority of claims.</p>
+  <p class="note">Five numbers corrected during this work are reported with <em>both</em> the
+  original and the corrected value, because each one changed a conclusion &mdash; and every one of
+  them had pointed the way the hypothesis wanted. Mention versus claim; any-token versus
+  distinctive-token scoring; a &ldquo;before the sentence&rdquo; cut that was byte-identical to the
+  mid-sentence cut; a decoy that controlled for filename plausibility but not for repository
+  identity; and a probe that separated its classes at the embedding layer, before any transformer
+  block had run, because the two exports cut on different punctuation.</p>
 
   <footer>
     Nicholas McCarty &middot; Upskilled Consulting &middot;

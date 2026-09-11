@@ -37,6 +37,13 @@ body{
   padding:clamp(2rem,6vw,5rem) clamp(1.5rem,7vw,7rem) clamp(4rem,8vw,6rem);
   position:relative; border-bottom:1px solid var(--rule);
 }
+/* DYNAMIC viewport units where supported. On mobile browsers `100vh` is the height WITH the URL
+   bar hidden, so a slide sized to it has its last line under the chrome until the user scrolls.
+   `dvh` tracks the visible area. Declared second so it simply wins where it parses. */
+@supports (height:100dvh){
+  body{height:100dvh}
+  .slide{min-height:100dvh}
+}
 .inner{width:100%; max-width:60rem; margin:0 auto}
 
 .eyebrow{
@@ -112,6 +119,32 @@ strong{font-weight:600; color:var(--ink)}
 .legend i{display:inline-block; width:.72em; height:.72em; border-radius:2px; margin-right:.45em;
           vertical-align:baseline; font-style:normal}
 
+/* ---- narrow screens, and inside the page's embed frame -----------------------------------
+   Three things break here, and none of them is font size:
+
+   1. `scroll-snap-type: mandatory` makes any slide taller than the viewport partly UNREACHABLE --
+      the scroller keeps pulling back to the snap point, so the overflow cannot be read. Phones are
+      exactly where slides overflow, so snapping relaxes to `proximity` and centring is dropped in
+      favour of top alignment, which lets a long slide simply be long.
+   2. The comparison table is monospace with two prose columns and cannot reflow below ~460px, so
+      it scrolls sideways inside its own box rather than forcing the slide to.
+   3. The display size floor (2.4rem) is set for a laptop; at 360px it eats a third of the screen
+      before the first sentence. */
+@media (max-width:640px){
+  body{scroll-snap-type:y proximity}
+  .slide{justify-content:flex-start; scroll-snap-stop:normal;
+         padding:clamp(1.6rem,7vw,2.6rem) clamp(1.1rem,5vw,1.8rem) clamp(3.2rem,9vw,4rem)}
+  h1{font-size:clamp(1.9rem,8vw,2.6rem)}
+  h2{font-size:clamp(1.35rem,6vw,1.9rem)}
+  /* `.stats` gap is set by the pre-existing max-width:640px block further down, which wins on
+     document order -- duplicating it here would be a rule that silently never applies. */
+  .plot{height:clamp(150px,22vh,190px); gap:1.6rem}
+  .bar{flex:0 0 clamp(72px,22vw,110px)}
+  .keys{gap:1.6rem}
+  .keys div{flex:0 0 clamp(72px,22vw,110px)}
+  .tablewrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  .tablewrap table{min-width:30rem}
+}
 table{border-collapse:collapse; width:100%; font-family:var(--mono);
       font-size:clamp(.72rem,1.05vw,.85rem); margin:1.6rem 0}
 th,td{text-align:left; padding:.62rem .8rem; border-bottom:1px solid var(--rule); vertical-align:top}
@@ -292,7 +325,7 @@ a{color:inherit}
       long transcripts inherits it, and the inflated number is the one that looks publishable.</p>
     <p>Eight measurements in this project were wrong before they were checked — each found by
       asking a suspicious number what it was made of:</p>
-    <table>
+    <div class="tablewrap"><table>
       <tr><th>what it looked like</th><th>what it was</th></tr>
       <tr><td class="was">Parser read 1,288 / 1,288 casefiles</td>
           <td class="is">Candidates found in 437 — 831 used a different table shape</td></tr>
@@ -300,7 +333,7 @@ a{color:inherit}
           <td class="is">A dropped range, never measured</td></tr>
       <tr><td class="was">Flash ran with reasoning off</td>
           <td class="is">Three flags said so; 107 of 107 tokens were reasoning</td></tr>
-    </table>
+    </table></div>
   </div>
   <div class="foot"><span>the contribution sentence is a retraction</span><span>07 / 10</span></div>
 </section>
