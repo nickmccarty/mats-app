@@ -202,45 +202,25 @@
   .video .ph { aspect-ratio:16/9; display:flex; align-items:center; justify-content:center;
                background:var(--sunk); color:var(--faint); font-family:var(--mono);
                font-size:.8rem; text-align:center; padding:1rem; }
-  .video iframe { display:block; width:100%; border:0; }
-
-  /* ---- the deck, full width ---------------------------------------------------------------
-     A slide is a page, not a frame: 16/9 crops every slide's prose. Height is driven by the
-     viewport so a whole slide lands on any screen, with a floor that keeps it legible on a phone
-     and a ceiling so it never eats the scroll on a laptop. */
   .deckwrap { margin:1.5rem 0; }
-  .deckwrap .video { margin:0; }
-  .video.deck iframe { height:clamp(460px, 72vh, 720px); }
-
-  /* PHONES. A slide is portrait-ish, so at narrow widths it needs proportionally MORE height, not
-     less -- the usual instinct to shrink embeds on mobile is what crops the text. The controls
-     below also stop being a justified row and become a stack of full-width tap targets, because
-     `justify-content:space-between` on a wrapped flex row leaves links stranded mid-line. */
-  @media (max-width:640px) {
-    .video.deck iframe { height:clamp(420px, 78vh, 620px); }
-    .video .deckbar { flex-direction:column; align-items:stretch; gap:.6rem; }
-    .video .deckacts { flex-direction:column; align-items:stretch; gap:.5rem; }
-    .video .deckbar a.btn { text-align:center; padding:.6em .7em; }
-  }
-
   .casenote { font-size:.86rem; line-height:1.6; color:var(--muted);
               background:var(--sunk); border:1px solid var(--rule);
               border-radius:8px; padding:.85rem 1rem; margin:.9rem 0 0; max-width:none; }
   .casenote b { color:var(--ink); }
 
-  .video .deckbar { display:flex; justify-content:space-between; align-items:center;
-                    gap:1rem; padding:.55rem .8rem; border-top:1px solid var(--rule);
-                    font-family:var(--mono); font-size:.72rem; color:var(--faint);
-                    flex-wrap:wrap; }
-  .video .deckbar a { color:var(--accent); text-decoration:none; }
-  .video .deckbar a:hover { text-decoration:underline; }
-  .video .deckacts { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
-  /* Tap targets, not text links: 44px is the usual minimum and .6em padding clears it at this
-     font size. */
-  .video .deckbar a.btn { border:1px solid var(--accent); border-radius:5px;
-                          padding:.45em .8em; color:var(--accent); white-space:nowrap; }
-  .video .deckbar a.btn:hover { background:var(--accent); color:var(--bg);
-                                text-decoration:none; }
+  /* The two links that outlived the deck they used to sit under. */
+  .deckbar.standalone { display:flex; gap:.7rem; flex-wrap:wrap; }
+  .deckbar .deckacts { display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; width:100%; }
+  /* Tap targets, not text links: 44px is the usual minimum and .55em padding clears it here. */
+  .deckbar a.btn { border:1px solid var(--accent); border-radius:6px; padding:.55em .95em;
+                   color:var(--accent); text-decoration:none; white-space:nowrap;
+                   font-family:var(--mono); font-size:.76rem; }
+  .deckbar a.btn:hover { background:var(--accent); color:var(--bg); text-decoration:none; }
+  /* On a phone `flex-wrap` alone leaves a stranded half-width button; stack them instead. */
+  @media (max-width:640px) {
+    .deckbar .deckacts { flex-direction:column; align-items:stretch; gap:.5rem; }
+    .deckbar a.btn { text-align:center; padding:.7em .7em; }
+  }
 
   footer { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--rule);
            font-size:.82rem; color:var(--faint); }
@@ -274,30 +254,22 @@
     <div class="fig hot"><b>8</b><span>measurements that were wrong before they were checked</span></div>
   </div>
 
-  <!-- THE ARGUMENT, FULL WIDTH. This was a two-column row pairing the deck with a 49-second screen
-       capture. The clip is gone: it cost 3.5 MB, it was the slowest thing on the page, and on a
-       phone the two-up row collapsed into a video too small to read the code in. Its evidentiary
-       content is one concrete case, which is carried better by the prose beneath the deck than by
-       frames a reader has to scrub through.
-
-       At full width the deck gets the height a slide actually needs, so prose no longer crops. -->
+  <!-- THE SLIDE DECK AND THE CLIP ARE BOTH GONE. The deck restated the argument this page already
+       makes, in less room and with less evidence, and a ten-slide iframe between the counters and
+       the prose was 720px of restatement a reader had to scroll past. The clip cost 3.5 MB to show
+       one case that a paragraph states more precisely. What survives of both is the case note
+       below and the two links, which is what either was actually being used for. -->
   <div class="deckwrap">
-    <div class="video deck">
-      <iframe src="deck.html" title="Faithfulness with ground truth — ten slides"
-              loading="lazy"></iframe>
-      <div class="deckbar">
-        <span>arrow keys or scroll · 10 slides</span>
-        <span class="deckacts">
-          <!-- The PDF opens in a new tab rather than an iframe: the browser's own viewer is a
-               better PDF reader than anything embedded here. Copied into site/ by build_site.py
-               from the myst export, so it cannot go stale against the report it is built from. -->
-          <a href="ctarp-faithfulness.pdf" target="_blank" rel="noopener"
-             class="btn">Report (PDF) ↗</a>
-          <a href="https://github.com/nickmccarty/mats-app" target="_blank" rel="noopener"
-             class="btn">Source &amp; data ↗</a>
-          <a href="deck.html" target="_blank" rel="noopener">open full screen ↗</a>
-        </span>
-      </div>
+    <div class="deckbar standalone">
+      <span class="deckacts">
+        <!-- The PDF opens in a new tab rather than an iframe: the browser's own viewer is a better
+             PDF reader than anything embedded here. Copied into site/ by build_site.py from the
+             myst export, so it cannot go stale against the report it is built from. -->
+        <a href="ctarp-faithfulness.pdf" target="_blank" rel="noopener"
+           class="btn">Report (PDF) ↗</a>
+        <a href="https://github.com/nickmccarty/mats-app" target="_blank" rel="noopener"
+           class="btn">Source &amp; data ↗</a>
+      </span>
     </div>
     <p class="casenote">One case, concretely. The model is asked about
     <code>core/api/__init__.py</code> and reasons that the flaw is in
@@ -701,7 +673,7 @@
          everything else, so a browser can serve a page from before a fix while the server has
          the fix — twice now that has been reported as a bug in code that was already correct,
          and there was no way to tell from the page itself. Now there is. -->
-    <span class="build">build 2026-09-11·619bc018</span>
+    <span class="build">build 2026-09-11·fc6b5a82</span>
   </footer>
 </div>
 
@@ -985,7 +957,7 @@
       // happened here: the modal ran a viewer that predated the fix while the server was serving
       // the fixed one, and every symptom pointed at the code rather than at the cache. Stamping
       // the URL makes a new build a new URL, so that pairing cannot happen.
-      frame.src = 'traces/trajectory.html?v=619bc018427e&run=' + encodeURIComponent(run);
+      frame.src = 'traces/trajectory.html?v=fc6b5a82b8fa&run=' + encodeURIComponent(run);
       m.setAttribute('open', '');
       document.body.style.overflow = 'hidden';
     }

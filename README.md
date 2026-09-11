@@ -25,7 +25,8 @@ The application material is the faithfulness draft plus the Jacobian-lens pilot 
 |---|---|
 | `report/ctarp-faithfulness.pdf` | **The draft.** 9pp. Confidential banner, no open-access stamp. |
 | `site/index.html` | The web version. Open from `file://`; §8 "Asking the activations" is the pilot. |
-| `site/deck.html` | 10-slide deck. Slides 9–10 are the pilot and what its control caught. |
+| `index.html` | **The write-up as a web page**, generated from `report/nanda.md` so it cannot drift from the PDF. |
+| `SUBMISSION.md` | The same write-up as plain Markdown, for pasting into a Google Doc. Figures are named as `[ INSERT FIGURE n ]` markers because a Doc cannot resolve a relative path. |
 | `notebooks/jlens_reloc_replication.ipynb` | Reproduces the pilot end to end on a Colab A100. |
 | `verify/verify_findings.ipynb` | Recomputes every claimed number from raw files. No GPU. |
 | `verify/probe_q1_q2.ipynb` | The two follow-up probes, each against its permutation null. No GPU. |
