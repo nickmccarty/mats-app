@@ -42,10 +42,9 @@ parts:
     probes, each of which returns a null or an artifact, including one that recovers the file in 20
     of 24 claims by identifying the repository rather than the file. Our findings show that when
     mining assertions from transcripts the unit of analysis decides the headline, and that
-    repetition inside a trace is not independent evidence. More broadly, five measurements here
-    looked publishable and were not, every one of them flattering the hypothesis, and each was
-    caught by a control fixed before the number was seen rather than by doubting the number
-    afterward.
+    repetition inside a trace is not independent evidence. More broadly, five measurements here looked
+    publishable and were wrong, each of them in the direction the hypothesis wanted, and we report
+    the mistaken value beside the corrected one throughout.
 ---
 
 :::{warning} Confidential working draft
@@ -180,8 +179,7 @@ in-scope citation instead. That clause was removed on 2026-08-31, and the effect
 
 So the answer to the third follow-up question below is neither of the two it proposes. The
 never-submitted set is not a suppression story and not an error story — it is instruction
-following, and the instruction was ours. The honest reading of the 97% is therefore that it
-measures a prompt as much as a reduction: under a prompt that asked for a consolation citation,
+following, and the instruction was ours. So the 97% measures a prompt as much as it measures a reduction: under a prompt that asked for a consolation citation,
 one relocation in six was lost.
 
 Whether those conclusions are *weighted* correctly is a separate question. On current evidence we
@@ -279,8 +277,7 @@ question well-posed: something at that point in the trajectory determines the fi
 about to name, and it is recoverable — so "can a lens recover it?" has a real answer, and for this
 lens the answer is no.
 
-The comparison is deliberately unfair to the lens, in the direction that makes the negative
-safe: the lens reads a single activation, while the baseline lets the model generate — up to
+The comparison is unfair to the lens, in the direction that makes the negative safe: the lens reads a single activation, while the baseline lets the model generate — up to
 2,400 tokens, and on these cases it uses them. So the baseline shows the answer is reachable
 *with additional forward computation*, not that it sits in the residual stream. A baseline that
 strong losing would have been decisive for the lens; a baseline that strong winning only bounds
@@ -357,77 +354,29 @@ so the rows survived; the two remaining cases were scored by a short resume run 
 resume reproduces the seeded decoy pairing exactly, because the probe iterates the whole case list
 and skips rather than slicing it — slicing would reseed the shuffle and re-pair every target.
 
-## Where this sits, and what it disagrees with
+## Related work
 
-**Perturbation tests measure self-consistency, and the field knows it.** The dominant way to test
-chain-of-thought faithfulness is to corrupt the reasoning and see whether the answer moves
-[@lanham2023faithfulness; @turpin2023say]. @parcalabescu2024measuring argue that this measures the
-model's tendency to produce a desired output under perturbation rather than faithfulness in
-@jacovi2020faithfully's sense, and the objection is well taken: an unchanged answer is scored
-unfaithful whether the model ignored the corrupted step or noticed and silently repaired it.
+Chain-of-thought faithfulness is usually tested by perturbing the reasoning and watching whether
+the answer moves [@lanham2023faithfulness; @turpin2023say]; @parcalabescu2024measuring note that
+this measures self-consistency more than faithfulness in @jacovi2020faithfully's sense. A
+relocation is a different object: the model revises mid-stream on its own, so there is no
+perturbation to disentangle, and the fix commit says whether the revision was right. That is the
+one advantage this setting has, and it is the reason for building it.
 
-The setting here sidesteps that argument rather than resolving it. A **relocation** — the model
-abandoning the file it was asked about and naming a different one, mid-reasoning — is a
-mid-stream revision that the model produces *spontaneously*. Nothing is corrupted, so there is no
-perturbation whose effect has to be disentangled from the model's response to being perturbed. And
-because the corpus is built from real advisories, the fix commit says whether the revision was
-**right**. That is the property a GSM8K-style perturbation study cannot have: it can ask whether the
-answer moved, not whether the reasoning went somewhere true.
+The readout tested here belongs to the logit-lens family [@nostalgebraist2020logitlens;
+@belrose2023tunedlens]. The negative is about this readout at this sample size and says nothing
+about whether the information is present — the ask-the-model baseline finds the file in 18 of 30
+claims.
 
-**Two specific disagreements with how this is usually done.**
-
-*Accuracy conditioned on a behavior is a selection artifact waiting to happen.* A natural analysis
-is to split traces by whether the behavior occurred and compare accuracy. The trap is that the
-behavior and the truncation budget are correlated: long traces are both likelier to contain a given
-phrase and likelier to be cut off. A study reporting that a self-correction marker predicts 100%
-accuracy, against a corpus whose overall accuracy is far lower, has almost certainly conditioned on
-completion. We report the analogous split (21 correct against 14 wrong, §*The follow-up*) with the
-labeling rule stated and both rules' outcomes given, because the rule moved the balance from 21/14
-to 27/11 on its own.
-
-*A resampling test without a matched base rate is not a test.* Regenerating from a context that
-historically preceded a behavior, and finding the behavior recurs, establishes very little unless
-the same procedure is run from matched contexts that did not. That is the entire content of our
-control export — same run, no relocation in the step, matched on prefix length and final character —
-and getting it right took three attempts, each of which produced a confident number first (§*The
-follow-up*, Q3).
-
-**Attention to a delimiter is the null hypothesis, not the finding.** Reasoning models attend
-heavily to `\n` and to structural tokens near the start of the context; this is the well-documented
-attention-sink pattern and it appears in essentially every decoder. Our own analogue of that mistake
-was cheaper to catch and more embarrassing: a probe that scored AUC 0.894 **at the embedding layer**,
-which no amount of mechanism could explain, because no block had run. It was punctuation.
-
-**On the instrument.** The Jacobian readout tested here is a transport in the family of the logit
-lens [@nostalgebraist2020logitlens] and the tuned lens [@belrose2023tunedlens]. Our negative is
-about *this* readout at *this* sample size and is not evidence that the information is absent — the
-ask-the-model baseline recovers the file in 18 of 30 claims, so something at that point determines
-it.
-
-**On the task.** @antares2026 establish two facts this corpus inherits. First, localization
-difficulty follows structure rather than severity, and performance *collapses* on vulnerabilities
-spanning five or more files — which is the backdrop for our Q1 failure: relocated filenames are
-nested inside repositories, only 4 of our 15 repositories host two distinct relocations, and a
-within-repository decoy therefore has almost nothing to score. Second, their §C.2 shows that adding
-a three-phase strategy to the system prompt, with no retraining, moves File F1 from 0.223 to 0.2313
-and structural exploration from 10.2% to 17.3%. Our Q4 result is the same phenomenon at finer grain
-and with a causal trace: a consolation clause in the prompt drives stated relocations out of the
-submitted output at 17.2% against 0.5% (odds ratio 39), and one transcript records the model
-resolving to cite the right file and then being redirected mid-sentence. Prompt-level instructions
-are not a nuisance parameter in agentic localization; they are a load-bearing part of the measured
-behavior.
-
-@fastcontext2026 separate exploration from solving into a dedicated subagent rewarded on
-patch-derived file and line F1, and two of their methodological choices are ones we arrived at
-independently and for the same reasons. They report **instance-wise averages rather than
-micro-averages** "so repositories with large patches do not dominate" — which is precisely our
-per-claim rather than per-mention unit, and the correction that shrank our first published figure
-when one claim turned out to be restated seven times. And they note their evaluation "intentionally
-rewards recovery of edited locations; it may under-credit supporting evidence such as tests,
-callers, configuration files, or neighboring implementations that are useful to an end-to-end solver
-but not modified by the reference patch." Our gold has exactly this shape, and it is why §*The
-follow-up* reports the strict path-match labels and the looser basename labels side by side instead
-of choosing one silently.
+Two results from the surrounding literature bear directly on our limits. @antares2026 find that
+localization difficulty tracks repository structure and collapses on vulnerabilities spanning five
+or more files; that is the backdrop for Q1 being unanswerable here, since only 4 of our 15
+repositories host two distinct relocations and a within-repository decoy has almost nothing to
+score. @fastcontext2026 report instance-wise rather than micro-averages "so repositories with large
+patches do not dominate", which is the same correction as our per-claim unit, and note that
+patch-derived gold "may under-credit supporting evidence such as tests, callers, configuration
+files" — a limitation our gold inherits exactly, and the reason the strict and loose label sets are
+both reported below.
 
 ## The follow-up, and what it returned
 
@@ -435,18 +384,14 @@ The divergence between stated and submitted location is visible in the transcrip
 The question this dataset is positioned to ask is whether it is visible **in the activations, and
 before the output is produced**.
 
-All of the questions below have now been attempted, and none came back the way it was proposed.
-Question 1 turned out to be unanswerable on this corpus, for a specific reason.
-Question 2 is null, against a null distribution that had to be measured rather than assumed.
-Question 3 was added during the follow-up. Question 4's premise did not survive reading the traces.
+All four questions below were attempted and none came back the way it was proposed. Q1 is
+unanswerable on this corpus. Q2 is null. Q3 was added partway through and does not survive
+correction for multiple comparisons. Q4's premise did not survive reading the traces.
 
-Each is reported with the number that was wrong first. That ordering is not modesty — across the
-follow-up, **five separate artifacts produced a publishable-looking result, and every one of them
-pointed in the direction the hypothesis wanted**: a repository detector reading as a filename probe,
-a delimiter detector reading as an event probe, a prompt-length shortcut, a per-mention count
-inflating a per-claim p-value, and a permutation null built at the wrong unit. None was caught by
-finding the result implausible. Each was caught by a control built in advance to catch that class of
-error.
+Five numbers along the way looked like results and were not: a repository detector reading as a
+filename probe, a delimiter detector reading as an event probe, a prompt-length shortcut, a
+per-mention count inflating a per-claim p-value, and a permutation null built at the wrong unit.
+Each is reported below with the wrong value first and the corrected one after it.
 
 Concretely, the corpus supplies per trace a triple — stated location, submitted location, true
 location — with 218 relocations mined and 6 where a stated location never reaches the output.
@@ -467,14 +412,12 @@ selective reporting looks like from the outside, so here is each one and what ad
 |---|---|---|
 | 37 claims | corpus-wide mining | the 192 relocations across all 504 trajectories, collapsed to distinct (task, file) claims |
 | 38 claims | the extraction | the 75 mentions exported for the probes, collapsed the same way |
-| 30 / 31 claims | the pilot comparison | the cut is genuinely earlier than the naming sentence. The baseline scores 30 and the lens 31: one mention is excluded from the baseline for an empty reply, and excluding it is the honest choice, since scoring an empty string as a miss would manufacture a negative |
+| 30 / 31 claims | the pilot comparison | the cut is genuinely earlier than the naming sentence. The baseline scores 30 and the lens 31: one mention is excluded from the baseline for an empty reply, excluded because scoring an empty string as a miss would manufacture a negative |
 | 35 claims | Q2, right vs wrong | a gold label exists **and** the cut is genuinely earlier |
 | 22–24 claims | Q1b, nearest centroid | the target filename recurs in **another run**, so a centroid can be built without using the readout being scored. The count moves with the layer because which readouts survive does |
 | 23 pairs | Q3, the event probe | the control is matched to its positive on both prompt length and final punctuation |
 
-Each restriction removes a way of being wrong, and each was fixed before the number it produces was
-looked at. The direction is always the same — every filter *shrinks* the sample and none of them
-was relaxed after a result came back unwelcome.
+Every filter shrinks the sample, and none was relaxed after seeing what it produced.
 
 Four questions, in increasing order of interest.
 
@@ -514,8 +457,8 @@ Logistic regression on the residual at the earlier cut, predicting whether the r
 the fix commit, leave-one-claim-out with PCA fitted inside each fold and a claim-level permutation
 null. 35 claims, 21 correct against 14 wrong. No layer clears its null; the best is AUC 0.517
 against a null mean of 0.435 (p = 0.30). The null sits near 0.42 rather than 0.5 because of the
-class imbalance and skipped folds — which is precisely why it has to be measured rather than
-assumed, since read against 0.5 the same number would have looked like a weak positive.
+class imbalance and skipped folds — so read against 0.5 instead of against its own null, the same number would have looked like a
+weak positive.
 
 **What the null is worth, stated as power rather than as prose.** The null's 95th percentile at the
 best layer is **0.676**. That is the detection threshold this design actually had: at 35 claims, no
@@ -568,8 +511,7 @@ tell. Each failure produced a confident-looking number first:
   classifier reading the last token alone. The export now stratifies on final character before
   matching on length.
 
-Layer 0 is the cheapest diagnostic in this report and the one that caught the worst error. A probe
-that separates classes before any block has run is reading its input, not the model.
+A probe that separates classes before any block has run is reading its input, not the model.
 
 **The corrected result: suggestive, and not a finding.** On the 23 pairs that are both
 length-balanced and final-character matched — where the length shortcut is worth 0.499 — the probe
@@ -585,21 +527,18 @@ behaves the way a real signal should and still fails to clear the bar:
 ![Both probes against the nulls they have to clear](images/diagrams/nullband.svg)
 
 *Each panel draws its own permutation null as a band (mean to 95th percentile) for the identical
-procedure; a filled dot is a layer above its null. The event probe rises out of its band late and
-starts inside it at layer 0 — the right shape. Right-vs-wrong never leaves its band. Reading either
+procedure; a filled dot is a layer above its null. The event probe starts inside its band at layer 0 and rises out of it late. Right-vs-wrong never leaves its band. Reading either
 curve against 0.5 instead of against its band would give the wrong answer in both panels.*
 
 Layer 0 is now non-significant, which is the diagnostic passing: nothing is separable before the
-model computes anything, and what separation exists appears late. That is the right shape. But eight
+model computes anything, and what separation exists appears late. But eight
 layers are eight tests, and Benjamini–Hochberg [@benjamini1995controlling] at q = 0.05 requires the
 smallest p below 0.00625. The smallest is 0.033. **Nothing survives correction**, and at 23 pairs
 the detection threshold was AUC 0.635 — so a real late-layer effect of ordinary size would have been
 invisible regardless.
 
-The correct reading is that the experiment is now *well-formed* and *underpowered*, which is a
-better place to be than the version that returned AUC 0.894 at layer 0. The design is reusable: 218
-relocations exist against the 75 extracted here, and the matched-control export is the part that
-took three attempts to get right.
+So the experiment is well-formed and underpowered. The design is reusable — 218 relocations exist
+against the 75 extracted here — and the matched-control export is the part that took three attempts.
 
 ### Q4. Is the never-submitted set mechanistically distinct?
 
@@ -632,8 +571,7 @@ nor the output produced.
   pairing is identical across both because the probe iterates the full case list and skips rather
   than slicing it.
 - The baseline lets the model generate up to 2,400 tokens before answering, while the lens reads
-  one activation. The comparison is deliberately unfair in the direction that makes the lens
-  negative safe, and correspondingly weak as evidence that nothing is in the residual stream.
+  one activation. The comparison is unfair in the direction that makes the lens negative safe, and correspondingly weak as evidence that nothing is in the residual stream.
 - Lens scoring counts a hit when any token of a filename enters the top 20, which is permissive.
   Shared tokens are now removed from target and decoy alike, which fixes the collision the control
   exposed, but the rule is still "any token at any layer" and a hit is not a rank.

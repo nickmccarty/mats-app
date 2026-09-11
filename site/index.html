@@ -276,15 +276,13 @@
     <code>cnl_blueprint.py</code> lines 22-36 — the <code>local_check</code> decorator. The real fix
     commit touches <b>exactly that decorator, at lines 23-34</b>. The citation it finally emits
     points at line 43. <b>The correct localization was in the reasoning and did not survive the
-    reduction to a structured answer</b> — which is the question this harness exists to ask.</p>
+    reduction to a structured answer</b> — which is the question this harness was built to ask.</p>
   </div>
 
 
   <h2 id="abstract">Annotated abstract</h2>
   <p class="dimnote">Color-coded by the role each sentence plays, following the annotated-abstract
-  format. The colors are the argument, and two of them are unusual: the <b>contribution</b>
-  sentence is a <i>retraction</i>, and the <b>broad impact</b> is a claim about how easily this kind
-  of work produces a number that looks like a result.</p>
+  format. The <b>contribution</b> sentence is a retraction.</p>
 
   <div class="abs">
     <div class="abskey">
@@ -331,9 +329,9 @@
       decides the headline, and that repetition inside a trace is not independent evidence.
       </span>
       <span class="h">
-      More broadly, five measurements here looked publishable and were not, every one of them
-      flattering the hypothesis, and each was caught by a control fixed before the number was
-      seen rather than by doubting the number afterward.
+      More broadly, five measurements here looked publishable and were wrong, each of them in the
+      direction the hypothesis wanted, and we report the mistaken value beside the corrected one
+      throughout.
       </span>
     </p>
   </div>
@@ -490,8 +488,7 @@
   <p>The extraction itself is sound, and one finding is unaffected: of 192 relocations mined
   from reasoning, only <b>5</b> fail to reach the structured output. The information is not
   being lost in the reduction. Whether it is <i>weighted</i> correctly is a separate question,
-  and the honest answer on current evidence is that it is not better than what the pipeline
-  already uses.</p>
+  and on current evidence it is not better than what the pipeline already uses.</p>
 
   <figure class="ex"><figcaption><b>A relocation that was right</b><span>inveniosoftware/invenio-communities · CWE-79</span></figcaption><blockquote>n an attacker could control the template name. I think the vulnerability is in `invenio_communities/views/ui.py:81-84`. The `format_item` function allows rendering arbitrary<cite>20260902-002023-eval005 · step 14</cite></blockquote><div class="hv" data-run="20260902-002023-eval005"><div class="hvhead"><code>20260902-002023-eval005</code><button class="openrun" data-run="20260902-002023-eval005">view full trajectory</button></div><div class="hvchart"></div></div><p class="exfoot">It named <code>invenio_communities/views/ui.py:81</code>. Gold for this task is <code>invenio_communities/config.py, invenio_communities/views/ui.py, setup.py</code> — an exact hit.</p></figure>
 
@@ -560,7 +557,7 @@
   favors both candidates equally.</p>
 
   <div class="note warn">
-    <p><b>The comparison is deliberately unfair to the lens.</b> The lens reads a single
+    <p><b>The comparison is unfair to the lens.</b> The lens reads a single
     activation; the baseline lets the model generate — up to 2,400 tokens, and it uses them. So
     asking shows the answer is reachable <i>with additional forward computation</i>, not that it
     sits in the residual stream. A baseline that strong losing would have settled the matter for

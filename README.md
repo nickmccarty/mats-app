@@ -40,14 +40,13 @@ scores two. Right-versus-wrong relocation is null at a detection threshold of AU
 relocation is *coming* is suggestive at late layers and survives no correction for multiple
 comparisons.
 
-**Five measurements here looked publishable and were not, and every one flattered the hypothesis.**
-A repository detector reading as a filename probe. A delimiter detector separating classes at the
-embedding layer, before any transformer block had run. A prompt-length shortcut. A per-mention count
-inflating a per-claim p-value. A permutation null built at the wrong unit. None was caught by
-doubting the result; each was caught by a control fixed before the number was seen.
+**Five measurements here looked publishable and were wrong**, each in the direction the hypothesis
+wanted: a repository detector reading as a filename probe; a delimiter detector separating classes
+at the embedding layer, before any transformer block had run; a prompt-length shortcut; a
+per-mention count inflating a per-claim p-value; a permutation null built at the wrong unit.
 
-Corrections are reported with **both** values, and `verify/verify_findings.ipynb` recomputes both,
-so a correction is arithmetic you can run instead of a claim you have to accept.
+The mistaken value is reported beside the corrected one throughout, and
+`verify/verify_findings.ipynb` recomputes both.
 
 ## What the pilot found
 
@@ -66,8 +65,8 @@ measured only where that cut is genuinely earlier than the naming sentence:
 hit rate is unreadable without the floor it has to clear. Scored only on claims whose cut is
 genuinely earlier than the naming sentence.*
 
-The information is there and the lens does not read it. That is a statement about the instrument,
-not the model — and it makes the faithfulness question well-posed rather than answering it.
+The information is there and the lens does not read it, which is a result about the instrument
+rather than about the model.
 
 **A third correction, found while building the follow-up probes, and it reaches this table.** The
 decoy in every row is another case's real target, drawn from the whole corpus. But relocated
@@ -93,7 +92,7 @@ repository's source.*
 re-states it. The repair for a future corpus is concrete: relocation pairs must be drawn from
 **within** a repository, so that repo identity favors both candidates equally.
 
-The comparison is deliberately unfair to the lens: it reads one activation, while the baseline
+The comparison is unfair to the lens: it reads one activation, while the baseline
 lets the model generate up to 2,400 tokens first. A baseline that strong losing would have settled
 the matter; winning only bounds what the lens failed to find.
 
@@ -117,15 +116,15 @@ and decoy at once. `verify/verify_findings.ipynb` recomputes both the old and co
 
 ## What the follow-up found
 
-Four activation-level questions. All of them returned a null, or returned an artifact that had to
-be taken apart. The full account is in the write-up; these are the two figures that carry it.
+Four activation-level questions, all of which returned a null or an artifact. The full account is
+in the write-up; these are the two figures that carry it.
 
 ![Both probes against the permutation nulls they have to clear](report/figures/nullband.png)
 
 *Each panel draws its **own** permutation null as a band (mean to 95th percentile) for the identical
 procedure; a filled dot is a layer above its null. The event probe rises out of its band late and
-starts inside it at layer 0 — which is the right shape, because layer 0 is the embedding output and
-nothing should be separable before the model computes anything. Right-versus-wrong never leaves its
+starts inside it at layer 0, which is the embedding output: nothing is separable before the
+model computes anything. Right-versus-wrong never leaves its
 band. Reading either curve against 0.5 instead of against its band gives the wrong answer in both
 panels.*
 
@@ -143,8 +142,6 @@ random ones. The two curves are the same curve. Held-out drops to 0.349, and Coh
 on labels carrying no information at all.*
 
 With 2,048 dimensions and 35 claims, the best-looking unit is the best of 2,048 draws from noise.
-That is the whole finding: at this sample size the standard recipe reaches its own conclusion with
-nothing present.
 
 ## Layout
 
@@ -364,7 +361,7 @@ rather than promised:
 
 | precaution | what it prevents |
 |---|---|
-| folds are **leave-one-claim-out**, never leave-one-row-out | one claim appears as several mentions and at two cut points; a random split puts near-duplicates of the test row in training. The notebook prints the naive number beside the honest one — the gap *is* the artifact |
+| folds are **leave-one-claim-out**, never leave-one-row-out | one claim appears as several mentions and at two cut points; a random split puts near-duplicates of the test row in training. the notebook prints the naive number beside the grouped one, and the gap is the artifact |
 | a **permutation null**, 500 shuffles per layer | the reported p is the fraction of label shuffles that beat the real labels, so the null is measured on this data rather than assumed to be 0.5 |
 | PCA fitted **inside** each fold | fitting once on everything leaks the test fold into the projection |
 
